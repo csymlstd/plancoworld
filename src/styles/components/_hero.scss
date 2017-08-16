@@ -1,0 +1,45 @@
+section.hero {
+  padding: 2rem 0;
+  background: color('accent','darker');
+  background-size: cover!important;
+  background-repeat: no-repeat!important;
+  background-position: center!important;
+  color: #fff;
+  margin-bottom: 1.5rem;
+
+  .level-item.title {
+    margin-bottom: 0!important;
+  }
+
+  .level-right a.level-item {
+    margin: 0 1rem;
+
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+
+  a {
+    color: rgba(255,255,255,0.6);
+
+    &:hover {
+      color: #fff;
+    }
+  }
+
+  .title {
+    color: #fff;
+  }
+
+  &.is-light {
+    background: color('grey','light');
+  }
+
+  & + .hero {
+    margin-top: -1.5rem;
+  }
+}
+
+.hero--tall {
+  height: 500px;
+}

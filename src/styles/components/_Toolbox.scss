@@ -1,0 +1,50 @@
+.toolbox--wrapper {
+  position: fixed;
+  bottom: 1rem;
+  width: 100%;
+  z-index: 1000;
+
+  .toolbox--button {
+    position: absolute;
+    right: 1rem;
+    bottom: 0;
+  }
+
+  .toolbox--menu {
+    position: absolute;
+    display: flex;
+    align-items: stretch;
+    background: #fff;
+    overflow: hidden;
+    // padding: 1.25rem;
+    border-radius: 5px;
+    height: 500px;
+    width: 800px;
+    max-width: 100%;
+    bottom: 4rem;
+    right: 1rem;
+    //border: 3px solid color('accent');
+    box-shadow: 0 5px 15px rgba(0,0,0,0.075);
+
+    nav.toolbox--nav {
+      flex-basis: 105px;
+      background: $warning;
+      padding: 1.5rem 1rem;
+      text-align: center;
+      color: rgba(0, 0, 0, 0.7);
+
+      a { color: rgba(0, 0, 0, 0.7); display: block; margin: 0 0 1.5rem; }
+
+      .icon {
+        display: flex;
+        margin: 0 auto 0.25rem;
+        font-size: 2rem;
+      }
+    }
+
+    main.toolbox--content {
+      flex-grow: 1;
+      padding: 1rem;
+    }
+  }
+}

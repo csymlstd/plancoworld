@@ -1,0 +1,57 @@
+nav.navbar {
+  height: 64px;
+  width: 100%;
+  background: color('accent');
+
+  .logo {
+    font-weight: 600;
+  }
+
+  .navbar-brand, .navbar-end {
+    > a, .navbar-link {
+      color: #fff;
+      font-size: 1.3rem;
+      line-height: 3rem;
+
+      &:hover {
+        background: color('accent', 'dark');
+      }
+
+      &::after {
+        border-color: #fff;
+      }
+    }
+
+    .navbar-link {
+      padding-right: 1rem;
+
+      &::after {
+        display: none;
+      }
+    }
+
+    .navbar-item.has-dropdown:hover {
+
+      .navbar-link {
+        background: color('accent', 'dark');
+        color: #fff;
+
+        &::after {
+          border-color: color('accent');
+        }
+      }
+    }
+  }
+
+
+  .navbar-dropdown.is-right {
+    left: auto;
+    right: 0;
+  }
+}
+
+.park-status {
+  padding: 1rem;
+  background: #E8B340;
+  color: rgba(72, 72, 72, 0.6);
+}

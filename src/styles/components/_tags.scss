@@ -1,0 +1,26 @@
+.is-box {
+  display: inline-flex;
+  flex-direction: column;
+  padding: 1rem;
+  border: 2px solid color('grey','light');
+  background: #fff;
+  font-size: 1rem;
+  color: color('grey');
+  height: auto;
+
+  .icon {
+    height: 2rem;
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+
+    img {
+      height: 2rem;
+      width: auto;
+    }
+  }
+}
+
+.tag.is-outlined {
+  background: #fff;
+  border: 1px solid color('grey','light');
+}

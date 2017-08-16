@@ -1,0 +1,23 @@
+.button {
+  border-width: 2px;
+  font-family: $fonts-primary;
+
+  &.is-fluid {
+    display: block;
+    width: 100%;
+  }
+
+  &.and-accent {
+    color: color('accent');
+  }
+
+}
+
+a.is-text {
+  font-family: $fonts-primary;
+  font-size: 1rem;
+}
+
+.header .is-text {
+  margin-left: 1.5rem;
+}

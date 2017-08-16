@@ -1,0 +1,53 @@
+.card {
+  border-radius: 1rem;
+  box-shadow: none;
+  //border: 2px solid color('grey', 'light');
+  border: 0;
+  overflow: hidden;
+
+  .card-image {
+    background: color('grey','light');
+    min-height: 180px;
+  }
+
+  &.is-empty {
+    text-align: center;
+    background: rgba(255,255,255,0.4);
+    border: 3px dashed color('grey','light');
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+      cursor: pointer;
+      border-color: color('accent');
+      background: #fff;
+    }
+
+    .title {
+      margin: 0;
+    }
+  }
+}
+
+.fadeIn {
+  opacity: 0;
+
+  &.is-active {
+    animation: fadeIn 0.3s ease-out forwards;
+  }
+}
+
+.box {
+  box-shadow: none;
+
+  &.is-warning {
+    background: $warning;
+    color: $grey-darker;
+  }
+
+  &.is-primary {
+    background: $primary;
+    color: #fff;
+  }
+}

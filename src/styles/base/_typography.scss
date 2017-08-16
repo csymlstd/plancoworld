@@ -1,0 +1,32 @@
+$fonts-primary: 'Futura';
+$fonts-secondary: 'Roboto Slab';
+
+body {
+  font-family: $fonts-primary;
+  color: color('grey','dark');
+}
+
+h1, h2, h3, h4, h5, h6, .ui.header {
+  font-family: $fonts-secondary;
+  color: color('grey','dark');
+}
+
+.level {
+  h1, h2, h3, h4, h5, h6 {
+    margin-bottom: 0!important;
+  }
+}
+
+.subtitle {
+  font-family: $fonts-primary;
+}
+
+p {
+  font-family: $fonts-primary;
+  font-size: 1.2rem;
+  color: color('grey','dark');
+}
+
+.text-center { text-align: center; }
+
+span.bullet { color: color('accent','dark'); font-size: 1rem; }

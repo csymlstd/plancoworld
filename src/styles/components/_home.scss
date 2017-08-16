@@ -1,0 +1,60 @@
+.home-page {
+  display: flex;
+  height: 100vh;
+  align-items: stretch;
+
+  .home-welcome {
+    position: relative;
+    background-color: color('accent');
+    background-size: cover!important;
+    background-position: center!important;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+
+    h1 {
+      font-family: $fonts-primary;
+    }
+
+    h2 {
+      font-family: $fonts-secondary;
+      font-weight: 600;
+    }
+
+    > div {
+      position: relative;
+      z-index: 50;
+    }
+
+    &::before {
+      display: block;
+      position: absolute;
+      content: ' ';
+      height: 100%;
+      width: 100%;
+      background: rgba(0,0,0,0.2);
+      z-index: 49;
+    }
+  }
+
+  .home-login {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .version {
+    position: absolute;
+    bottom: 1rem;
+    left: 1rem;
+    z-index: 51;
+  }
+}
+
+.columns.stretch {
+  height: calc(100vh - 64px );
+  align-items: stretch;
+  margin: 0;
+}
