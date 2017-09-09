@@ -48,6 +48,51 @@ label.checkbox {
   }
 }
 
+.switch {
+  font-size: 1rem;
+
+
+  label {
+    cursor: pointer;
+    text-indent: -9999px;
+    width: 2em;
+    height: 1em;
+    background: grey;
+    display: block;
+    border-radius: 100px;
+    position: relative;
+
+    &:after {
+      content: '';
+      position: absolute;
+      top: 0.14em;
+      left: 0.14em;
+      width: 0.75em;
+      height: 0.75em;
+      background: #fff;
+      border-radius: 90px;
+      transition: 0.3s;
+    }
+  }
+
+  &.is-active label {
+    background: $success;
+  }
+
+  &.is-warning label {
+    cursor: not-allowed;
+    background: $warning;
+  }
+
+  &.is-active label:after {
+    transform: translate(calc(100% + 0.25em));
+  }
+
+  label:active:after {
+    // width: 0.75em;
+  }
+}
+
 .input, .textarea {
   border: 2px solid color('grey', 'light');
   box-shadow: none;
@@ -55,5 +100,22 @@ label.checkbox {
 
   &::placeholder {
     color: color('grey');
+  }
+}
+
+.control {
+  &.is-loading:after {
+    animation: fa-spin 2s infinite linear;
+    content: "\f013";
+    font-family: 'Font Awesome 5 Solid';
+    font-weight: 900;
+    font-size: 1.4em;
+    color: color('grey', 'light');
+    height: 1em;
+    width: 1em;
+    border: 0!important;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1;
+    vertical-align: -15%;
   }
 }

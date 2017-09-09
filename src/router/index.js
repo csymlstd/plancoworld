@@ -8,6 +8,9 @@ Vue.use(Router)
 export default new Router({
   mode: 'history',
   linkActiveClass: 'is-active',
+  scrollBehavior (to, from, savedPosition) {
+    return { x: 0, y: 0 }
+  },
   routes: [
     {
       path: '/',
@@ -53,7 +56,8 @@ export default new Router({
     },
     {
       path: '/parks/import',
-      name: 'Import',
+      name: 'ImportPark',
+      meta: { auth: true },
       component: require('@/components/Parks/Import')
     },
     {
@@ -107,22 +111,37 @@ export default new Router({
       component: require('@/components/Blueprints/Blueprints')
     },
     {
+      path: '/blueprints/import',
+      name: 'ImportBlueprint',
+      meta: { auth: true },
+      component: require('@/components/Blueprints/Import')
+    },
+    {
       path: '/billboards',
       name: 'Billboards',
+      meta: { auth: true },
       component: require('@/components/Billboards/Billboards'),
 
     },
     {
       path: '/billboards/import',
       name: 'ImportBillboard',
+      meta: { auth: true },
       component: require('@/components/Billboards/Import')
     },
     {
       path: '/billboards/convert-to-webm',
       name: 'Convert',
+      meta: { auth: true },
       component: require('@/components/Billboards/Convert'),
 
     },
+    // {
+    //   path: '/billboards/generator',
+    //   name: 'Generator',
+    //   meta: { auth: false },
+    //   component: require('@/components/Billboards/Generator'),
+    // },
     {
       path: '/billboards/:slug',
       name: 'Billboard',

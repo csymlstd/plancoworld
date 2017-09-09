@@ -1,28 +1,33 @@
 <template>
   <main class="home-page">
-    <div class="column home-welcome" :style="{ backgroundImage: `url('https://plancoworld.s3.amazonaws.com/users/b83b97c7-246a-48d4-8879-911e14f6e890.jpg')` }">
+    <div class="column home-welcome">
       <div>
         <h1 class="title is-1 has-text-white">PlanCo World</h1>
-        <h2 class="subtitle is-5 has-text-white">Collect and organize your creations of Planet Coaster.</h2>
+        <h2 class="subtitle is-5 has-text-white">Collect, organize and share your creations of Planet Coaster.</h2>
 
-        <router-link :to="{ name: 'Parks' }" class="button is-white is-medium show" data-cycle>Explore Other Parks</router-link>
-        <router-link :to="{ name: 'Blueprints' }" class="button is-white is-medium" data-cycle>Explore Other Blueprints</router-link>
-        <router-link :to="{ name: 'Billboards' }" class="button is-white is-medium" data-cycle>Explore Other Billboards</router-link>
-        <router-link :to="{ name: 'Audio' }" class="button is-white is-medium" data-cycle>Explore Other Audio</router-link>
+        <login v-if="!user.authenticated"></login>
+        <div v-show="user.authenticated">
+        <router-link :to="{ name: 'Parks' }" class="button is-primary is-inverted is-medium show" data-cycle>Explore Other Parks</router-link>
+        <router-link :to="{ name: 'Blueprints' }" class="button is-primary is-inverted is-medium" data-cycle>Explore Other Blueprints</router-link>
+        <router-link :to="{ name: 'Billboards' }" class="button is-primary is-inverted is-medium" data-cycle>Explore Other Billboards</router-link>
+        <router-link :to="{ name: 'Audio' }" class="button is-primary is-inverted is-medium" data-cycle>Explore Other Audio</router-link>
+        </div>
 
       </div>
     </div>
-    <div class="column home-login">
-      <login v-if="!user.authenticated"></login>
-    </div>
-    <div class="tags version has-addons">
-      <div class="tag is-primary is-inverted">Alpha</div>
+    <router-link :to="{ name: 'Park', params: { slug: 'pixel-island-discover-the-adventure-highly-decorated-theme-park' } }" class="version has-text-white">Pixel Island by PixelWess89</router-link>
+    <!-- <div class="tags version has-addons">
+      <div class="tag is-warning is-inverted">Alpha</div>
       <div class="tag">0.0.1</div>
-    </div>
+    </div> -->
+    <video class="texture" muted autoplay playsinline loop poster="">
+      <source src="https://s3-us-west-2.amazonaws.com/plancoworld/parks/hero.webm" type="video/webm">
+    </video>
   </main>
 </template>
 
 <script>
+import '@/styles/components/_home.scss'
 import auth from '@/services/auth'
 import Login from '@/components/Login'
 
@@ -43,7 +48,8 @@ export default {
       let i = 0;
       let l = cycle.length
       let last
-      setInterval(() => {
+
+      let tick = () => {
         last = (i == 0 ? l - 1 : i - 1)
         cycle[i].classList.add('show')
         cycle[last].classList.remove('show')
@@ -52,8 +58,15 @@ export default {
         } else {
           i++
         }
+      }
+
+      tick()
+      setInterval(() => {
+        tick()
       }, 1200 );
     }
+
+
   }
 }
 </script>

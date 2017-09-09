@@ -1,30 +1,47 @@
 <template>
   <div>
+
   <section class="hero">
     <div class="container">
       <div class="level">
         <div class="level-left">
-          <h1 class="title level-item">Parks</h1>
+          <!-- <h1 class="title level-item">Parks</h1> -->
         </div>
         <div class="level-right">
           <a class="level-item">Learn to Build</a>
           <a class="level-item">Glossary</a>
-          <router-link :to="{ name: 'Import', params: { model: 'Park' } }" class="button is-primary is-medium level-item">Add a Park</router-link>
+          <router-link :to="{ name: 'ImportPark' }" class="button is-primary is-medium level-item" v-if="isLoggedIn()">Add a Park</router-link>
         </div>
       </div>
     </div>
   </section>
   <main class="container">
     <div class="columns">
-      <div class="column is-one-quarter">
-        <Filters :options="filterOptions" @selected="filterParks" ></Filters>
+      <div class="column is-one-quarter content">
+        <Filters :options="filterOptions" @selected="filterParks"></Filters>
       </div>
       <div class="column">
-        <Sort @sort="sortParks" @order="orderParks"></Sort>
-        <div class="columns is-multiline">
+        <div class="level">
+          <div class="level-left">
+            <div class="level-item"><Sort @sort="sortParks" @order="orderParks"></Sort></div>
+          </div>
+          <div class="level-right">
+            <a class="delete level-item" @click="globalParams.name = ''; getParks()" v-if="globalParams.name"></a>
+            <div class="level-item">
+              <div class="control has-icons-left is-medium">
+                <input type="text" class="input is-medium" @keydown.enter="getParks" v-model="globalParams.name" placeholder="Filter by park name" />
+                <span class="icon is-small is-left"><i class="fas fa-search"></i></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+        <div class="columns cards is-multiline loader--parent">
+          <Loader v-if="loading"></Loader>
           <Park :model="park" :key="park._id" v-for="park in parks"></Park>
           <div class="column" v-if="parks.length == 0 && loading == false" v-cloak>
-            There aren't any Parks that match what you're looking for. Maybe you should build it!
+            <div class="notification is-warning">There aren't any Parks that match what you're looking for. You should build it!</div>
           </div>
         </div>
         <Pagination :total="pagination.total" :current="pagination.current" :pages="pagination.pages" @goTo="goToPage"></Pagination>
@@ -42,16 +59,24 @@
 import Filters from '@/components/ui/Filters'
 import Sort from '@/components/ui/Sort'
 import Pagination from '@/components/ui/Pagination'
+import Search from '@/components/ui/Search'
+import Loader from '@/components/ui/Loader'
 import API from '@/services/api'
+import Auth from '@/services/auth'
 import Park from './Card'
 
 export default {
   name: 'parks',
+  metaInfo: {
+    title: 'Parks'
+  },
   components: {
     Filters,
     Sort,
     Park,
-    Pagination
+    Pagination,
+    Loader,
+    Search
   },
   data () {
     return {
@@ -66,9 +91,11 @@ export default {
       },
       filterOptions: {
         'parks': {
-          label: null,
+          label: 'Park Type',
           type: 'toggle',
-          visible: true
+          visible: true,
+          force: true,
+          max: 1
         },
         'parks-plans': {
           label: 'Park Plans',
@@ -79,6 +106,11 @@ export default {
         'regions': {
           label: 'Biomes',
           type: 'list'
+        },
+        'age-groups': {
+          label: 'Age Groups',
+          type: 'toggle',
+          visible: true,
         },
         'amenities': {
           label: 'Amenities',
@@ -98,17 +130,21 @@ export default {
         'style': {
           label: 'Styles',
           type: 'list'
-        },
+        }
       }
     }
   },
   methods: {
+    isLoggedIn() {
+      return Auth.isLoggedIn()
+    },
     getParks (params = {}) {
       this.loading = true
       params = Object.assign(params, this.globalParams)
       return API.fetch('parks', params).then((data) => {
         console.log(data)
         this.parks = data.parks
+        this.loading = false
         this.pagination.total = data.total
         this.pagination.pages = data.pages
         this.pagination.limit = data.limit
@@ -158,6 +194,13 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" scoped>
+  section.hero {
+    background-image: url('/assets/images/hero-parks.png');
+    background-size: auto 100%!important;
+    background-repeat: no-repeat!important;
+    background-position: 150px center!important;
+  }
+
   .hero .title {
     margin: 0;
   }

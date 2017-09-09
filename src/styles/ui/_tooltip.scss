@@ -1,0 +1,40 @@
+$arrow-size: 8px;
+
+.tooltip {
+  display: block !important;
+  padding: 4px;
+  z-index: 10000;
+  position: relative;
+  margin-bottom: 0.25rem;
+
+
+  .tooltip-inner {
+    background: #000;
+    color: #fff;
+    border-radius: 3px;
+    padding: 8px 14px;
+    margin-bottom: 4px;
+  }
+
+  .tooltip-arrow {
+    display: block;
+    position: absolute;
+    width: 0; height: 0;
+    bottom: 0;
+    border-left: $arrow-size solid transparent;
+    border-right: $arrow-size solid transparent;
+    border-top: $arrow-size solid #000;
+  }
+
+  &[aria-hidden='true'] {
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity .15s, visibility .15s;
+  }
+
+  &[aria-hidden='false'] {
+    visibility: visible;
+    opacity: 1;
+    transition: opacity .15s;
+  }
+}

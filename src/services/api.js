@@ -53,6 +53,14 @@ export default {
     })
   },
 
+  delete(resource, data = {}) {
+    return refreshExpiredToken().then(() => {
+      return api.delete('/'+resource, { headers: { 'Authorization': auth.getAuthHeader() }})
+    }).then((response) => {
+      return response.data
+    })
+  },
+
   post(resource, data = {}) {
     return refreshExpiredToken().then(() => {
       return api.post('/'+resource, data, { headers: { 'Authorization': auth.getAuthHeader() }})
@@ -60,5 +68,10 @@ export default {
       return response.data
     })
   },
+
+  handleError(err, model) {
+    if(!err) return false
+
+  }
 
 }

@@ -1,8 +1,8 @@
 <template>
   <div>
-    <section class="hero hero--tall" :style="{ 'background-image': 'url('+(imported.media.length > 0 ? imported.media[0].url : '')+')' }" v-if="imported.type == 'park'">
+    <section class="hero hero--tall" :style="{ 'background-image': 'url('+(imported.media.length > 0 ? imported.media[0].url : '')+')' }" v-if="step > 0">
       <div class="container">
-        <Upload @uploaded="addPhoto" folder="parks" :instant="true" :isDark="true" instructions="Drop your park photos here, or click to browse your computer"></Upload>
+        <Upload @uploaded="addPhoto" folder="parks" :instant="true" :isDark="true" instructions="Drop your park photos here, or click to browse your computer" v-if="imported.media.length == 0"></Upload>
 
       </div>
       <!-- <img :src="imported.media ? imported.media[0].url : ''" v-if="imported.media.length > 0" class="cover-photo" @load="$event.target.classList.toggle('is-active')" /> -->
@@ -24,30 +24,31 @@
       <div class="columns is-centered">
         <div class="column is-three-quarters" v-if="step == 0">
           <div class="field">
-            <h2 class="title">Import your Workshop Blueprint</h2>
+            <h2 class="title">Import and Connect to Steam Workshop</h2>
+            <div class="field">
+              <p>Enter the URL to your Park in the Workshop to import your descriptions, tags, and photos.</p>
+            </div>
+            <div class="notification is-warning" v-if="errors.import">
+              {{ errors.import }}
+            </div>
             <div class="field has-addons">
-            <div class="control is-expanded">
-              <input type="text" name="url" v-model="url" class="input is-medium" placeholder="http://steamcommunity.com/sharedfiles/filedetails/?id=#########" />
-            </div>
-            <div class="control">
-              <button class="button is-medium is-primary" :class="{ 'is-loading': loading.importing }" @click="importItem()">Import Park</button>
-            </div>
+              <div class="control is-expanded">
+                <input type="text" name="url" v-model="url" class="input is-medium" placeholder="http://steamcommunity.com/sharedfiles/filedetails/?id=#########" />
+              </div>
             </div>
           </div>
           <div class="level">
             <div class="level-left">
-              <div class="level-item">
-                <button class="button is-white is-medium" @click="importLater()">Import Later</button>
-              </div>
-              <div class="level-item">
-                <p>You will need to connect your Park <br /> to a Workshop Blueprint to make it public.</p>
-              </div>
+              <button class="button is-medium is-primary level-item" :class="{ 'is-loading': loading.importing }" @click="importItem()"><span class="icon"><i class="fas fa-cloud-upload"></i></span> <span>Import Blueprint</span></button>
+              <button class="button is-white is-medium level-item" @click="importLater()">Import Later</button>
+              <p class="level-item has-text-grey">You can connect it later if you're still working on it. <br /> It will be unpublished until you do.</p>
             </div>
           </div>
         </div>
           <!-- <button class="ui button" @click="addField()" :disabled="fields >= max">Add Another</button> -->
         </div>
-        <div class="form for-park columns is-centered" v-if="step == 1">
+        <div class="form for-park columns is-centered" v-show="step == 1">
+
           <div class="column is-three-quarters">
             <div class="field">
               <label class="label">Park Name</label>
@@ -58,12 +59,12 @@
 
             <div class="field">
               <label class="label">About Your Park</label>
-              <p v-if="wasImported">If you have links to billboards and audio files, you can upload them directly to PlanCo World in the next step.</p>
+              <div class="box"><p>Instead of linking to billboards and audio files, you can upload them directly to PlanCo World!</p></div>
               <div class="description editor" v-html="imported.description"></div>
             </div>
 
             <div class="field">
-              <Filters :options="filterOptions" @selected="" ></Filters>
+              <Filters :options="filterOptions" @selected="addTags" ref="tags" ></Filters>
               <!-- <a class="button" @click="">Add Tags</a><div class="field is-grouped is-grouped-multiline">
                 <div class="control" v-for="tag in imported.tags">
                   <div class="tag is-primary is-medium">{{ tag.name }} <button class="delete is-small"></button></div>
@@ -72,8 +73,8 @@
             </div>
 
             <div class="field is-grouped">
-              <div class="control"><a class="button is-primary is-medium" @click="addPark()">Continue</a></div>
-              <div class="control"><a class="button is-medium is-white" @click="addPark()">Save Park</a></div>
+              <div class="control"><a class="button is-primary is-medium" @click="addPark()">Save &amp; Visit</a></div>
+              <div class="control"><a class="button is-medium is-white" @click="addPark()">Save &amp; Add Another</a></div>
             </div>
           </div>
         </div>
@@ -84,12 +85,13 @@
 <script>
 import Filters from '@/components/ui/Filters'
 import API from '@/services/api'
+import slug from 'slug'
 
 import Upload from '@/components/ui/Upload'
 
 import Quill from 'quill'
-import 'quill/dist/quill.core.css'
-import 'quill/dist/quill.snow.css'
+//
+//
 
 export default {
   name: 'Import',
@@ -103,7 +105,10 @@ export default {
       loading: {
         importing: false
       },
-      url: 'http://steamcommunity.com/sharedfiles/filedetails/?id=1085896826',
+      errors: {
+        import: false
+      },
+      url: 'http://steamcommunity.com/sharedfiles/filedetails/?id=1112379208',
       imported: {
         title: '',
         media: [],
@@ -136,6 +141,11 @@ export default {
           visible: true,
           max: 1,
         },
+        'age-groups': {
+          label: 'Age Groups',
+          type: 'toggle',
+          visible: true,
+        },
         'amenities': {
           label: 'Amenities',
           type: 'list'
@@ -161,15 +171,37 @@ export default {
   methods: {
     importItem() {
       this.loading.importing = true
+      this.errors.import = false
       API.post('import', { url: this.url }).then((data) => {
-        Object.assign(this.imported, data)
-        this.loading.importing = false
-        this.step = 1
-        this.wasImported = true
 
-        this.$nextTick(() => {
-          this.attachEditor()
-        })
+        if(data.type != 'park') {
+          this.errors.import = 'That workshop item is not a Park'
+        } else {
+          Object.assign(this.imported, data)
+          this.$refs.tags.setPopulated(this.imported.tags)
+          this.imported.slug = slug(this.imported.title)
+
+          if(this.imported.cover) {
+            API.post('media/import', {
+              url: this.imported.cover,
+            }).then((cover) => {
+              this.addPhoto(cover.media)
+            })
+          }
+
+          this.step = 1
+          this.wasImported = true
+
+          this.$nextTick(() => {
+            this.attachEditor()
+          })
+        }
+
+        this.loading.importing = false
+      }).catch((err) => {
+        console.log(err)
+        if(err.response && err.response.data.message) this.errors.import = err.response.data.message
+        this.loading.importing = false
       })
     },
     attachEditor() {
@@ -190,6 +222,9 @@ export default {
       console.log('adding', media)
       this.imported.media.push(media)
     },
+    addTags(tags) {
+      this.imported.tags = tags
+    },
     importLater() {
       this.imported = {
         title: '',
@@ -205,15 +240,12 @@ export default {
     },
     addPark() {
       let newPark = {
-        media: [],
-        tags: []
+        media: []
       }
       newPark.name = this.imported.title
+      newPark.steam_id = this.imported.steam_id
       newPark.description = this.editor.container.firstChild.innerHTML
-
-      for(let i=0;i<this.imported.tags.length;i++) {
-        newPark.tags.push(this.imported.tags[i]._id)
-      }
+      newPark.tags = this.$refs.tags.selected
 
       for(let i=0;i<this.imported.media.length;i++) {
         newPark.media.push(this.imported.media[i]._id)

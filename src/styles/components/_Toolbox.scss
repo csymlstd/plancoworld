@@ -1,25 +1,37 @@
+[draggable]:hover {
+  cursor: move; /* fallback if grab cursor is unsupported */
+  cursor: grab;
+  cursor: -moz-grab;
+  cursor: -webkit-grab;
+}
+
+[draggable]:active {
+  cursor: grabbing;
+  cursor: -moz-grabbing;
+  cursor: -webkit-grabbing;
+}
+
 .toolbox--wrapper {
-  position: fixed;
-  bottom: 1rem;
-  width: 100%;
-  z-index: 1000;
 
   .toolbox--button {
-    position: absolute;
     right: 1rem;
     bottom: 0;
+    position: fixed;
+    bottom: -0.2rem;
+    z-index: 9970;
   }
 
   .toolbox--menu {
-    position: absolute;
+    position: fixed;
+    z-index: 9971;
     display: flex;
     align-items: stretch;
     background: #fff;
     overflow: hidden;
     // padding: 1.25rem;
     border-radius: 5px;
-    height: 500px;
-    width: 800px;
+    height: 75%;
+    width: 600px;
     max-width: 100%;
     bottom: 4rem;
     right: 1rem;
@@ -45,6 +57,7 @@
     main.toolbox--content {
       flex-grow: 1;
       padding: 1rem;
+      overflow: auto;
     }
   }
 }

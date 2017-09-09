@@ -1,5 +1,5 @@
 <template>
-  <div class="column is-one-quarter">
+  <div class="column is-one-third">
     <div class="card">
       <div class="card-image" @click="viewBillboard">
         <img :src="model.media[0] ? model.media[0].url : ''" v-if="model.media.length > 0" />

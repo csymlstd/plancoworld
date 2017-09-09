@@ -1,30 +1,5 @@
 <template>
   <div class="ui form">
-    <h3 class="title is-3">Personal Information</h3>
-
-    <div class="field">
-    <div class="field-body">
-      <div class="field">
-        <label class="label">First Name</label>
-        <div class="control"><input type="text" v-model="user.name.first" class="input is-medium"></div>
-      </div>
-      <div class="field">
-        <label class="label">Last Name</label>
-        <div class="control"><input type="text" v-model="user.name.last" class="input is-medium"></div>
-      </div>
-    </div>
-    </div>
-
-    <div class="field">
-      <label class="label">Email</label>
-      <div class="control"><input type="email" v-model="user.email" class="input is-medium"></div>
-    </div>
-    <div class="field">
-      <label class="label">Display Name</label>
-      <div class="control"><input type="text" v-model="user.name.display" class="input is-medium"></div>
-    </div>
-
-
     <div class="level">
       <div class="level-left">
         <figure class="image is-128x128 level-item">
@@ -36,26 +11,33 @@
       </div>
     </div>
 
-
-
-
-    <Upload @uploaded="updateAvatar" folder="users" :maxItems="1" v-if="uploadAvatar">
+    <Upload @uploaded="updateAvatar" folder="users" :instant="true" :maxItems="1" v-if="uploadAvatar">
 
     </Upload>
 
-    <h4 class="ui dividing header">Change Your Password</h4>
-
-    <div class="ui message warning visible" v-if="user.noPassword">
-      You do not have a password. Enter one below and you can use your email address to login next time.
+    <div class="field">
+    <div class="field-body">
+      <div class="field">
+        <label class="label">Real Name</label>
+        <div class="control"><input type="text" v-model="user.name.real" class="input is-medium"></div>
+      </div>
+      <div class="field">
+        <label class="label">Display Name (Steam)</label>
+        <div class="control"><input type="text" v-model="user.name.display" class="input is-medium"></div>
+      </div>
+    </div>
     </div>
 
-    <div class="field" v-if="!user.noPassword">
-      <label>New Password</label>
-      <input type="password" v-model="user.password">
+    <div class="field">
+      <label class="label">Email</label>
+      <div class="control"><input type="email" v-model="user.email" class="input is-medium"></div>
+      <div class="notification is-warning" v-if="this.errors.email">{{ this.errors.email }}</div>
     </div>
 
-    <div class="ui message visible">
-      You can request a <a href="#">one-time login link</a> sent to the email address above at any time. This will let you log back in to PlanCo World if you forget your password or lose access to your Steam account.
+
+
+    <div class="box">
+      You can request a <a href="#">one-time login link</a> sent to the email address above at any time. This will let you log back in to PlanCo World if you lose access to your Steam account.
     </div>
 
     <div class="ui divider"></div>
@@ -85,6 +67,9 @@ export default {
         name: {},
         avatar: {}
       },
+      errors: {
+        email: false
+      }
     }
   },
   methods: {
@@ -106,6 +91,11 @@ export default {
       if(data.avatar) {
         console.log('changing avatar to id', data)
         data.avatar = data.avatar._id
+      }
+
+      if(['',null,undefined].indexOf(data.email) > -1) {
+        this.errors.email = 'Sorry, we need an email address.'
+        return false
       }
 
       console.log('updating user', data)
@@ -139,7 +129,6 @@ export default {
     }
   },
   mounted() {
-    console.log(auth.getScope())
     this.getUser().then(() => {
       this.loading = false
     }).catch((err) => {

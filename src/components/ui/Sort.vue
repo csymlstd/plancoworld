@@ -1,22 +1,11 @@
 <template>
-  <div class="field is-grouped">
-    <div class="control">
-      <div class="dropdown is-hoverable">
-        <div class="dropdown-trigger">
-          <div class="field has-addons">
-            <div class="control"><button class="button is-medium">Sort By</button></div>
-            <div class="control"><button class="button is-static is-medium">{{ selectedLabels.sort }}</button></div>
-          </div>
-        </div>
-        <div class="dropdown-menu">
-          <div class="dropdown-content">
-            <a class="dropdown-item" :class="{ 'is-active': (sort == 'popular') }" @click="updateSort('popular', 'Popular')">Popular</a>
-            <a class="dropdown-item" :class="{ 'is-active': (sort == 'added' && order == 'desc') }" @click="updateSort('added', 'Newest'); updateOrder('desc')">Newest</a>
-            <a class="dropdown-item" :class="{ 'is-active': (sort == 'added' && order == 'asc') }" @click="updateSort('added', 'Oldest'); updateOrder('asc')">Oldest</a>
-          </div>
-        </div>
-      </div>
-    </div>
+  <div class="tabs is-toggle level-item">
+    <ul>
+      <li :class="{ 'is-active': (sort == 'hot' && order == 'desc') }"><a @click="updateSort('hot'); updateOrder('desc')">Hot</a></li>
+      <li :class="{ 'is-active': (sort == 'popular') }"><a @click="updateSort('popular', 'Popular')">Popular</a></li>
+      <li :class="{ 'is-active': (sort == 'added' && order == 'desc') }"><a @click="updateSort('added'); updateOrder('desc')">Newest</a></li>
+      <li :class="{ 'is-active': (sort == 'added' && order == 'asc') }"><a @click="updateSort('added'); updateOrder('asc')">Oldest</a></li>
+    </ul>
   </div>
 </template>
 
@@ -36,11 +25,10 @@ export default {
   },
   data () {
     return {
-      sort: 'popular',
+      sort: 'hot',
       order: 'desc',
       selected: [],
       selectedLabels: {
-        sort: 'Popular',
         order: 'Desc'
       },
       visibility: {}
@@ -63,7 +51,6 @@ export default {
     updateSort(sort, label) {
       this.$emit('sort', sort)
       this.sort = sort
-      this.selectedLabels.sort = label
     },
     updateOrder(order) {
       this.$emit('order', order)

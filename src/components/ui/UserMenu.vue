@@ -22,7 +22,7 @@ export default {
   methods: {
     logout() {
       auth.logout()
-      router.push('/')
+      //router.push('/')
     },
     initDropdown() {
       $('.dropdown.account').dropdown({

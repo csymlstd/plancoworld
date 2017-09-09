@@ -3,7 +3,7 @@
     <div class="dropdown-trigger" @click="toggle">
       <slot name="trigger">
         <button class="button">
-          Dropdown
+          {{ label }}
         </button>
       </slot>
     </div>
@@ -23,6 +23,10 @@ export default {
   props: {
     'alignRight': {
       default: false
+    },
+    label: {
+      type: String,
+      default: 'Dropdown'
     }
   },
   data () {
@@ -47,7 +51,17 @@ export default {
     }
   },
   mounted () {
+    document.addEventListener('keydown', (e) => {
+      if(this.active && e.keyCode == 27) {
+        this.close();
+      }
+    })
 
+    document.addEventListener('click', (e) => {
+      if(this.active) {
+        this.close();
+      }
+    })
   }
 }
 

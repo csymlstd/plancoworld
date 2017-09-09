@@ -2,9 +2,6 @@
 // Color palette function
 ////////////////////////////////////////////////////////////////////////////////
 
-$sea: #8EAFA4;
-$orange: #A13620;
-
 $colors: (
  'accent': (
     light: #eef0f1,
@@ -12,25 +9,24 @@ $colors: (
     dark: #015D8A,
     darker: #323c42,
  ),
+ 'secondary': (
+    base: #FF8C00,
+    dark: #B26200,
+    darker: #482400
+ ),
  'grey': (
    dark: #363636,
    base: #8997a2,
    light: #d5dce2
  ),
- 'black': (
-   base: #000,
-   trans: transparentize(#000, .3)
+ 'red': (
+    base: #FF1934
  ),
- 'white': (
-   base: #fff,
-   trans: transparentize(#fff, .5)
+ 'purp': (
+   base: #4827C2
  ),
- 'social': (
-   facebook: #3c5a9a,
-   twitter: #55acee,
-   google: #de4b39,
-   reddit: #cee3f8,
-   linkedin: #007bb5
+ 'green': (
+   base: #3FAE2A
  )
 );
 
@@ -40,10 +36,10 @@ $colors: (
 
 // background-image: repeating-linear-gradient(
 //     60deg,
-//     orange,
-//     orange 10px,
-//     black 10px,
-//     black 20px
+//     color('secondary'),
+//     color('secondary') 10px,
+//     color('secondary', 'darker') 10px,
+//     color('secondary', 'darker') 20px
 //   );
 
 //usage

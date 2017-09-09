@@ -3,18 +3,21 @@
     <section class="hero hero--tall">
 
     </section>
-    <main class="content ui container billboard--content">
-      <div class="level">
-        <div class="level-left"><h2 class="title is-2">{{ billboard.name }}</h2></div>
-        <div class="level-right">
-          <div class="field is-grouped">
-            <div class="control"><button class="button is-primary">Download for Game</button></div>
-
-            <div class="control"><div class="field has-addons">
-              <div class="control"><button class="button">Download Source</button></div>
+    <section class="hero">
+      <div class="container">
+        <div class="level is-mobile">
+          <div class="level-left">
+            <h1 class="title level-item"><router-link :to="{ name: 'Billboards' }">Billboard</router-link></h1>
+            <h2 class="title level-item"> / {{ billboard.name }}</h2>
+          </div>
+          <div class="level-right">
+            <button class="button level-item is-medium is-dark"><span class="icon"><i class="fas fa-link"></i></span></button>
+            <button class="button is-primary is-medium level-item" :class="{ 'is-loading': downloading }" @click="downloadBillboard()" :disabled="!billboard.media">Download Billboard</button>
+            <div class="field has-addons level-item">
+              <div class="control"><button class="button is-medium">Download Source</button></div>
               <div class="control">
                 <Dropdown :alignRight="true">
-                  <button slot="trigger" class="button">.sketch</button>
+                  <button slot="trigger" class="button is-medium">.sketch</button>
                   <div slot="menu">
                     <a class="dropdown-item">
                       <span>Sketch</span>
@@ -22,14 +25,13 @@
                   </div>
                 </Dropdown>
               </div>
-            </div></div>
-
-            <div class="control"><button class="button">Add to Toolbox</button></div>
+            </div>
+            <SaveToToolbox model="billboards" :data="billboard"></SaveToToolbox>
           </div>
         </div>
       </div>
-
-
+    </section>
+    <main class="content ui container billboard--content">
 
       <div class="pw--tags">
         <div class="ui label" :class="{ ['pw--tag-'+tag.model]: true }" v-for="tag in billboard.tags">{{ tag.name }}</div>
@@ -44,7 +46,8 @@
 </template>
 
 <script>
-import Tags from '@/components/Tags'
+import SaveToToolbox from '@/components/ui/SaveToToolbox'
+import Filters from '@/components/ui/Filters'
 import Blueprint from '@/components/cards/Blueprint'
 import Billboard from '@/components/Billboards/Card'
 import API from '@/services/api'
@@ -54,15 +57,28 @@ import Dropdown from '@/components/ui/Dropdown'
 export default {
   name: 'billboards',
   components: {
-    Tags,
     Blueprint,
     Billboard,
-    Dropdown
+    Dropdown,
+    SaveToToolbox
   },
   data () {
     return {
       msg: 'These are the billboards!',
-      billboard: {}
+      billboard: {},
+      downloading: false
+    }
+  },
+  methods: {
+    downloadBillboard () {
+      this.downloading = true
+      let mediaID = billboard.media[0]._id
+      API.fetch(`media/${mediaID}/download`).then((billboard) => {
+        let url = billboard.signedRequest
+        console.log(url)
+        window.open(url)
+        this.downloading = false
+      })
     }
   },
   mounted () {

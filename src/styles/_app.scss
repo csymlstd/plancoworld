@@ -1,9 +1,26 @@
 // Variables
-$fonts-primary: 'Futura';
-$primary: #0091D7;
 
-@import '~bulma/bulma.sass';
+$fonts-primary: 'Futura';
+$font-family-billboard: $fonts-primary;
+$primary: #0091D7;
+$danger: #E54D42;
+// $success: #13c339;
+$dark: #323c42;
+// $warning: #ff8c00;
+
+$grey-lighter: #d5dce2;
+$grey-light: #8997a2;
+$grey: #8997a2;
+// $border-hover: $grey-light !default
+
+@import "~bulma/sass/utilities/_all";
+@import "~bulma/sass/base/_all";
+@import "~bulma/sass/elements/_all";
+@import "~bulma/sass/components/_all";
+@import "~bulma/sass/grid/_all";
+@import "~bulma/sass/layout/_all";
 
 @import './base/base';
 @import './components/components';
+@import './ui/ui';
 @import './vendors/vendors';

@@ -1,0 +1,23 @@
+.loader--parent {
+  position: relative;
+  min-height: 96px;
+}
+
+.loader--wrapper {
+  position: absolute;
+  background: color('accent');
+  color: #fff;
+  z-index: 99999;
+  top: 50%; left: 50%;
+  transform: translateX(-50%) translateY(-50%);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  i {
+    font-size: 2em;
+  }
+}

@@ -11,7 +11,7 @@ section.filters {
   position: relative;
 
   .level {
-    margin: 0;
+    margin: 0 0 0.5rem!important;
   }
 
   .description {
@@ -42,18 +42,24 @@ section.filters {
 .toggles {
   display: flex;
   flex-wrap: wrap;
-  margin-top: 0.5rem;
+  margin: 0.5rem 0 0!important;
+
+  .column {
+    padding: 0.25rem!important;
+  }
 }
 
 .toggle {
-  flex-basis: calc(50% - 0.5rem);
-  padding: 1rem 0.5rem;
-  margin: 0.25rem;
+  // flex-basis: calc(50% - 0.5rem);
+  width: 100%;
+  padding: 1rem 0.25rem;
+  // margin: 0.25rem;
   justify-content: center;
   align-items: center;
   text-align: center;
   font-size: 1rem;
   border-radius: 0.5rem;
+  white-space: nowrap;
 
   &:hover {
     border-color: color('accent');

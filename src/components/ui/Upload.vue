@@ -1,38 +1,46 @@
 <template>
-  <form :class="{ 'upload--form': true, 'is-dark': isDark }" enctype="multipart/form-data" @submit.prevent="onSubmit" v-if="!complete">
+  <form :class="{ 'upload--form': true, 'is-dark': isDark }" enctype="multipart/form-data" @submit.prevent="onSubmit">
     <div class="upload--wrapper" @ondragover="onChange">
         <div class="upload--drop-area" v-if="items.length == 0">
             <div class="instructions">{{ instructions }}</div>
             <input type="file" name="items[]" multiple @change="onChange">
         </div>
         <div class="upload--files">
-          <div class="upload--file" v-for="(file, key) in items" :class="{ 'is-uploaded': file.uploaded }">
+          <div :class="{ 'upload--file': true, 'box': isDark, 'is-uploaded': file.uploaded }" v-for="(file, key) in items">
             <div class="level">
               <div class="level-left">
                 <figure class="level-item image is-128x128" v-if="file.imageData" >
                     <img :src="file.imageData" />
                 </figure>
-                <progress class="progress is-primary is-small level-item" v-if="file.progress > 0 && file.progress < 100" :value="file.progress" max="100"> </progress>
+                <span class="level-item">{{ file.name }}</span>
+                <span class="tag level-item is-outlined">{{ file.duration }} Seconds</span>
               </div>
               <div class="level-right">
-                <div class="tag is-primary" v-if="!file.uploaded && file.progress == 0">Ready to Upload</div>
-                <div class="tag is-warning" v-if="file.failed">Failed</div>
-                <div class="tag is-success" v-if="file.uploaded">Uploaded</div>
-                <a @click="removeItem(key)" class="upload--delete level-item button is-link">Delete</a>
+                <progress class="progress is-primary is-small level-item" v-if="file.progress > 0 && file.progress < 100" :value="file.progress" max="100"> </progress>
+                <div class="tag is-primary is-medium level-item" v-if="file.ready">Ready to Upload</div>
+                <div class="tag is-warning is-medium level-item" v-if="file.failed"><span class="icon"><i class="fas fa-exclamation-triangle"></i></span> <span>Failed</span></div>
+
+                <div class="tag is-success is-medium level-item" v-if="file.uploaded && !file.transcoding && !file.transcoded">Uploaded</div>
+                <div class="tag is-primary is-medium level-item" v-if="file.uploaded && file.isTranscodePending && !file.transcoding && !file.transcoded">Preparing Transcode  <span class="icon"><i class="fas fa-cog fa-spin"></i></span></div>
+                <div class="tag is-success is-medium level-item" v-if="file.transcoded">Transcoded  <span class="icon"><i class="fas fa-check"></i></span></div>
+                <div class="tag is-primary is-medium level-item" v-if="file.transcoding">Transcoding <span class="icon"><i class="fas fa-cog fa-spin"></i></span></div>
+
+                <a @click="removeItem(key)" class="upload--delete level-item button is-link"><span class="icon"><i class="fas fa-trash"></i></span></a>
               </div>
             </div>
 
           </div>
         </div>
     </div>
-    <a href="#" class="button is-light" @click="toggleToolbox" v-if="enableToolbox">Get from Toolbox</a>
-    <button type="submit" class="ui button secondary" v-if="!instant" :disabled="items.length < minItems || items.length > maxItems">Upload</button>
+    <a href="#" class="button is-warning" @click="toggleToolbox" v-if="enableToolbox"><span>Get from</span> <span class="icon"><i class="fas fa-archive"></i></span></a>
+    <button type="submit" class="button is-primary" :class="{ 'is-loading': loading }" v-if="!instant" :disabled="items.length < minItems || items.length > maxItems"><span class="icon"><i class="fas fa-cloud-upload"></i></span> <span>Upload</span></button>
   </form>
 </template>
 
 <script>
 import API from '@/services/api'
 import auth from '@/services/auth'
+import Media from '@/services/media'
 import { ToolBus } from '@/components/Toolbus.js'
 
 import axios from 'axios'
@@ -78,7 +86,8 @@ export default {
       errorMsg: '',
       complete: false,
       completed: [],
-      loading: false
+      loading: false,
+      transcodeQueue: [],
     }
   },
   methods: {
@@ -95,41 +104,66 @@ export default {
         return (bytes / Math.pow(1024, i)).toFixed(2) + ' ' + sizes[i];
     },
     onChange(e) {
-        this.formData = new FormData();
+        //this.formData = new FormData();
         let files = e.target.files || e.dataTransfer.files;
         for(let x=0;x<files.length;x++) {
             if(!isNaN(x)) {
-
-              this.items.push({
+              let file = {
                 file: e.target.files[x] || e.dataTransfer.files[x],
                 name: files[x].name,
                 type: files[x].type,
                 size: files[x].size,
                 sizeFormatted: this.bytesToSize(files[x].size),
-                transcode: false,
+                ready: false,
+                duration: false,
                 uploaded: false,
+                isTranscodePending: false,
+                transcoding: false,
+                transcoded: false,
                 failed: false,
-                loading: false,
                 progress: 0
-              })
+              }
 
-              let n = this.items.length - 1
+              let allowed = Media.isAllowedType(file.type)
 
-              let allowed = ['image/png','image/jpeg']
+              if(this.transcode) {
+                console.log('checking if can transcode '+file.type)
+                allowed = Media.canTranscode(file.type)
+              }
 
-              if(allowed.indexOf(this.items[n].type) > -1) {
-                let reader = new FileReader()
-                reader.addEventListener('load', () => {
-                  this.$set(this.items[n], 'imageData', reader.result)
-                })
+              if(allowed) {
+                console.log('file is allowed')
+                // If allowed, add to upload queue
+                this.items.push(file)
+                let n = this.items.length - 1
 
-                reader.readAsDataURL(this.items[n].file)
+                if(Media.isImage(file.type)) {
+                  // Set file as ready to upload
+                  file.ready = true
+                  // Add preview of image
+                  let reader = new FileReader()
+                  reader.addEventListener('load', () => {
+                    this.$set(this.items[n], 'imageData', reader.result)
+                  })
+                  reader.readAsDataURL(this.items[n].file)
+                } else if(Media.canTranscode(file.type)) {
+                  console.log('checking duration')
+                  // Check duration of the video
+                  let v = document.createElement('video')
+                  v.preload = 'metadata'
+                  v.onloadedmetadata = () => {
+                    this.items[n].duration = v.duration.toFixed(1)
+                    this.items[n].ready = true
+                  }
+                  v.src = URL.createObjectURL(file.file)
+                }
               }
 
 
             }
         }
 
+        // If instant is enabled, upload files immediately
         if(this.instant === true) {
           this.onSubmit()
         }
@@ -137,77 +171,188 @@ export default {
     },
     removeItem(n) {
       // @todo remove from DB
-      console.log('removing '+ (n-1))
-      this.$emit('deleted', this.items[n-1])
-      this.$delete(this.items, (n-1))
-      console.log(this.items)
+      console.log('removing '+ n)
+
+      if(this.items[n].uploaded) {
+        API.delete('media/'+this.items[n].media._id).then(() => {
+          this.$notify('notifications', 'Media deleted', 'success')
+          this.$emit('deleted', this.items[n])
+          this.$delete(this.items, n)
+        })
+      } else {
+        this.$emit('deleted', this.items[n])
+        this.$delete(this.items, n)
+      }
+
+
     },
     removeItems() {
         this.items = [];
     },
-    onSubmit() {
-        this.formData.append('items[]', this.items);
+    uploadFile(file, signature) {
+      // Cache the public url for Media creation
+      file.publicURL = signature.url
+      file.key = signature.key
 
+      return axios({
+        method: 'PUT',
+        url: signature.signedRequest,
+        headers: { 'Content-Type': signature.contentType },
+        data: file.file,
+        onUploadProgress: function (progressEvent) {
+          // Update Upload Progress
+          let newProgress = (progressEvent.loaded / progressEvent.total * 100)
+          if(newProgress > 15) {
+            file.progress = (progressEvent.loaded / progressEvent.total * 100)
+          }
+
+        }
+      }).then((response) => {
+        // If signature has returned with a signed transcode request
+        let transcoder = { }
+        if(signature.isTranscodePending) {
+          transcoder = { isPending: true }
+          file.isTranscodePending = true
+        }
+
+        // Create new Media with S3 object
+        return API.post('media', { name: file.name, key: file.key, contentType: file.type, size: file.size, url: file.publicURL, transcoder, meta: { duration: file.duration }})
+      }).then((media) => {
+        console.log('uploaded', media)
+        file.media = media
+        file.uploaded = true
+        return media
+      }).catch((err) => {
+        console.log('error uploading', err)
+        file.failed = true
+        this.loading = false
+        this.$notify('notifications', 'Error uploading', 'error')
+      })
+    },
+    createJob(file) {
+      console.log('creating job')
+      return API.post(`media/${file.media._id}/transcode`).then((response) => {
+        console.log('created job', response)
+        if(response.transcoder.status == 'Submitted') {
+          file.isTranscodePending = false
+          file.transcoding = true
+          this.completed.push(file.key)
+          this.checkCompleted()
+        }
+        return file
+      }).catch((err) => {
+        console.log('error transcoding',err)
+        file.failed = true
+        this.$notify('notifications', 'Error preparing transcode', 'error')
+      })
+    },
+    checkJob(file) {
+      if(!file.transcoded) {
+        console.log('checking job')
+        return API.fetch(`media/${file.media._id}/transcode`).then((response) => {
+          if(response.transcoder.status == 'Complete') {
+             file.transcoded = true
+             file.transcoding = false
+          }
+
+          if(response.transcoder.status == 'Progress') {
+            file.transcoding = true
+          }
+
+          if(response.transcoder.status == 'Error') {
+             file.transcoding = false
+             file.isTranscodePending = true
+             file.failed = true
+          }
+
+          return file
+        })
+      }
+
+      return file
+    },
+    checkCompleted() {
+      if(this.completed.length == this.items.length) {
+        this.loading = false
+        this.complete = true
+      }
+
+      return this.complete
+    },
+    onSubmit() {
+        this.loading = true
+        //this.formData.append('items[]', this.items);
         for(let i=0;i<this.items.length;i++) {
           let file = this.items[i]
-          if(!file.uploaded) {
+          if(file.ready) {
+            file.ready = false
             file.progress = 5
-            file.loading = true
             file.failed = false
+            let duration = file.duration ? file.duration : undefined
             // Sign the file for S3
-            API.post('media/sign', { filename: file.name, filetype: file.type, folder: this.folder, size: file.size, transcode: this.transcode }).then((signature) => {
+            API.post('media/sign', { filename: file.name, filetype: file.type, folder: this.folder, size: file.size, transcode: this.transcode, duration })
+            .then((signature) => {
               file.progress = 10
-              // Cache the public url for Media creation
-              file.publicURL = signature.url
-              file.key = signature.key
               // Upload file to S3 using signed request
-              axios({
-                method: 'PUT',
-                url: signature.signedRequest,
-                headers: { 'Content-Type': signature.contentType },
-                data: file.file,
-                onUploadProgress: function (progressEvent) {
-                  // Update Upload Progress
-                  let newProgress = (progressEvent.loaded / progressEvent.total * 100)
-                  if(newProgress > 15) {
-                    file.progress = (progressEvent.loaded / progressEvent.total * 100)
-                  }
-
-                }
-              }).then((response) => {
-                // If signature has returned with a signed transcode request
-                let transcoder = { }
-                if(signature.isTranscodePending) {
-                  transcoder = { isPending: true }
-                }
-                // Create new Media with S3 object
-                return API.post('media', { name: file.name, key: file.key, contentType: file.type, size: file.size, url: file.publicURL, transcoder })
-              }).then((media) => {
-                console.log('uploaded', media)
-                file.loading = false
-                file.uploaded = true
+              return this.uploadFile(file, signature)
+            }).then(() => {
+              console.log('uploaded file', file)
+              // After media has been created, check if Transcode is pending and create job
+              if(file.isTranscodePending == true) {
+                console.log('file is pending')
+                return this.createJob(file)
+              } else {
+                console.log('file is not pending')
                 this.completed.push(file.key)
-                if(this.completed.length == this.items.length) this.complete = true
+                this.checkCompleted()
                 // Emit the new Media to the parent to save reference ID
-                this.$emit('uploaded', media)
-              }).catch((err) => {
-                console.log('error uploading', err)
-                file.failed = true
-                this.$notify('notifications', 'Error uploading', 'error')
-              })
+                return file
+              }
+            }).then((file) => {
+              if(file.transcoding) {
+                let checking = setInterval(() => {
+                  this.checkJob(file).then(() => {
+                    if(file.transcoded) {
+                      clearInterval(checking)
+                    }
+                  })
+                }, 5000)
+              }
+              // Emit the new Media to the parent to save reference ID
+              this.$emit('uploaded', file.media)
             }).catch((err) => {
               console.log('error signing', err)
               file.failed = true
+              this.loading = false
               this.$notify('notifications', 'Error signing', 'error')
             })
           }
-
-
         }
+    },
+    getTranscoding() {
+      API.fetch('media', { transcoding: 'Pending', owned: true }).then((media) => {
+        for(let m=0;m<media.length;m++) {
+          let file = {
+            name: media[m].name,
+            ready: false,
+            duration: media[m].meta.duration,
+            uploaded: false,
+            isTranscodePending: media[m].transcoder.isPending ? true : false,
+            transcoding: (media[m].transcoder.isPending == false && media[m].transcoder.status == 'Progressing') ? true : false,
+            transcoded: false,
+            failed: false,
+            media: media[m]
+          }
+
+          this.items.push(file)
+        }
+      })
     }
   },
   mounted () {
-
+    if(this.transcoding) {
+      this.getTranscoding()
+    }
   }
 }
 </script>

@@ -1,4 +1,5 @@
 .card {
+  width: 100%;
   border-radius: 1rem;
   box-shadow: none;
   //border: 2px solid color('grey', 'light');
@@ -6,8 +7,51 @@
   overflow: hidden;
 
   .card-image {
-    background: color('grey','light');
-    min-height: 180px;
+    position: relative;
+    background-color: color('grey','light');
+    background-size: cover!important;
+    background-position: center!important;
+    height: 180px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+
+    .bottom {
+      position: absolute;
+      bottom: -1.5rem;
+    }
+
+    .vote {
+      width: 3rem;
+      height: 3rem;
+      border-radius: 50%;
+      padding: 0.4rem 0 0.3rem;
+      background: color('accent');
+      color: #fff;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction:column;
+      transition: all 0.3s ease-out;
+
+      &:hover {
+        transform: scale(1.1);
+      }
+    }
+
+    .selected-tags {
+      margin: 0;
+
+      .tag {
+        margin-bottom: 0;
+      }
+    }
+
+    img {
+      // height: 100%;
+      // width: auto;
+      // max-width: none;
+    }
   }
 
   &.is-empty {
@@ -27,6 +71,12 @@
     .title {
       margin: 0;
     }
+  }
+}
+
+.cards {
+  .column {
+    display: flex;
   }
 }
 

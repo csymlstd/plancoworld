@@ -1,5 +1,6 @@
 <script>
 import Vue from 'vue'
+import '@/styles/ui/_notification.scss'
 
 /*=============================================================================
   Created by NxtChg (admin@nxtchg.com), 2017. License: Public Domain.
@@ -21,7 +22,8 @@ Vue.component('vs-notify', {
 		'<div :class="[\'vs-notify\', group]" :style="styles"><transition-group :name="trans" mode="out-in">'+
 			'<div :class="it.type" v-for="it in list" :key="it.id">'+
 				'<slot name="body" :class="it.type" :item="it" :close="function(){ end(it) }">'+
-					'<div @click.stop="end(it)" v-html="it.text"></div>'+
+					'<span @click.stop="end(it)" class="icon"><i class="fas fa-check"></i></span>'+
+					'<span @click.stop="end(it)" v-html="it.text"></span>'+
 				'</slot>'+
 			'</div>'+
 		'</transition-group></div>',

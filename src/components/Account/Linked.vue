@@ -1,10 +1,7 @@
 <template>
-  <div class="ui form">
-    <button class="ui icon button secondary" @click="loginWithSteam()"><i class="steam icon"></i> Link Account with Steam</button>
-
-    <div class="ui message visible">
-      You can request a <a href="#">one-time login link</a> sent to your email address at any time. This will let you log back in to PlanCo World if you forget your password or lose access to your Steam account.
-    </div>
+  <div class="box">
+    <button class="button is-medium is-dark" v-if="!isConnected()" @click="loginWithSteam()"><span class="icon"><i class="fab fa-steam"></i></span> <span>Link Account with Steam</span></button>
+    <button class="button is-medium is-dark" v-if="isConnected()" @click="loginWithSteam()"><span class="icon"><i class="fab fa-steam"></i></span> <span>Disconnect from Steam</span></button>
 
   </div>
 </template>
@@ -16,7 +13,7 @@ import auth from '@/services/auth'
 export default {
   name: 'account',
   components: {
-    
+
   },
   data () {
     return {
@@ -28,6 +25,9 @@ export default {
     }
   },
   methods: {
+    isConnected() {
+      return auth.user.profile.oauth.steam.id ? true : false
+    },
     getUser (params = {}) {
       return API.fetch('user', params).then((data) => {
         Object.assign(this.user, data)

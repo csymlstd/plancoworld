@@ -3,65 +3,193 @@
     <div class="toolbox--button">
       <div class="button is-medium is-warning" @click="toggle()"><span class="icon"><i class="fas fa-archive"></i> </span><span>Toolbox</span></div>
     </div>
-    <div class="toolbox--menu" v-show="active">
-      <main class="toolbox--content">
-        Content
+    <div class="toolbox--menu" v-show="open">
+      <main class="toolbox--content loader--parent">
+        <Loader v-if="loading"></Loader>
+        <div class="level">
+          <div class="level-left">
+            <div class="tabs is-toggle level-item">
+              <ul>
+                <li :class="{ 'is-active': context == 'user' }" @click="tab(active, 'user')"><a>Your {{ panes[active].title }}</a></li>
+                <li :class="{ 'is-active': context == 'saved' }" @click="tab(active, 'saved')"><a>Saved {{ panes[active].title }}</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="toolbox--list">
+          <div class="toolbox--list-parks" v-if="active == 'parks'">
+            <Park :model="park" :key="park._id" v-for="park in panes[active].data.parks"></Park>
+          </div>
+          <div class="toolbox--list-blueprints" v-if="active == 'blueprints'">
+            <Blueprint :model="blueprint" :key="blueprint._id" v-for="blueprint in panes[active].data.blueprints"></Blueprint>
+          </div>
+          <div class="toolbox--list-images columns" v-if="active == 'images'">
+            <ImageThumbnail :key="image._id" :media="image" v-for="image in panes[active].data.media"></ImageThumbnail>
+          </div>
+          <div class="toolbox--list-videos columns" v-if="active == 'videos'">
+            <VideoThumbnail :key="video._id" :media="video" v-for="video in panes[active].data.media"></VideoThumbnail>
+          </div>
+
+          <Pagination :total="pagination.total" :current="pagination.current" :pages="pagination.pages" @goTo="goToPage" v-if="pagination.pages > 1"></Pagination>
+        </div>
+
+
+
       </main>
       <nav class="toolbox--nav">
-        <a href="#"><span class="icon"><i class="fas fa-film"></i></span> <span>Videos</span></a>
-        <a href="#"><span class="icon"><i class="fas fa-image"></i></span> <span>Images</span></a>
-        <a href="#"><span class="icon"><i class="fas fa-cube"></i></span> <span>Parks</span></a>
-        <a href="#"><span class="icon"><i class="fas fa-cube"></i></span> <span>Blueprints</span></a>
-        <a href="#"><span class="icon"><i class="fas fa-cube"></i></span> <span>Billboards</span></a>
+        <a @click="tab('parks')"><span class="icon"><i class="fas fa-cubes"></i></span> <span>Parks</span></a>
+        <a @click="tab('blueprints')"><span class="icon"><i class="fas fa-cube"></i></span> <span>Blueprints</span></a>
+        <a @click="tab('billboards')"><span class="icon"><i class="far fa-rectangle-portrait"></i></span> <span>Billboards</span></a>
+        <a @click="tab('videos')"><span class="icon"><i class="fas fa-film"></i></span> <span>Videos</span></a>
+        <a @click="tab('images')"><span class="icon"><i class="fas fa-image"></i></span> <span>Images</span></a>
       </nav>
     </div>
   </div>
 </template>
 
 <script>
+import '@/styles/components/_Toolbox.scss'
+import Pagination from '@/components/ui/Pagination'
+import Loader from '@/components/ui/Loader'
 import API from '@/services/api'
 import { ToolBus } from './Toolbus.js'
 
+import Park from '@/components/Parks/List'
+import Blueprint from '@/components/Blueprints/List'
+import ImageThumbnail from '@/components/Media/ImageThumbnail'
+import VideoThumbnail from '@/components/Media/VideoThumbnail'
+
 export default {
   name: 'toolbox',
-  props: {
-
+  components: {
+    Park,
+    Blueprint,
+    Loader,
+    Pagination,
+    VideoThumbnail,
+    ImageThumbnail
   },
   data () {
     return {
-      active: false
-    }
-  },
-  methods: {
-    getToolbox () {
-      return new Promise((resolve, reject) => {
-        resolve()
-      })
-    },
-    toggle() {
-      if(this.active) {
-         return this.active = false
-      } else {
-        return this.active = true
+      open: false,
+      loading: true,
+      active: 'parks',
+      context: 'user',
+      pagination: {
+        current: 1,
+        pages: 1,
+        total: 0,
+        limit: 25
+      },
+      panes: {
+        'parks': {
+          title: 'Parks',
+          query: 'parks',
+          data: []
+        },
+        'blueprints': {
+          title: 'Blueprints',
+          query: 'blueprints',
+          data: []
+        },
+        'billboards': {
+          title: 'Billboards',
+          query: 'billboards',
+          data: []
+        },
+        'videos': {
+          title: 'Videos',
+          query: 'media',
+          params: { type: 'video' },
+          data: []
+        },
+        'images': {
+          title: 'Images',
+          query: 'media',
+          params: { type: 'image' },
+          data: []
+        }
       }
     }
   },
+  watch: {
+    active: () => {
+
+    },
+    context: () => {
+
+    }
+  },
+  methods: {
+    getToolbox(m) {
+      this.loading = true
+      let model = this.panes[m]
+      let params = {}
+      if(this.context == 'user') {
+        params = { owned: true }
+      } else if(this.context == 'saved') {
+        params = { toolbox: true }
+      }
+
+      params = Object.assign(params, { page: this.pagination.current } , this.panes[m].params)
+      return API.fetch(model.query, params).then((response) => {
+        model.data = response
+        this.pagination = {
+          total: response.total,
+          pages: response.pages,
+          limit: response.limit,
+          current: response.page
+        }
+        this.loading = false
+      }).catch(() => {
+        this.loading = false
+      })
+    },
+    toggle() {
+      if(this.open) {
+         return this.open = false
+      } else {
+        this.getToolbox(this.active)
+        return this.open = true
+      }
+    },
+    tab(model, context = 'user') {
+      console.log('tabbing to '+model)
+      this.active = model
+      this.context = context
+      this.pagination = {
+        current: 1,
+        pages: 1,
+        total: 0,
+        limit: 25
+      }
+
+      this.getToolbox(model)
+    },
+    goToPage(page) {
+      this.pagination.current = page
+      this.getParks().then(() => {
+        this.loading = false
+      })
+    }
+  },
   mounted () {
-
     ToolBus.$on('toggle', (tab) => {
+      if(tab) this.tab(tab)
       this.toggle()
-    })
-
-    this.getToolbox().then(() => {
-
-    }).catch((err) => {
-
     })
   }
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style lang="scss">
+<style lang="scss" scoped>
+hr {
+  background-color: $warning-invert;
+}
 
+.tabs {
+  margin: 0!important;
+}
 </style>

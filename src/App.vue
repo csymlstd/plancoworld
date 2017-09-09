@@ -1,26 +1,35 @@
 <template>
   <div id="app">
-    <nav class="navbar">
+    <nav class="navbar" :class="{ 'transparent': isHome }">
         <div class="navbar-brand">
           <router-link class="navbar-item logo" to="/">PlanCo World</router-link>
-          <router-link class="navbar-item" to="/parks">Parks</router-link>
-          <router-link class="navbar-item" to="/blueprints">Blueprints</router-link>
-          <router-link class="navbar-item" to="/billboards">Billboards</router-link>
-          <router-link class="navbar-item" to="/audio">Audio</router-link>
         </div>
 
-        <div class="navbar-end">
-          <div class="navbar-item has-dropdown is-hoverable">
+        <div class="navbar-menu">
+          <div class="navbar-start">
+            <router-link :to="{ name: 'Parks' }" class="navbar-item">Parks</router-link>
+            <router-link :to="{ name: 'Blueprints' }" class="navbar-item">Blueprints</router-link>
+            <router-link :to="{ name: 'Billboards' }" class="navbar-item">Billboards</router-link>
+            <router-link :to="{ name: 'Audio' }" class="navbar-item">Audio</router-link>
+          </div>
+          <div class="navbar-end">
+          <div class="navbar-item">
+            <Search @selected="go"></Search>
+          </div>
+          <div class="navbar-item has-dropdown is-hoverable" v-if="user.authenticated">
             <a class="navbar-link"><span class="icon"><i class="fas fa-cloud-upload"></i></span></a>
             <div class="navbar-dropdown is-right">
-              <router-link :to="{ name: 'Import', params: { model: 'Park' } }" class="navbar-item">Park</router-link>
-              <router-link :to="{ name: 'Import', params: { model: 'Blueprint' } }" class="navbar-item">Blueprint</router-link>
+              <router-link :to="{ name: 'ImportPark' }" class="navbar-item">Park</router-link>
+              <router-link :to="{ name: 'ImportBlueprint' }" class="navbar-item">Blueprint</router-link>
               <router-link :to="{ name: 'ImportBillboard' }" class="navbar-item">Billboard</router-link>
-              <a class="navbar-item">Audio</a>
+              <router-link :to="{ name: 'ImportAudio' }" class="navbar-item">Audio</router-link>
+              <hr class="dropdown-divider" />
+              <router-link :to="{ name: 'Convert' }" class="navbar-item">Convert</router-link>
             </div>
           </div>
           <UserMenu v-if="user.authenticated"></UserMenu>
-          <router-link class="navbar-item" v-if="!user.authenticated" to="/">Login</router-link>
+          <router-link class="navbar-item" v-if="!user.authenticated && !isHome" to="/">Login</router-link>
+        </div>
         </div>
     </nav>
     <vs-notify group="notifications"></vs-notify>
@@ -29,7 +38,7 @@
 
     <footer class="main">
       <div class="container">
-        <p class="description">PlanCo World &copy; 2017. <br /> We are not affiliated with Frontier Developments. <span class="planco" title="Trademarks">Buldcrefs</span> mentioned on this <span class="planco" title="website">murlstess</span> are the property of their respective <span class="planco" title="owners">pohdes</span>.</p>
+        <p class="description">PlanCo World &copy; 2017. <br /> We are not affiliated with Planet Coaster, Frontier Developments or its licensors. <span class="planco" title="Buldcrefs">Trademarks</span> are the property of their respective owners.</p>
       </div>
     </footer>
   </div>
@@ -41,6 +50,7 @@ import auth from '@/services/auth'
 import '@/components/ui/Notify'
 import Toolbox from '@/components/Toolbox'
 import UserMenu from '@/components/ui/UserMenu'
+import Search from '@/components/ui/Search'
 
 import '@/styles/vendors/_font-awesome-core.scss';
 import '@/styles/vendors/_font-awesome-brands.scss';
@@ -48,23 +58,46 @@ import '@/styles/vendors/_font-awesome-brands.scss';
 import '@/styles/vendors/_font-awesome-regular.scss';
 import '@/styles/vendors/_font-awesome-solid.scss';
 
+import 'quill/dist/quill.core.css'
+import 'quill/dist/quill.snow.css'
+
 auth.checkAuth()
 
 export default {
   data() {
     return {
-      user: auth.user
+      user: auth.user,
+      isHome: false
+    }
+  },
+  watch: {
+    $route () {
+      console.log(this.$route.path)
+      if(this.$route.path === '/') {
+        this.isHome = true
+      } else {
+        this.isHome = false
+      }
     }
   },
   components: {
     Toolbox,
-    UserMenu
+    UserMenu,
+    Search
   },
   methods: {
-
+    go(match) {
+      let type = match._type
+      let name = type.charAt(0).toUpperCase() + type.slice(1)
+      router.push({ name, params: { slug: match._source.slug }})
+    }
   },
   mounted () {
-
+    if(this.$route.path === '/') {
+      this.isHome = true
+    } else {
+      this.isHome = false
+    }
   }
 }
 </script>
@@ -74,19 +107,4 @@ export default {
 [v-cloak] {
   display: none!important;
 }
-
-.vs-notify{ position:fixed; width:300px; z-index:9999; }
-.vs-notify .ntf { font-size:14px; padding:10px; margin:0 5px 5px; color:#fff; background:#44A4FC; border-left:5px solid #187FE7; box-sizing:border-box; text-align:left; cursor:pointer; }
-.vs-notify .warn   { background:#ffb648; border-left-color:#f48a06; }
-.vs-notify .error  { background:#E54D42; border-left-color:#B82E24; }
-.vs-notify .success { background:#68CD86; border-left-color:#42A85F; }
-
-.ntf-left-enter-active, .ntf-left-leave-active, .ntf-right-enter-active, .ntf-right-leave-active, .ntf-top-enter-active, .ntf-top-leave-active,
-.ntf-bottom-enter-active, .ntf-bottom-leave-active{ transition: all 0.3s; }
-.ntf-left-enter,  .ntf-left-leave-to { opacity:0; transform:translateX(-300px); }
-.ntf-right-enter, .ntf-right-leave-to{ opacity:0; transform:translateX(300px); }
-.ntf-fade-enter-active, .ntf-fade-leave-active{ transition: opacity 0.5s; }
-.ntf-fade-enter, .ntf-fade-leave-to{ opacity: 0; }
-.ntf-top-enter,  .ntf-top-leave-to{ opacity:0; transform: translateY(-120px); }
-.ntf-bottom-enter, .ntf-bottom-leave-to{ opacity:0; transform: translateY(120px); }
 </style>

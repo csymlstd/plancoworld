@@ -1,9 +1,12 @@
 <template>
   <div class="field">
     <div class="field">
-      <button class="button is-fullwidth is-dark is-medium" @click="loginWithSteam()">Log in through Steam</button>
+      <button class="button is-dark is-medium" :class="{ 'is-loading': loading.steam }" @click="loginWithSteam()"><span class="icon"><i class="fab fa-steam"></i></span> <span>Login with Steam</span></button>
     </div>
-    <p class="field text-center">or</p>
+    <div class="field">
+      <a class="has-text-white">Login with Email</a>
+    </div>
+    <!-- <p class="field text-center">or</p>
     <form @submit="login">
       <div class="ui message error visible" v-if="error">
         {{ error.error }}
@@ -15,10 +18,10 @@
         <div class="control"><input type="password" class="input is-medium" placeholder="Password" v-model="credentials.password"></div>
       </div>
       <div class="text-center">
-        <button class="button is-primary is-fullwidth" type="submit">Login</button>
+        <button class="button is-primary is-fullwidth" type="submit" :class="{ 'is-loading': loading.login }">Login</button>
         <a class="button is-link">Send One-Time Login Link</a>
       </div>
-    </form>
+    </form> -->
   </div>
 </template>
 
@@ -33,7 +36,11 @@ export default {
         email: '',
         password: ''
       },
-      error: false
+      error: false,
+      loading: {
+        login: false,
+        steam: false
+      }
     }
   },
 
@@ -41,20 +48,27 @@ export default {
 
     login(e) {
       e.preventDefault()
+      this.loading.login = true
       let credentials = {
         email: this.credentials.email,
         password: this.credentials.password
       }
 
       auth.login(credentials, 'parks').then(() => {
-
+        this.loading.steam = false
       }).catch((err) => {
+        this.loading.steam = false
         if(err) this.error = err
       })
     },
 
     loginWithSteam() {
-      auth.loginWithSteam()
+      this.loading.steam = true
+      auth.loginWithSteam().then(() => {
+        this.loading.steam = false
+      }).catch(() => {
+        this.loading.steam = false
+      })
     }
   }
 

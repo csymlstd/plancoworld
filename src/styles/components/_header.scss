@@ -1,24 +1,72 @@
+body {
+  padding-top: 64px;
+}
+
+html.page-home body {
+  padding-top: 0;
+}
+
 nav.navbar {
+  position: fixed;
+  top: 0;
+  z-index: 9950;
   height: 64px;
   width: 100%;
   background: color('accent');
+
+  &.transparent {
+    background: transparent;
+  }
 
   .logo {
     font-weight: 600;
   }
 
-  .navbar-brand, .navbar-end {
-    > a, .navbar-link {
+  .search {
+    .input {
+      background: transparent;
+      border: 0;
+      border-bottom: 2px solid rgba(255,255,255,0.75);
+      border-radius: 0;
       color: #fff;
+
+      &::placeholder {
+        color: rgba(255,255,255,0.75);
+      }
+
+      &:focus {
+        border-color: #fff;
+      }
+
+      &:focus ~ .icon, &:hover ~ .icon {
+        color: rgba(255,255,255,1)!important;
+      }
+    }
+
+    .control .icon {
+      color: rgba(255,255,255,0.75)!important;
+    }
+  }
+
+  &.transparent {
+    .navbar-brand, .navbar-start, .navbar-end {
+      > a, .navbar-link {
+
+      }
+    }
+  }
+
+  .navbar-brand, .navbar-start, .navbar-end {
+    overflow: visible;
+
+    > a, .navbar-link {
+      color: rgba(255,255,255,0.75);
       font-size: 1.3rem;
       line-height: 3rem;
 
-      &:hover {
-        background: color('accent', 'dark');
-      }
-
-      &::after {
-        border-color: #fff;
+      &:hover, &.is-active  {
+        color: #fff;
+        background: transparent;
       }
     }
 
@@ -33,12 +81,8 @@ nav.navbar {
     .navbar-item.has-dropdown:hover {
 
       .navbar-link {
-        background: color('accent', 'dark');
         color: #fff;
-
-        &::after {
-          border-color: color('accent');
-        }
+        background: transparent;
       }
     }
   }

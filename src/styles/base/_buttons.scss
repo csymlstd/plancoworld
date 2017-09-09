@@ -11,6 +11,25 @@
     color: color('accent');
   }
 
+  &.is-rounded {
+    border-radius: 5em;
+  }
+
+  &.is-loading:after {
+    animation: fa-spin 2s infinite linear;
+    content: "\f013";
+    font-family: 'Font Awesome 5 Solid';
+    font-weight: 900;
+    font-size: 1.4em;
+    color: rgba(255,255,255,0.75);
+    height: 1em;
+    width: 1em;
+    border: 0!important;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1;
+    vertical-align: -15%;
+  }
+
 }
 
 a.is-text {
@@ -20,4 +39,33 @@ a.is-text {
 
 .header .is-text {
   margin-left: 1.5rem;
+}
+
+.tabs.is-toggle {
+  a {
+    border-width: 2px;
+  }
+}
+
+.construction {
+  padding-left: 1.5em!important;
+  position: relative;
+  overflow: hidden;
+  border: 0!important;
+
+  &:hover { border: 0; }
+
+  &::after {
+    position: absolute;
+    display: block;
+    content: ' ';
+    background: url('/assets/images/construction.svg') no-repeat;
+    background-size: contain;
+    width: 6em;
+    height: 3em;
+    top: 0;
+    left: 0;
+    transform: translate(-5em);
+    opacity: 0.6;
+  }
 }

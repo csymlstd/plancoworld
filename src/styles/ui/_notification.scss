@@ -1,0 +1,59 @@
+.vs-notify {
+  bottom: 3rem!important;
+  position: fixed;
+  width: 350px;
+  z-index: 9999;
+
+
+  .ntf {
+    font-size: 1rem;
+    padding: 1rem;
+    margin: 0 1rem 0.5rem;
+    border-radius: 4px;
+    color: #fff;
+    background: $primary;
+    box-sizing: border-box;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.190, 1.000, 0.220, 1.000);
+    will-change: transform;
+
+    .icon {
+      margin-right: 0.5rem;
+    }
+  }
+
+  .warn   { background: $warning; }
+  .error  { background: $danger; } //#B82E24
+  .success { background: $success; }
+
+  .ntf-left-enter-active, .ntf-left-leave-active, .ntf-right-enter-active, .ntf-right-leave-active, .ntf-top-enter-active, .ntf-top-leave-active,
+  .ntf-bottom-enter-active, .ntf-bottom-leave-active {
+    // transition: all 0.4s cubic-bezier(0.190, 1.000, 0.220, 1.000);
+    // will-change: transform;
+  }
+
+  .ntf-left-enter,  .ntf-left-leave-to {
+    transform:translateX(-350px);
+  }
+
+  .ntf-right-enter, .ntf-right-leave-to{
+    transform:translateX(350px);
+  }
+
+  .ntf-fade-enter-active, .ntf-fade-leave-active{
+    transition: opacity 0.3s;
+  }
+
+  .ntf-fade-enter, .ntf-fade-leave-to{
+    opacity: 0;
+  }
+
+  .ntf-top-enter,  .ntf-top-leave-to{
+    transform: translateY(-120px);
+  }
+
+  .ntf-bottom-enter, .ntf-bottom-leave-to{
+    transform: translateY(120px);
+  }
+}

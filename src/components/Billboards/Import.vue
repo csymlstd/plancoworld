@@ -8,7 +8,7 @@
             <h1 class="title level-item"> / Add a Billboard</h1>
           </div>
           <div class="level-right">
-            <a class="level-item">Generator</a>
+            <router-link :to="{ name: 'Generator' }" class="level-item">Generator</router-link>
             <router-link :to="{ name: 'Convert' }" class="level-item">Convert to WebM</router-link>
             <a class="level-item">Glossary</a>
             <router-link :to="{ name: 'ImportBillboard' }" class="button is-primary is-medium">Add a Billboard</router-link>
@@ -25,18 +25,40 @@
     <section class="section">
       <div class="columns is-centered">
         <div class="form for-park column is-three-quarters is-centered">
+
+          <h4 class="title is-4">Billboard Title</h4>
           <div class="field">
-            <h4 class="title is-4">Billboard Title</h4>
             <div class="control">
               <input type="text" name="title" v-model="imported.title" class="input is-medium" placeholder="PlanCo World Entrance Sign" />
             </div>
           </div>
 
+          <h4 class="title is-4">About your Billboard</h4>
           <div class="field">
-            <h4 class="title is-4">About your Billboard</h4>
             <p v-if="wasImported">If you have links to billboards and audio files, you can upload them directly to PlanCo World in the next step.</p>
             <div class="description editor" v-html="imported.description"></div>
           </div>
+
+          <h4 class="title is-4">Add to a Pack</h4>
+          <div class="field has-addons">
+
+            <div class="control has-icons-left is-expanded">
+              <input type="text" name="title" v-model="imported.pack" class="input is-medium" placeholder="" />
+              <span class="icon is-left"><i class="far fa-search"></i></span>
+            </div>
+            <div class="control">
+              <button class="button is-success is-medium">Create New Pack</button>
+            </div>
+          </div>
+
+
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="columns is-centered">
+        <div class="form for-park column is-three-quarters is-centered">
 
           <div class="field">
             <Filters :options="filterOptions" @selected="" ></Filters>
@@ -64,8 +86,8 @@ import API from '@/services/api'
 import Upload from '@/components/ui/Upload'
 
 import Quill from 'quill'
-import 'quill/dist/quill.core.css'
-import 'quill/dist/quill.snow.css'
+
+
 
 export default {
   name: 'Import',
@@ -90,6 +112,7 @@ export default {
           label: 'Type of Media',
           type: 'toggle',
           visible: true,
+          force: true,
           min: 1,
           max: 1
         },

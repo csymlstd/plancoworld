@@ -1,5 +1,5 @@
 <template>
-<nav class="pagination is-centered is-medium">
+<nav class="pagination is-centered">
   <a class="pagination-previous" :disabled="current <= 1" @click="goTo(current-1)">Previous</a>
   <a class="pagination-next" :disabled="current >= pages" @click="goTo(current+1)">Next page</a>
   <ul class="pagination-list">

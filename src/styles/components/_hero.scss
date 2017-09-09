@@ -1,18 +1,30 @@
 section.hero {
+  position: relative;
+  z-index: 1000;
   padding: 2rem 0;
-  background: color('accent','darker');
+  background-color: color('accent','darker');
   background-size: cover!important;
   background-repeat: no-repeat!important;
   background-position: center!important;
   color: #fff;
   margin-bottom: 1.5rem;
 
+  .hero-meta {
+    position: absolute;
+    bottom: 2rem;
+    width: 100%;
+  }
+
   .level-item.title {
     margin-bottom: 0!important;
   }
 
-  .level-right a.level-item {
+  .level-right .level-item {
     margin: 0 1rem;
+
+    & + .level-item {
+      margin-left: 0;
+    }
 
     &:last-child {
       margin-right: 0;
@@ -42,4 +54,19 @@ section.hero {
 
 .hero--tall {
   height: 500px;
+}
+
+main.home-page {
+  position: relative;
+  overflow: hidden;
+}
+
+.texture {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  min-width: 100%;
+  min-height: 100%;
+  max-width: none;
+  transform: translateX(-50%) translateY(-50%);
 }

@@ -26,6 +26,7 @@ export default {
       localStorage.setItem('access_token', response.access_token)
       localStorage.setItem('refresh_token', response.refresh_token)
 
+      document.body.classList.add('logged-in')
       this.user.authenticated = true
       this.user.profile = response.user
 
@@ -42,6 +43,7 @@ export default {
     let catchToken = window.addEventListener('message', (message) => {
       if(message.data.message === 'Token') {
         let auth = JSON.parse(message.data.auth)
+        document.body.classList.add('logged-in')
         localStorage.setItem('access_token', auth.access_token)
         localStorage.setItem('refresh_token', auth.refresh_token)
 
@@ -157,13 +159,20 @@ export default {
     localStorage.removeItem('refresh_token')
     this.user.authenticated = false
     this.tokens.access_token = {}
+    document.body.classList.remove('logged-in')
+  },
+
+  isLoggedIn() {
+    return this.user.authenticated
   },
 
   checkAuth() {
     let token = localStorage.getItem('access_token')
     if(token) {
+      document.body.classList.add('logged-in')
       this.user.authenticated = true
     } else {
+      document.body.classList.remove('logged-in')
       this.user.authenticated = false
     }
 
@@ -201,6 +210,6 @@ export default {
   },
 
   isOwner(model) {
-    return (this.user.authenticated) ? (model.user._id == this.user.profile._id) : false
+    return (this.user.authenticated && typeof model.user !== 'undefined' && typeof this.user.profile !== 'undefined') ? (model.user._id == this.user.profile._id) : false
   }
 }

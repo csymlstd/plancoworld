@@ -7,7 +7,7 @@
         <h1 class="title">Billboards</h1>
       </div>
       <div class="level-right">
-        <a class="level-item">Generator</a>
+        <router-link :to="{ name: 'Generator' }" class="level-item">Generator</router-link>
         <router-link :to="{ name: 'Convert' }" class="level-item">Convert to WebM</router-link>
         <a class="level-item">Glossary</a>
         <router-link :to="{ name: 'ImportBillboard' }" class="button is-primary is-medium">Add a Billboard</router-link>
@@ -21,12 +21,30 @@
       <Filters :options="filterOptions" @selected="filterBillboards" @sort="sortBillboards" @order="orderBillboards"></Filters>
     </div>
     <div class="column">
-      <div class="columns is-multiline">
-        <Billboard :model="billboard" :key="billboard._id" v-for="billboard in billboards"></Billboard>
-        <div class="column" v-if="billboards.length == 0 && loading == false" v-cloak>
-          There aren't any Billboards that match what you're looking for. Maybe you should build it!
+
+      <div class="level">
+        <div class="level-left">
+          <div class="level-item"><Sort @sort="sortBillboards" @order="orderBillboards"></Sort></div>
+        </div>
+        <div class="level-right">
+          <a class="delete level-item" @click="globalParams.name = ''; getParks()" v-if="globalParams.name"></a>
+          <div class="level-item">
+            <div class="control has-icons-left is-medium">
+              <input type="text" class="input is-medium" @keydown.enter="getParks" v-model="globalParams.name" placeholder="Filter by billboard name" />
+              <span class="icon is-small is-left"><i class="fas fa-search"></i></span>
+            </div>
+          </div>
         </div>
       </div>
+
+      <div class="columns cards is-multiline loader--parent">
+        <Loader v-if="loading"></Loader>
+        <Park :model="park" :key="billboard._id" v-for="billboard in billboards"></Park>
+        <div class="column" v-if="billboards.length == 0 && loading == false" v-cloak>
+          <div class="notification is-warning">There aren't any Billboards that match what you're looking for. You should create it!</div>
+        </div>
+      </div>
+      <Pagination :total="pagination.total" :current="pagination.current" :pages="pagination.pages" @goTo="goToPage"></Pagination>
     </div>
 
   </div>
@@ -36,6 +54,8 @@
 
 <script>
 import Filters from '@/components/ui/Filters'
+import Sort from '@/components/ui/Sort'
+import Loader from '@/components/ui/Loader'
 import API from '@/services/api'
 
 import Billboard from '@/components/Billboards/Card'
@@ -44,13 +64,24 @@ export default {
   name: 'billboards',
   components: {
     Filters,
+    Sort,
+    Loader,
     Billboard
+  },
+  metaInfo: {
+    title: 'Billboards'
   },
   data () {
     return {
       loading: false,
       billboards: [],
       globalParams: {},
+      pagination: {
+        current: 1,
+        pages: 1,
+        total: 0,
+        limit: 25
+      },
       filterOptions: {
         'billboards': {
           label: null,
@@ -92,21 +123,40 @@ export default {
   },
   methods: {
     getBillboards (params = {}) {
+      this.loading = true
       params = Object.assign(params, this.globalParams)
       return API.fetch('billboards', params).then((data) => {
         this.billboards = data
+        this.loading = false
+        this.pagination.total = data.total
+        this.pagination.pages = data.pages
+        this.pagination.limit = data.limit
+        this.pagination.current = data.page
+        return data
       })
     },
     sortBillboards(sort) {
       this.globalParams.sort = sort
+      this.getBillboards().then(() => {
+        this.loading = false
+      })
     },
     orderBillboards(order) {
       this.globalParams.order = order
+      this.getBillboards().then(() => {
+        this.loading = false
+      })
     },
     filterBillboards(tags) {
       this.loading = true
       tags = tags.join(',')
       this.getBillboards({ tags: tags }).then(() => {
+        this.loading = false
+      })
+    },
+    goToPage(page) {
+      this.globalParams.page = page
+      this.getBillboards().then(() => {
         this.loading = false
       })
     }
