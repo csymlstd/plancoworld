@@ -33,6 +33,11 @@ export default {
   },
   methods: {
     toggle () {
+      if(!Auth.authenticated) {
+        this.$store.commit('toggleModal', { modal: 'login', state: true })
+
+        return false
+      }
       API.post(`${this.model}/${this.data._id}/toolbox`).then((is) => {
         this.savedToToolbox = is.savedToToolbox
         this.$emit('savedToToolbox', this.savedToToolbox)

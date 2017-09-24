@@ -24,6 +24,10 @@ section.filters {
     position: relative;
     padding-left: 0;
     padding-right: 0;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    padding-right: 4rem;
 
     .tag {
       position: absolute;
@@ -60,6 +64,8 @@ section.filters {
   font-size: 1rem;
   border-radius: 0.5rem;
   white-space: nowrap;
+
+  .icon { margin: 0!important; }
 
   &:hover {
     border-color: color('accent');

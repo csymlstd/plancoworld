@@ -6,7 +6,24 @@ Vue.use(Vuex)
 
 export const store = new Vuex.Store({
   state: {
-    tags: []
+    tags: [],
+    measurements: 'imperial', // or 'metric'
+    toolbox: {
+      open: false,
+      selectMode: false,
+      restricted: [],
+      active: 'parks',
+      context: 'user',
+      pagination: {
+        current: 1,
+        pages: 1,
+        total: 0,
+        limit: 25
+      },
+    },
+    modals: {
+      login: false
+    }
   },
   getters: {
     getTagGroup: (state, getters) => (model) => {
@@ -16,6 +33,11 @@ export const store = new Vuex.Store({
     }
   },
   mutations: {
+    toggleModal(state, opts) {
+      if(typeof state.modals[opts.modal] == 'undefined') return false
+      if(typeof opts.state != 'undefined')  return state.modals[opts.modal] = opts.state
+      return state.modals[opts.modal] = state.modals[opts.modal] ? false : true
+    },
     addTag(state, id) {
       state.tags.push(id)
     },
@@ -24,6 +46,12 @@ export const store = new Vuex.Store({
     },
     replaceTags(state, tags) {
       state.tags = tags
+    },
+    toImperial(state) {
+      state.measurements = 'imperial'
+    },
+    toMetric(state) {
+      state.measurements = 'metric'
     }
   },
   actions: {

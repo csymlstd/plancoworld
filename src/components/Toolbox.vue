@@ -18,17 +18,19 @@
         </div>
 
         <div class="toolbox--list">
+          <div class="notification is-primary" v-if="selectMode">Select an image to use here!</div>
+
           <div class="toolbox--list-parks" v-if="active == 'parks'">
             <Park :model="park" :key="park._id" v-for="park in panes[active].data.parks"></Park>
           </div>
           <div class="toolbox--list-blueprints" v-if="active == 'blueprints'">
-            <Blueprint :model="blueprint" :key="blueprint._id" v-for="blueprint in panes[active].data.blueprints"></Blueprint>
+            <Blueprint :model="blueprint" :key="blueprint._id" v-for="blueprint in panes[active].data.blueprints" v-tooltip="{ content: selectMode ? 'Select this Blueprint' : null }"></Blueprint>
           </div>
-          <div class="toolbox--list-images columns" v-if="active == 'images'">
-            <ImageThumbnail :key="image._id" :media="image" v-for="image in panes[active].data.media"></ImageThumbnail>
+          <div class="toolbox--list-images columns is-multiline" v-if="active == 'images'">
+            <ImageThumbnail :key="image._id" :media="image" v-for="image in panes[active].data.media" @select="select(image)"></ImageThumbnail>
           </div>
-          <div class="toolbox--list-videos columns" v-if="active == 'videos'">
-            <VideoThumbnail :key="video._id" :media="video" v-for="video in panes[active].data.media"></VideoThumbnail>
+          <div class="toolbox--list-videos columns is-multiline" v-if="active == 'videos'">
+            <VideoThumbnail :key="video._id" :media="video" v-for="video in panes[active].data.media" @select="select(video)"></VideoThumbnail>
           </div>
 
           <Pagination :total="pagination.total" :current="pagination.current" :pages="pagination.pages" @goTo="goToPage" v-if="pagination.pages > 1"></Pagination>
@@ -74,6 +76,8 @@ export default {
     return {
       open: false,
       loading: true,
+      selectMode: false,
+      restricted: [],
       active: 'parks',
       context: 'user',
       pagination: {
@@ -113,14 +117,6 @@ export default {
       }
     }
   },
-  watch: {
-    active: () => {
-
-    },
-    context: () => {
-
-    }
-  },
   methods: {
     getToolbox(m) {
       this.loading = true
@@ -132,7 +128,7 @@ export default {
         params = { toolbox: true }
       }
 
-      params = Object.assign(params, { page: this.pagination.current } , this.panes[m].params)
+      params = Object.assign(params, { page: this.pagination.current }, this.panes[m].params)
       return API.fetch(model.query, params).then((response) => {
         model.data = response
         this.pagination = {
@@ -146,18 +142,30 @@ export default {
         this.loading = false
       })
     },
+    select(model) {
+      if(this.selectMode) {
+        console.log('emitting select')
+        ToolBus.$emit('select', model)
+        this.toggle()
+      }
+    },
     toggle() {
       if(this.open) {
-         return this.open = false
+        this.selectMode = false
+        this.restricted = []
+        return this.open = false
       } else {
         this.getToolbox(this.active)
         return this.open = true
       }
     },
-    tab(model, context = 'user') {
-      console.log('tabbing to '+model)
+    tab(model, context, selectMode = []) {
+      if(selectMode.length > 0) {
+        this.selectMode = true
+      }
+
       this.active = model
-      this.context = context
+      if(context) this.context = context
       this.pagination = {
         current: 1,
         pages: 1,
@@ -175,8 +183,9 @@ export default {
     }
   },
   mounted () {
-    ToolBus.$on('toggle', (tab) => {
-      if(tab) this.tab(tab)
+    ToolBus.$on('toggle', (options) => {
+      let opts = Object.assign({ tab: 'parks', context: 'user', selectMode: false }, options)
+      this.tab(opts.tab, opts.context, opts.selectMode)
       this.toggle()
     })
   }

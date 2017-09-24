@@ -1,27 +1,27 @@
 <template>
-  <div class="column is-one-third">
-    <div class="card">
+  <div class="column is-one-third-desktop is-half-tablet">
+    <div class="card has-level-bottom">
       <a class="card-image" :style="{ 'backgroundImage': `url('${thumbnail}')` }" @click="viewPark">
-        <div class="level top">
+        <div class="level bottom">
           <div class="level-left"><div class="level-item"><Filters :options="tagOptions" :inline="true" :readOnly="true" ref="tags"></Filters></div></div>
           <div class="level-right"><div class="level-item" v-if="isSaved()"><span class="tag is-rounded is-warning is-medium" v-tooltip="'Saved to Toolbox'"><span class="icon"><i class="fas fa-archive"></i></span></span></div></div>
         </div>
-
-        <div class="level bottom">
-          <div class="level-left">
-            <div class="level-item">
-              <div class="vote"><div class="icon"><i class="far fa-chevron-up"></i></div><div class="count" v-if="model.votes.upTotal > 0">{{ model.votes.upTotal }}</div></div>
-            </div>
-          </div>
-        </div>
-
-
           <!-- <img :src="thunbnail ? thumbnail : ''" class="fadeIn" @load="$event.target.classList.toggle('is-active')" /> -->
       </a>
       <div class="card-content">
         <div class="content">
-          <h3><a @click="viewPark">{{ model.name | truncate(70) }}</a></h3>
-          <div class="creator">By {{ model.user.name.display }}</div>
+          <h3 class="title"><a @click="viewPark">{{ model.name | truncate(70) }}</a></h3>
+          <div class="level bottom">
+            <div class="level-left">
+              <Creator :user="model.user" class="level-item"></Creator>
+            </div>
+            <div class="level-right">
+              <Reaction :model="model"></Reaction>
+              <!-- <div class="vote level-item"><span class="icon"><i class="fas fa-heart"></i></span><span class="count">{{ model.votes.upTotal || 0 }}</span></div> -->
+            </div>
+          </div>
+
+
         </div>
       </div>
     </div>
@@ -32,13 +32,17 @@
 import router from '@/router'
 
 import Filters from '@/components/ui/Filters'
+import Reaction from '@/components/ui/Reaction'
+import Creator from '@/components/ui/ProfileMicro'
 import Media from '@/services/media'
 import Auth from '@/services/auth'
 
 export default {
   name: 'park-card',
   components: {
-    Filters
+    Filters,
+    Creator,
+    Reaction
   },
   props: {
     model: {},
@@ -47,6 +51,7 @@ export default {
     return {
       selected: [],
       groups: [],
+      addReaction: false,
       thumbnail: '',
       tagOptions: {
         'parks': {

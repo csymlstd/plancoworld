@@ -9,16 +9,25 @@ section.hero {
   color: #fff;
   margin-bottom: 1.5rem;
 
+  &.hero--tall {
+    height: 500px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .cover-photo {
+    height: 100%;
+    max-height: 100%;
+    width: auto;
+    max-width: none;
+  }
+
   .hero-meta {
     position: absolute;
     bottom: 2rem;
     width: 100%;
   }
-
-  .level-item.title {
-    margin-bottom: 0!important;
-  }
-
   .level-right .level-item {
     margin: 0 1rem;
 
@@ -41,6 +50,10 @@ section.hero {
 
   .title {
     color: #fff;
+
+    &.level-item {
+      margin-bottom: 0!important;
+    }
   }
 
   &.is-light {
@@ -50,15 +63,6 @@ section.hero {
   & + .hero {
     margin-top: -1.5rem;
   }
-}
-
-.hero--tall {
-  height: 500px;
-}
-
-main.home-page {
-  position: relative;
-  overflow: hidden;
 }
 
 .texture {

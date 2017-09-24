@@ -3,7 +3,7 @@
     <div class="field">
       <button class="button is-dark is-medium" :class="{ 'is-loading': loading.steam }" @click="loginWithSteam()"><span class="icon"><i class="fab fa-steam"></i></span> <span>Login with Steam</span></button>
     </div>
-    <div class="field">
+    <div class="field" v-if="!steamOnly">
       <a class="has-text-white">Login with Email</a>
     </div>
     <!-- <p class="field text-center">or</p>
@@ -29,7 +29,9 @@
 import auth from '@/services/auth'
 
 export default {
-
+  props: {
+    steamOnly: false
+  },
   data() {
     return {
       credentials: {
@@ -56,6 +58,7 @@ export default {
 
       auth.login(credentials, 'parks').then(() => {
         this.loading.steam = false
+        this.$store.commit('toggleModal', { modal: 'login', state: false })
       }).catch((err) => {
         this.loading.steam = false
         if(err) this.error = err
@@ -66,6 +69,8 @@ export default {
       this.loading.steam = true
       auth.loginWithSteam().then(() => {
         this.loading.steam = false
+        this.$store.commit('toggleModal', { modal: 'login', state: false })
+        this.$notify('notifications','Welcome back to PlanCo World!')
       }).catch(() => {
         this.loading.steam = false
       })

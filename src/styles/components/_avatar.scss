@@ -1,0 +1,40 @@
+.avatar {
+  background: color('grey','light');
+  border-radius: 50%;
+  background-size: cover!important;
+  background-repeat: no-repeat;
+  background-position: center!important;
+}
+
+.profile--micro {
+  display: flex;
+  align-items: center;
+
+  .avatar {
+    width: 2rem;
+    height: 2rem;
+    margin-right: 0.5rem;
+  }
+}
+
+.profile--mini {
+  text-align: center;
+
+  .avatar {
+    margin: 0 auto;
+    width: 4rem;
+    height: 4rem;
+  }
+
+  .user {
+    margin-top: 0.75rem;
+  }
+}
+
+.park-info {
+  margin-top: 1.5rem;
+
+  .profile--mini {
+    margin-top: -3rem;
+  }
+}

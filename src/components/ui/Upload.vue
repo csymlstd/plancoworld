@@ -93,7 +93,7 @@ export default {
   methods: {
     toggleToolbox(e) {
       e.preventDefault()
-      ToolBus.$emit('toggle', 'images')
+      ToolBus.$emit('toggle', { tab: 'images', selectMode: ['images', 'videos'] })
     },
     // http://scratch99.com/web-development/javascript/convert-bytes-to-mb-kb/
     bytesToSize(bytes) {
@@ -146,7 +146,7 @@ export default {
                     this.$set(this.items[n], 'imageData', reader.result)
                   })
                   reader.readAsDataURL(this.items[n].file)
-                } else if(Media.canTranscode(file.type)) {
+                } else if(Media.canTranscode(file.type) || Media.isVideo(file.type)) {
                   console.log('checking duration')
                   // Check duration of the video
                   let v = document.createElement('video')
@@ -154,6 +154,10 @@ export default {
                   v.onloadedmetadata = () => {
                     this.items[n].duration = v.duration.toFixed(1)
                     this.items[n].ready = true
+
+                    if(this.instant === true) {
+                      this.onSubmit()
+                    }
                   }
                   v.src = URL.createObjectURL(file.file)
                 }
@@ -167,7 +171,6 @@ export default {
         if(this.instant === true) {
           this.onSubmit()
         }
-        //this.itemsTotalSize = this.bytesToSize(fileSizes);
     },
     removeItem(n) {
       // @todo remove from DB
@@ -353,6 +356,18 @@ export default {
     if(this.transcoding) {
       this.getTranscoding()
     }
+
+    // When a user selects an item from the toolbox while in select mode
+    ToolBus.$on('select', (media) => {
+      console.log(media)
+      let allowed = Media.isAllowedType(media.contentType)
+      if(allowed) {
+        this.$notify('notifications', 'Media added from Toolbox', 'success')
+        this.$emit('uploaded', media)
+      } else {
+        this.$notify('notifications', 'That is not allowed here', 'error')
+      }
+    })
   }
 }
 </script>

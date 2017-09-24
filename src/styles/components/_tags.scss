@@ -1,5 +1,13 @@
 .tag {
   cursor: default;
+
+  &:hover {
+    text-decoration: none!important;
+  }
+
+  &.is-white:hover {
+    color: $black;
+  }
 }
 
 .is-box {

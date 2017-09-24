@@ -1,6 +1,6 @@
 <template>
   <div class="column is-half thumbnail">
-    <div class="image is-16by9" draggable>
+    <div class="image is-16by9" @click="select()">
       <img :src="media.url" />
     </div>
     <div class="level">
@@ -31,9 +31,13 @@ export default {
       extension: ''
     }
   },
+  methods: {
+    select () {
+      this.$emit('select')
+    }
+  },
   watch: {
     media: function() {
-      console.log(this.media.key)
       this.extension = Media.getExtension(this.media.key)
     }
   }

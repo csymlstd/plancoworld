@@ -48,7 +48,7 @@
           <!-- <button class="ui button" @click="addField()" :disabled="fields >= max">Add Another</button> -->
         </div>
         <div class="form for-blueprint columns is-centered" v-show="step == 1">
-          <div class="column is-three-quarters">
+          <div class="column is-three-quarters content">
             <div class="field">
               <label class="label">Blueprint Name</label>
               <div class="control">
@@ -59,7 +59,113 @@
             <div class="field">
               <label class="label">About Your Blueprint</label>
               <p v-if="wasImported">If you have links to billboards and audio files, you can upload them directly to PlanCo World in the next step.</p>
-              <div class="description editor" v-html="imported.description"></div>
+              <div class="box">
+                <div class="description editor" v-html="imported.description"></div>
+              </div>
+            </div>
+
+            <div class="field">
+              <div class="box">
+                <div class="level">
+                  <div class="level-left">
+                    <h5 class="title is-5">Ratings</h5>
+                  </div>
+                  <div class="level-right">
+                    <div class="switch level-item" :class="{'is-active is-primary':enableRatings }" @click="enableRatings = enableRatings ? false: true">
+                      <label></label>
+                    </div>
+                  </div>
+                </div>
+                <div class="columns" v-if="enableRatings">
+                  <div class="column">
+                    <div class="reaction is-large fun"></div>
+                  </div>
+                  <div class="column">
+                    <div class="reaction is-large nauseating"></div>
+                  </div>
+                  <div class="column">
+                    <div class="reaction is-large scary"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="box">
+                <div class="level">
+                  <div class="level-left">
+                    <h5 class="title is-5">Ride Stats</h5>
+                  </div>
+                  <div class="level-right">
+                    <div class="switch level-item" :class="{'is-active is-primary':enableStats }" @click="enableStats = enableStats ? false: true">
+                      <label></label>
+                    </div>
+                  </div>
+                </div>
+                <div class="columns" v-if="enableStats">
+                  <div class="column">
+                    <label class="label">Duration</label>
+                    <div class="field has-addons">
+                      <div class="control">
+                        <input type="number" class="input" v-model="imported.stats.duration" />
+                      </div>
+                      <div class="control">
+                        <div class="button is-static">minutes</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="column">
+                    <label class="label">Length</label>
+                    <div class="field has-addons">
+                      <div class="control">
+                        <input type="number" class="input" v-model="imported.stats.length" />
+                      </div>
+                      <div class="control">
+                        <div class="button is-static" v-if="isImperial()">feet</div>
+                        <div class="button is-static" v-else>meters</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="column">
+                    <label class="label">Biggest Drop</label>
+                    <div class="field has-addons">
+                      <div class="control">
+                        <input type="number" class="input" v-model="imported.stats.biggestDrop" />
+                      </div>
+                      <div class="control">
+                        <div class="button is-static" v-if="isImperial()">feet</div>
+                        <div class="button is-static" v-else>meters</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="columns" v-if="enableStats">
+                  <div class="column">
+                    <label class="label">Max Speed</label>
+                    <div class="field has-addons">
+                      <div class="control">
+                        <input type="number" max="149" class="input" v-model="imported.stats.maxSpeed" />
+                      </div>
+                      <div class="control">
+                        <div class="button is-static" v-if="isImperial()">mph</div>
+                        <div class="button is-static" v-else>kmh</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="column">
+                    <label class="label">Average Speed</label>
+                    <div class="field has-addons">
+                      <div class="control">
+                        <input type="number" max="149" class="input" v-model="imported.stats.avgSpeed" />
+                      </div>
+                      <div class="control">
+                        <div class="button is-static" v-if="isImperial()">mph</div>
+                        <div class="button is-static" v-else>kmh</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="columns">
+
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div class="field">
@@ -82,6 +188,7 @@
 </template>
 
 <script>
+import { store } from '@/store.js'
 import slug from 'slug'
 import Filters from '@/components/ui/Filters'
 import API from '@/services/api'
@@ -91,7 +198,7 @@ import Upload from '@/components/ui/Upload'
 import Quill from 'quill'
 
 export default {
-  name: 'Import',
+  store,
   components: {
     Upload,
     Filters
@@ -109,9 +216,12 @@ export default {
       imported: {
         title: '',
         media: [],
-        tags: []
+        tags: [],
+        stats: {}
       },
       wasImported: false,
+      enableStats: false,
+      enableRatings: false,
       filterOptions: {
         'buildings': {
           label: 'Buildings',
@@ -238,17 +348,13 @@ export default {
       this.imported.tags = tags
     },
     importLater() {
-      this.imported = {
-        title: '',
-        type: 'blueprint',
-        media: [],
-        tags: []
-      }
-
       this.step = 1
       this.$nextTick(() => {
         this.attachEditor()
       })
+    },
+    isImperial() {
+      return this.$store.state.measurements == 'imperial'
     },
     addBlueprint() {
       let newBlueprint = {
@@ -277,7 +383,7 @@ export default {
     }
   },
   mounted () {
-
+    console.log(this.$store.measurements)
   }
 }
 </script>

@@ -40,32 +40,33 @@ export default {
   },
 
   loginWithSteam(redirect) {
-    let catchToken = window.addEventListener('message', (message) => {
-      if(message.data.message === 'Token') {
-        let auth = JSON.parse(message.data.auth)
-        document.body.classList.add('logged-in')
-        localStorage.setItem('access_token', auth.access_token)
-        localStorage.setItem('refresh_token', auth.refresh_token)
+    return new Promise((resolve, reject) => {
+      let catchToken = window.addEventListener('message', (message) => {
+        if(message.data.message === 'Token') {
+          let auth = JSON.parse(message.data.auth)
+          document.body.classList.add('logged-in')
+          localStorage.setItem('access_token', auth.access_token)
+          localStorage.setItem('refresh_token', auth.refresh_token)
 
-        this.user.authenticated = true
-        this.user.profile = auth.user
+          this.user.authenticated = true
+          this.user.profile = auth.user
 
-        router.push('/parks')
-        message.source.close()
-        //window.removeEventListener('message', catchToken, false)
-      }
+          message.source.close()
+          resolve()
+          //window.removeEventListener('message', catchToken, false)
+        }
+      })
+
+      let dualScreenLeft = (window.screenLeft != undefined) ? window.screenLeft : screen.left;
+      let dualScreenTop = (window.screenTop != undefined) ? window.screenTop : screen.top;
+      let width = window.innerWidth ? window.innerWidth : document.documentElement.clientWidth ? document.documentElement.clientWidth : screen.width;
+      let height = window.innerHeight ? window.innerHeight : document.documentElement.clientHeight ? document.documentElement.clientHeight : screen.height;
+
+      let left = ((width / 2) - (600 / 2)) + dualScreenLeft;
+      let top = ((height / 2) - (755 / 2)) + dualScreenTop;
+      let steamWindow = window.open(api.url()+'auth/steam', 'steamAuth', 'height=600,width=755,top='+top+',left='+left+',resizable,scrollbars,chrome=yes,centerscreen')
+      if(window.focus) steamWindow.focus()
     })
-
-    let dualScreenLeft = (window.screenLeft != undefined) ? window.screenLeft : screen.left;
-    let dualScreenTop = (window.screenTop != undefined) ? window.screenTop : screen.top;
-    let width = window.innerWidth ? window.innerWidth : document.documentElement.clientWidth ? document.documentElement.clientWidth : screen.width;
-    let height = window.innerHeight ? window.innerHeight : document.documentElement.clientHeight ? document.documentElement.clientHeight : screen.height;
-
-    let left = ((width / 2) - (600 / 2)) + dualScreenLeft;
-    let top = ((height / 2) - (755 / 2)) + dualScreenTop;
-    let steamWindow = window.open(api.url()+'auth/steam', 'steamAuth', 'height=600,width=755,top='+top+',left='+left+',resizable,scrollbars,chrome=yes,centerscreen')
-    if(window.focus) steamWindow.focus()
-
 
     // api.post('auth/steam').then((response) => {
     //   let steamUrl = response.redirect;

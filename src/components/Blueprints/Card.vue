@@ -11,7 +11,14 @@
       <div class="card-content">
         <div class="content">
           <h3><a @click="viewBlueprint">{{ model.name }}</a> <span class="tag is-warning" v-if="isSaved()"><i class="fas fa-archive"></i></span></h3>
-          <div class="creator">By {{ model.user.name.display }}</div>
+          <div class="level bottom">
+            <div class="level-left">
+              <Creator :user="model.user" class="level-item"></Creator>
+            </div>
+            <div class="level-right">
+
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -23,10 +30,11 @@ import router from '@/router'
 
 import Media from '@/services/media'
 import Auth from '@/services/auth'
+import Creator from '@/components/ui/ProfileMicro'
 
 export default {
   components: {
-
+    Creator
   },
   props: {
     model: {},

@@ -1,7 +1,10 @@
 import auth from './auth'
 import axios from 'axios'
 
-const API_URL = 'http://localhost:5100/api/'
+let API_URL = 'http://localhost:5100/v1/'
+if(process.env.NODE_ENV == 'production') {
+  API_URL = 'http://api.planco.world/v1/'
+}
 const api = axios.create({
   baseURL: API_URL,
 })

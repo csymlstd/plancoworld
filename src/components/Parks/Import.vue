@@ -1,6 +1,6 @@
 <template>
   <div>
-    <section class="hero hero--tall" :style="{ 'background-image': 'url('+(imported.media.length > 0 ? imported.media[0].url : '')+')' }" v-if="step > 0">
+    <section class="hero hero--tall" :style="{ 'background-image': 'url('+(imported.media.length > 0 ? imported.media[0].url : '')+')' }">
       <div class="container">
         <Upload @uploaded="addPhoto" folder="parks" :instant="true" :isDark="true" instructions="Drop your park photos here, or click to browse your computer" v-if="imported.media.length == 0"></Upload>
 
@@ -15,54 +15,54 @@
             <h1 class="title level-item"> / {{ imported.title || 'Add a Park' }}</h1>
           </div>
           <div class="level-right">
-
+            <button class="button is-primary is-medium level-item" @click="step = 0" v-if="!imported.steam_id"><span>Connect to </span><span class="icon"><i class="fab fa-steam"></i></span></button>
+            <button class="button is-success is-medium level-item" v-if="imported.steam_id"><span>Connected to</span><span class="icon"><i class="fab fa-steam"></i></span></button>
           </div>
         </div>
       </div>
     </section>
     <section class="section">
-      <div class="columns is-centered">
-        <div class="column is-three-quarters" v-if="step == 0">
-          <div class="field">
-            <h2 class="title">Import and Connect to Steam Workshop</h2>
+
+        <Modal :class="['importFromSteam', 'is-wide']" :show="step == 0">
             <div class="field">
-              <p>Enter the URL to your Park in the Workshop to import your descriptions, tags, and photos.</p>
-            </div>
-            <div class="notification is-warning" v-if="errors.import">
-              {{ errors.import }}
-            </div>
-            <div class="field has-addons">
-              <div class="control is-expanded">
-                <input type="text" name="url" v-model="url" class="input is-medium" placeholder="http://steamcommunity.com/sharedfiles/filedetails/?id=#########" />
+              <h2 class="title">Import and Connect to Steam Workshop</h2>
+              <div class="field">
+                <p>Enter the URL to your Park in the Workshop to import your descriptions, tags, and photos.</p> <p class="has-text-grey">You can connect it later if you're still working on it. It will be unpublished until you do.</p>
+              </div>
+              <div class="notification is-warning" v-if="errors.import">
+                {{ errors.import }}
+              </div>
+              <div class="field has-addons">
+                <div class="control is-expanded">
+                  <input type="text" name="url" v-model="url" class="input is-medium" placeholder="http://steamcommunity.com/sharedfiles/filedetails/?id=#########" />
+                </div>
               </div>
             </div>
-          </div>
-          <div class="level">
-            <div class="level-left">
-              <button class="button is-medium is-primary level-item" :class="{ 'is-loading': loading.importing }" @click="importItem()"><span class="icon"><i class="fas fa-cloud-upload"></i></span> <span>Import Blueprint</span></button>
-              <button class="button is-white is-medium level-item" @click="importLater()">Import Later</button>
-              <p class="level-item has-text-grey">You can connect it later if you're still working on it. <br /> It will be unpublished until you do.</p>
+            <div class="level">
+              <div class="level-left">
+                <button class="button is-medium is-primary level-item" :class="{ 'is-loading': loading.importing }" @click="importItem()"><span class="icon"><i class="fab fa-steam"></i></span> <span>Import Park</span></button>
+                <button class="button is-light is-medium level-item" @click="importLater()">Connect Later</button>
+              </div>
             </div>
-          </div>
-        </div>
-          <!-- <button class="ui button" @click="addField()" :disabled="fields >= max">Add Another</button> -->
-        </div>
-        <div class="form for-park columns is-centered" v-show="step == 1">
 
+        </Modal>
+
+      <div class="form content for-park columns is-centered">
           <div class="column is-three-quarters">
+            <h2 class="title is-4">Tell us about your park</h2>
             <div class="field">
-              <label class="label">Park Name</label>
               <div class="control">
-                <input type="text" name="title" v-model="imported.title" class="input is-medium" placeholder="PlanCo World!" />
+                <input type="text" name="title" v-model="imported.title" class="input is-medium" placeholder="Park Name" />
               </div>
             </div>
 
             <div class="field">
-              <label class="label">About Your Park</label>
-              <div class="box"><p>Instead of linking to billboards and audio files, you can upload them directly to PlanCo World!</p></div>
-              <div class="description editor" v-html="imported.description"></div>
+              <div class="box">
+                <div class="description editor" v-html="imported.description"></div>
+              </div>
             </div>
 
+            <h2 class="title is-4">What does your park offer to your guests?</h2>
             <div class="field">
               <Filters :options="filterOptions" @selected="addTags" ref="tags" ></Filters>
               <!-- <a class="button" @click="">Add Tags</a><div class="field is-grouped is-grouped-multiline">
@@ -83,6 +83,7 @@
 </template>
 
 <script>
+import Modal from '@/components/ui/Modal'
 import Filters from '@/components/ui/Filters'
 import API from '@/services/api'
 import slug from 'slug'
@@ -97,7 +98,8 @@ export default {
   name: 'Import',
   components: {
     Upload,
-    Filters
+    Filters,
+    Modal
   },
   data () {
     return {
@@ -150,8 +152,8 @@ export default {
           label: 'Amenities',
           type: 'list'
         },
-        'construction-kits': {
-          label: 'Construction Kits',
+        'content-packs': {
+          label: 'Content Packs',
           type: 'list',
           dlc: true,
           visible: true,
@@ -163,6 +165,10 @@ export default {
         },
         'style': {
           label: 'Styles',
+          type: 'list'
+        },
+        'language': {
+          label: 'Language',
           type: 'list'
         },
       }
@@ -251,10 +257,7 @@ export default {
         newPark.media.push(this.imported.media[i]._id)
       }
 
-      console.log('new park', newPark)
-
       API.post('parks', newPark).then((data) => {
-        console.log(data)
         this.$notify('notifications', 'Park created!', 'success')
       }).catch((err) => {
         console.log(err)

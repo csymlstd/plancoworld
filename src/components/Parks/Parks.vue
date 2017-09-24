@@ -39,7 +39,22 @@
 
         <div class="columns cards is-multiline loader--parent">
           <Loader v-if="loading"></Loader>
-          <Park :model="park" :key="park._id" v-for="park in parks"></Park>
+
+          <Park :model="park" :key="park._id" v-for="(park, index) in parks" v-if="index < 4"></Park>
+
+          <div class="column is-one-third" v-if="parks.length > 4">
+            <div class="card card--pcw bg--accent">
+              <div class="card-content content">
+                <h2 class="has-text-white">We are hiring Mechanics!</h2>
+                <p class="has-text-white">Help maintain our Parks, Blueprints, Billboards, and Audio.</p>
+                <p class="has-text-white">Wages range from $0 to nuzumpo</p>
+                <a class="button is-dark">Apply Within</a>
+              </div>
+            </div>
+          </div>
+
+          <Park :model="park" :key="park._id" v-for="(park, index) in parks" v-if="index > 3"></Park>
+
           <div class="column" v-if="parks.length == 0 && loading == false" v-cloak>
             <div class="notification is-warning">There aren't any Parks that match what you're looking for. You should build it!</div>
           </div>
@@ -116,8 +131,8 @@ export default {
           label: 'Amenities',
           type: 'list'
         },
-        'construction-kits': {
-          label: 'Construction Kits',
+        'content-packs': {
+          label: 'Content Packs',
           type: 'list',
           dlc: true,
           visible: true,

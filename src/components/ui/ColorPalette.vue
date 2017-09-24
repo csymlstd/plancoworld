@@ -1,6 +1,5 @@
 <template>
-  <div class="box color-palette" v-if="value.length > 0 || editMode">
-    <h5 class="title is-5">Color Palette</h5>
+  <div class="color-palette" v-if="(value && value.length > 0) || editMode">
     <div class="colors">
       <div class="color" v-tooltip="color" @click="copyColor(color, key)" :style="{ 'background': color }" v-for="(color, key) in value"><button class="delete" @click="deleteColor($event, key)" v-if="editMode"></button></div>
       <div class="color is-new" v-tooltip="'Add New Color'" @click="addColor()" v-if="editMode"><span class="icon"><i class="fas fa-plus"></i></span></div>

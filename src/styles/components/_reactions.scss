@@ -1,0 +1,82 @@
+.reactions {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  .add-reaction {
+    position: absolute;
+    z-index: 40;
+    top: -3rem;
+    right: 0;
+    display: flex;
+    align-items: center;
+    padding: 0.4rem;
+    border-radius: 0.4rem;
+    background: #fff;
+    box-shadow: 0 0 8px rgba(0,0,0,0.1);
+
+    .reaction {
+      opacity: 1!important;
+      height: 1.8rem;
+      width: 1.8rem;
+    }
+  }
+
+  i {
+    margin: 0 0.1rem;
+    transition: all 0.2s ease-out;
+    opacity: 0.4;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+
+  &.has-selected {
+    .reaction:not(.is-selected) {
+      opacity: 0.3;
+    }
+  }
+}
+
+.reaction {
+  position: relative;
+  display: block;
+  width: 1.4rem;
+  height: 1.4rem;
+  background-size: contain!important;
+  background-repeat: no-repeat!important;
+  text-indent: -9999px;
+  margin: 0 0.1rem;
+  transition: all 0.2s ease-out;
+
+  .is-selectable &:hover {
+    transform: scale(1.2);
+    opacity: 1!important;
+  }
+
+  &.is-large {
+    width: 2.4rem;
+    height: 2.4rem;
+  }
+
+  &.love {
+    background: url('/assets/images/emojis/smiling-face-with-heart-shaped-eyes.png');
+  }
+
+  &.fun {
+    background: url('/assets/images/emojis/grinning-face-with-smiling-eyes.png');
+  }
+
+  &.boring {
+    background: url('/assets/images/emojis/face-with-rolling-eyes.png');
+  }
+
+  &.scary {
+    background: url('/assets/images/emojis/face-screaming-in-fear.png');
+  }
+
+  &.nauseating {
+    background: url('/assets/images/emojis/nauseated-face.png');
+  }
+}

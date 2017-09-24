@@ -1,7 +1,8 @@
 <template>
   <div class="column is-half thumbnail">
-    <div class="image is-16by9" draggable>
-      <img :src="thumbnail" />
+    <div class="image is-16by9" :class="{ 'no-thumbnail': !thumbnail }" @click="select()">
+      <img :src="thumbnail" v-if="thumbnail" />
+      <div class="name" v-if="!thumbnail">{{ media.name }}</div>
     </div>
     <div class="level">
       <div class="level-left">
@@ -30,6 +31,11 @@ export default {
   data () {
     return {
 
+    }
+  },
+  methods: {
+    select () {
+      this.$emit('select')
     }
   },
   computed: {

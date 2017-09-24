@@ -34,6 +34,21 @@ $colors: (
     @return map-get(map-get($colors, $color-name), $tone);
 }
 
+.bg--accent { background: color('accent'); }
+.bg--accent-light { background: color('accent', 'light'); }
+.bg--accent-dark { background: color('accent', 'dark'); }
+.bg--accent-darker { background: color('accent', 'darker'); }
+
+.bg--warning { background: $warning; }
+
+.bg--secondary { background: color('secondary'); }
+.bg--secondary-dark { background: color('secondary', 'dark'); }
+.bg--secondary-darker { background: color('secondary', 'darker'); }
+
+.bg--grey { background: color('grey'); }
+.bg--grey-dark { background: color('grey', 'dark'); }
+.bg--grey-light { background: color('grey', 'light'); }
+
 // background-image: repeating-linear-gradient(
 //     60deg,
 //     color('secondary'),

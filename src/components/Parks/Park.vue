@@ -3,11 +3,21 @@
   <section class="hero hero--tall" :style="{ backgroundImage: `url('${park.media.length > 0 ? park.media[0].url : '' }')` }">
     <div class="hero-meta">
       <div class="container">
-        <Upload @uploaded="addPhoto" folder="parks" :instant="true" :isDark="true" instructions="Drop your park photos here, or click to browse your computer" v-if="park && isOwner() && editMode"></Upload>
-        <Filters :options="heroFilterOptions" :inline="true" :readOnly="true" :large="true" ref="heroTags"></Filters>
+        <div class="level">
+          <div class="level-left">
+            <Filters :options="heroFilterOptions" :inline="true" :readOnly="true" :large="true" ref="heroTags" class="level-item"></Filters>
+            <div class="tags selected-tags level-item">
+              <a v-if="park.billboards.length > 0" href="#billboards" class="tag is-rounded is-white is-large" data-scroll v-tooltip="'Download the custom Billboards for the best experience'"><span class="icon"><i class="fas fa-exclamation"></i></span> <span>Billboards</span></a>
+            </div>
+          </div>
+          <div class="level-right">
+            <a @click="openModal('uploadPhotos')" class="button level-item is-white is-medium" v-if="editMode"><span>Manage Photos</span></a>
+          </div>
+        </div>
       </div>
     </div>
   </section>
+
   <section class="hero">
     <div class="container">
       <div class="level is-mobile">
@@ -22,49 +32,53 @@
           <a v-if="!park.steam_id && isOwner()" @click="openModal('linkToWorkshop')" class="button level-item is-medium is-primary"><span class="icon"><i class="fas fa-exclamation-circle"></i></span> <span>Link to Workshop</span></a>
 
           <div class="field level-item has-addons" v-if="isOwner()">
-          <div class="control"><a @click="toggleEditMode" class="button is-warning is-medium construction">Edit</a></div>
-          <div class="control"><a @click="updatePark()" class="button is-light is-medium" v-if="editMode">Save</a></div>
-          <div class="control">
-            <div class="button is-white is-medium" @click="toggleStatus()" v-tooltip="{ content: statusTooltip }">
-              <div class="switch" :class="{ 'is-active': park.status && park.steam_id, 'is-warning': !park.steam_id }">
-                <label></label>
+            <div class="control"><a @click="toggleEditMode" class="button is-warning is-medium construction">Edit</a></div>
+            <div class="control"><a @click="updatePark()" class="button is-light is-medium" v-if="editMode">Save</a></div>
+            <div class="control">
+              <div class="button is-white is-medium" @click="toggleStatus()" v-tooltip="{ content: statusTooltip }">
+                <div class="switch" :class="{ 'is-active': park.status && park.steam_id, 'is-warning': !park.steam_id }">
+                  <label></label>
+                </div>
               </div>
             </div>
           </div>
-          </div>
-
-
 
           <SaveToToolbox model="parks" :data="park" v-if="!isOwner()"></SaveToToolbox>
         </div>
       </div>
     </div>
   </section>
-  <main class="content container">
 
-    <!-- <section class="notification is-warning" v-if="!loading && !park.steam_id" v-cloak>
-      <span class="icon"><i class="fas fa-exclamation-circle"></i></span>&nbsp;
-      <span>This Park will not be visible to the community until you link it to a Steam Workshop item.</span>
-    </section> -->
-
-    <Modal :class="{ 'linkToWorkshop': true }" @close="closeModal('linkToWorkshop')" :show="modalOpen('linkToWorkshop')">
-      <div class="form">
-        <div class="field">
-          <div class="control">
-            <input type="text" v-model="modals.linkToWorkshop.url" class="input is-medium" placeholder="http://steamcommunity.com/sharedfiles/filedetails/?id=#########" />
-          </div>
-        </div>
-        <div class="field">
-          <a class="button is-primary is-medium" @click="linkToWorkshop()">Link to Workshop</a>
+  <Modal :class="{ 'linkToWorkshop': true }" @close="closeModal('linkToWorkshop')" :show="modalOpen('linkToWorkshop')">
+    <div class="form">
+      <div class="field">
+        <div class="control">
+          <input type="text" v-model="modals.linkToWorkshop.url" class="input is-medium" placeholder="http://steamcommunity.com/sharedfiles/filedetails/?id=#########" />
         </div>
       </div>
-    </Modal>
+      <div class="field">
+        <a class="button is-primary is-medium" @click="linkToWorkshop()">Link to Workshop</a>
+      </div>
+    </div>
+  </Modal>
 
+  <main class="content container">
     <div class="columns">
       <div class="column is-one-quarter">
-        <ColorPalette v-model="park.colors" :editMode="editMode"></ColorPalette>
+        <div class="box park-info">
+          <Creator :user="park.user"></Creator>
 
-        <Filters :options="filterOptions" :readOnly="!editMode" ref="tags"></Filters>
+          <hr />
+
+          <ColorPalette v-model="park.colors" :editMode="editMode"></ColorPalette>
+        </div>
+
+        <Filters class="field" :options="filterOptions" :readOnly="!editMode" ref="tags"></Filters>
+
+        <a href="#" class="button is-white is-fluid field">Report Park</a>
+
+        <a href="#" class="button is-warning is-fluid" v-if="editMode">Delete Park</a>
+
       </div>
 
       <div class="column">
@@ -75,26 +89,25 @@
         </section>
 
 
-
-
-        <div class="level">
+        <div class="level" id="billboards">
           <div class="level-left">
-            <h3 class="ui header level-item">Billboards <a class="is-text" v-tooltip="'Be sure to place in My Documents\\Frontier Developments\\Planet Coaster\\UserMedia'">Download All ({{ park.billboards.length }})</a></h3>
+            <h3 class="ui header level-item">Billboards <a @click="openModal('downloadBillboards')" class="is-text">Download All ({{ park.billboards.length }})</a></h3>
           </div>
           <div class="level-right">
-            <a @click="" class="button level-item is-white is-medium"><span class="icon"><i class="fas fa-paint-brush has-text-primary"></i></span> <span>Generator</span></a>
+            <router-link :to="{ name: 'Generator' }" class="button level-item is-white is-medium"><span class="icon"><i class="fas fa-paint-brush has-text-primary"></i></span> <span>Generator</span></router-link>
             <a @click="openModal('addBillboard')" class="button level-item is-white is-medium"><span class="icon"><i class="fas fa-plus has-text-primary"></i></span> <span>Add Billboard</span></a>
           </div>
         </div>
         <Billboard :model="billboard" :key="billboard._id" v-for="billboard in park.billboards"></Billboard>
 
+        <Modal :class="{ 'downloadBillboards': true }" @close="closeModal('downloadBillboards')" :show="modalOpen('downloadBillboards')">
+          <p>Be sure to place in Documents\Frontier Developments\Planet Coaster\UserMedia</p>
+        </Modal>
+
         <Modal :class="{ 'addBillboard': true }" @close="closeModal('addBillboard')" :show="modalOpen('addBillboard')">
           <div class="form">
             <div class="field">
-              <div class="control has-icons-left">
-                <input type="text" class="input is-medium" placeholder="Search for a Billboard" />
-                <span class="icon icon-left"><i class="fas fa-search"></i></span>
-              </div>
+              <Search @selected="addToPark($event, 'addBillboard')" placeholder="Search for Billboards" :models="['billboards']"></Search>
             </div>
             <div class="field">
               <a class="button is-primary is-medium">Add to Park</a>
@@ -107,7 +120,6 @@
             <h3 class="ui header level-item">Blueprints</h3>
           </div>
           <div class="level-right">
-            <a @click="notify()" class="button is-white is-medium">Yo</a>
             <a @click="openModal('addBlueprint')" class="button is-white is-medium"><span class="icon"><i class="fas fa-plus has-text-primary"></i></span> <span>Add Blueprint</span></a>
           </div>
         </div>
@@ -116,10 +128,7 @@
         <Modal :class="{ 'addBlueprint': true }" @close="closeModal('addBlueprint')" :show="modalOpen('addBlueprint')">
           <div class="form">
             <div class="field">
-              <div class="control has-icons-left">
-                <input type="text" class="input is-medium" placeholder="Search for a Blueprint" />
-                <span class="icon icon-left"><i class="fas fa-search"></i></span>
-              </div>
+              <Search @selected="addToPark($event, 'addBlueprint')" placeholder="Search for Blueprints" :models="['blueprints']"></Search>
             </div>
             <div class="field">
               <a class="button is-primary is-medium">Add to Park</a>
@@ -130,36 +139,43 @@
       </div>
     </div>
 
-
+    <Modal :class="{ 'uploadPhotos': true }" @close="closeModal('uploadPhotos')" :show="modalOpen('uploadPhotos')">
+      <Upload @uploaded="addPhoto" folder="parks" instructions="Drop your park photos here, or click to browse your computer" v-if="park && isOwner() && editMode"></Upload>
+    </Modal>
 
   </main>
   </div>
 </template>
 
 <script>
+import Search from '@/components/ui/Search'
 import Filters from '@/components/ui/Filters'
 import Upload from '@/components/ui/Upload'
 import SaveToToolbox from '@/components/ui/SaveToToolbox'
 import ColorPalette from '@/components/ui/ColorPalette'
 import Modal from '@/components/ui/Modal'
 import Dropdown from '@/components/ui/Dropdown'
-import Blueprint from '@/components/cards/Blueprint'
+import Creator from '@/components/ui/ProfileMini'
+import Blueprint from '@/components/Blueprints/Card'
 import Billboard from '@/components/Billboards/Card'
 import API from '@/services/api'
 import auth from '@/services/auth'
 import { store } from '@/store.js'
 
 import Quill from 'quill'
+import SmoothScroll from 'smooth-scroll'
 
 export default {
   name: 'parks',
   store,
   components: {
+    Search,
     Filters,
     Upload,
     SaveToToolbox,
     ColorPalette,
     Dropdown,
+    Creator,
     Blueprint,
     Billboard,
     auth,
@@ -175,11 +191,21 @@ export default {
           show: false,
           url: ''
         },
+        uploadPhotos: {
+          show: false,
+          loading: false
+        },
         addBillboard: {
-          show: false
+          show: false,
+          loading: false
         },
         addBlueprint: {
-          show: false
+          show: false,
+          loading: false
+        },
+        downloadBillboards: {
+          show: false,
+          loading: false
         }
       },
       editor: false,
@@ -225,15 +251,15 @@ export default {
         'age-groups': {
           label: 'Age Groups',
           type: 'toggle',
-          visible: true,
         },
         'amenities': {
           label: 'Amenities',
           type: 'list'
         },
-        'construction-kits': {
-          label: 'Construction Kits',
+        'content-packs': {
+          label: 'Content Packs',
           type: 'list',
+          readOnly: 'checklist',
           dlc: true,
           visible: true,
           force: true
@@ -273,12 +299,34 @@ export default {
     },
     closeModal(modal) {
       this.modals[modal].show = false
+      this.modals[modal].loading = false
     },
     openModal(modal) {
       this.modals[modal].show = true
     },
     modalOpen(modal) {
       return this.modals[modal].show
+    },
+    addToPark(match, modal) {
+      this.modals[modal].loading = true
+
+      let plural = match._type+'s'
+      let model = this.park[plural]
+      let data = {}
+
+      data[plural] = [match._id]
+      model.forEach((m) => {
+        data[plural].push(m._id)
+      })
+
+      console.log('putting', data)
+      API.put(this.apiURL(), data).then(() => {
+        return this.getPark()
+      }).then(() => {
+
+      }).catch(() => {
+
+      })
     },
     getTagGroup(model) {
       return this.$store.getters.getTagGroup(model)
@@ -321,9 +369,13 @@ export default {
       })
       this.park.status = newStatus
     },
-    toggleEditMode(e) {
-      if(e) e.preventDefault()
-      this.editMode = this.editMode ? false : true
+    toggleEditMode(state) {
+      if(state === true || state === false) {
+         this.editMode = state
+      } else {
+        this.editMode = this.editMode ? false : true
+      }
+
       if(this.editMode == true) {
         this.$nextTick(() => {
           this.attachEditor()
@@ -355,7 +407,7 @@ export default {
       })
     },
     updatePark() {
-      this.toggleEditMode()
+      this.toggleEditMode(false)
       this.loading = true
       let data = this.park
 
@@ -410,6 +462,9 @@ export default {
   },
   created () {
     this.getPark()
+  },
+  mounted () {
+    new SmoothScroll('a[data-scroll]')
   }
 }
 </script>

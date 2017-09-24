@@ -6,3 +6,8 @@
 .dropdown-item, .navbar-dropdown .navbar-item {
   font-size: 1rem;
 }
+
+.dropdown .search-dropdown {
+  min-width: 450px;
+  right: 0;
+}

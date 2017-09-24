@@ -17,10 +17,11 @@
       </div>
     </section>
     <section class="hero hero--tall">
-      <div class="container">
-        <Upload @uploaded="addPhoto" :maxItems="1" folder="billboards" :isDark="true" :instant="true" instructions="Drop your billboard image or webm here, or click to browse your computer"></Upload>
-        <img :src="imported.media ? imported.media[0].url : ''" v-if="imported.media.length > 0" class="cover-photo" @load="$event.target.classList.toggle('is-active')" />
-      </div>
+        <Upload @uploaded="addMedia" :maxItems="1" folder="billboards" :isDark="true" :instant="true" instructions="Drop your billboard image or webm here, or click to browse your computer" v-if="imported.media.length == 0"></Upload>
+        <img :src="imported.media[0].url" v-if="imported.media[0] && imported.media[0].type == 'image'" class="cover-photo" />
+        <video class="cover-photo" autoplay loop>
+          <source :src="imported.media[0].url" v-if="imported.media[0] && imported.media[0].type == 'video'">
+        </video>
     </section>
     <section class="section">
       <div class="columns is-centered">
@@ -36,7 +37,9 @@
           <h4 class="title is-4">About your Billboard</h4>
           <div class="field">
             <p v-if="wasImported">If you have links to billboards and audio files, you can upload them directly to PlanCo World in the next step.</p>
-            <div class="description editor" v-html="imported.description"></div>
+            <div class="box">
+              <div class="description editor" v-html="imported.description"></div>
+            </div>
           </div>
 
           <h4 class="title is-4">Add to a Pack</h4>
@@ -61,7 +64,7 @@
         <div class="form for-park column is-three-quarters is-centered">
 
           <div class="field">
-            <Filters :options="filterOptions" @selected="" ></Filters>
+            <Filters :options="filterOptions" @selected="addTags" ref="tags" ></Filters>
             <!-- <a class="button" @click="">Add Tags</a><div class="field is-grouped is-grouped-multiline">
               <div class="control" v-for="tag in imported.tags">
                 <div class="tag is-primary is-medium">{{ tag.name }} <button class="delete is-small"></button></div>
@@ -70,8 +73,8 @@
           </div>
 
           <div class="field is-grouped">
-            <div class="control"><a class="button is-medium is-primary" @click="addPark()">Save Billboard</a></div>
-            <div class="control"><a class="button is-medium is-white" @click="addPark()">Save &amp; Add Another</a></div>
+            <div class="control"><a class="button is-medium is-primary" @click="addBillboard()">Save Billboard</a></div>
+            <div class="control"><a class="button is-medium is-white" @click="addBillboard()">Save &amp; Add Another</a></div>
           </div>
         </div>
       </div>
@@ -82,10 +85,12 @@
 <script>
 import Filters from '@/components/ui/Filters'
 import API from '@/services/api'
+import Media from '@/services/media'
 
 import Upload from '@/components/ui/Upload'
 
 import Quill from 'quill'
+import slug from 'slug'
 
 
 
@@ -122,6 +127,11 @@ export default {
           visible: true,
           force: true,
           min: 1,
+        },
+        'language': {
+          label: 'Language',
+          type: 'list',
+          visible: true
         },
         'shops': {
           label: 'Shops',
@@ -165,9 +175,18 @@ export default {
         theme: 'snow'
       })
     },
-    addPhoto(media) {
+    addMedia(media) {
       console.log('adding', media)
       this.imported.media.push(media)
+
+      if(Media.isImage(media.contentType)) {
+        this.$refs.tags.checkTag('59654fd912341326996d3358','billboards')
+      } else if(Media.isVideo(media.contentType)) {
+        this.$refs.tags.checkTag('59654fdf12341326996d3359','billboards')
+      }
+    },
+    addTags(tags) {
+      this.imported.tags = tags
     },
     addBillboard() {
       let newBillboard = {
@@ -175,20 +194,14 @@ export default {
         tags: []
       }
       newBillboard.name = this.imported.title
+      newBillboard.slug = slug(this.imported.title)
       newBillboard.description = this.editor.container.firstChild.innerHTML
+      newBillboard.tags = this.$refs.tags.selected
 
-      for(let i=0;i<this.imported.tags.length;i++) {
-        newBillboard.tags.push(this.imported.tags[i]._id)
-      }
-
-      for(let i=0;i<this.imported.media.length;i++) {
-        newBillboard.media.push(this.imported.media[i]._id)
-      }
-
-      console.log('new billboard', newBillboard)
+      // Currently only permits one image per billboard
+      newBillboard.media.push(this.imported.media[0])
 
       API.post('billboards', newBillboard).then((data) => {
-        console.log(data)
         this.$notify('notifications', 'Billboard created!', 'success')
       }).catch((err) => {
         console.log(err)

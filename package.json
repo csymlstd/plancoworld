@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "axios": "^0.16.2",
-    "billboard-generator": "git+https://gitlab.com/joaopluis/billboard-generator.git",
+    "billboard-generator": "git+https://gitlab.com/csymlstd/billboard-generator.git",
     "bulma": "^0.5.1",
     "debounce": "^1.0.2",
     "express": "~4.13.4",
@@ -27,6 +27,7 @@
     "raven-js": "^3.17.0",
     "serve-favicon": "~2.3.0",
     "slug": "^0.9.1",
+    "smooth-scroll": "^12.1.5",
     "tinycolor2": "^1.4.1",
     "v-clipboard": "^1.0.4",
     "v-tooltip": "^2.0.0-beta.11",

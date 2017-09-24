@@ -10,31 +10,51 @@
             <router-link :to="{ name: 'Parks' }" class="navbar-item">Parks</router-link>
             <router-link :to="{ name: 'Blueprints' }" class="navbar-item">Blueprints</router-link>
             <router-link :to="{ name: 'Billboards' }" class="navbar-item">Billboards</router-link>
-            <router-link :to="{ name: 'Audio' }" class="navbar-item">Audio</router-link>
+            <!-- <router-link :to="{ name: 'Audio' }" class="navbar-item">Audio</router-link> -->
+            <div class="navbar-item has-dropdown is-hoverable">
+              <a class="navbar-link"><span class="icon"><i class="far fa-lg fa-ellipsis-h"></i></span></a>
+              <div class="navbar-dropdown is-right">
+                <a href="http://steamcommunity.com/app/493340/workshop/" target="_blank" class="navbar-item">Workshop</a>
+                <a href="https://www.reddit.com/r/PlanetCoaster/" target="_blank" class="navbar-item">r/PlanetCoaster</a>
+                <hr class="dropdown-divider" />
+                <a href="https://www.reddit.com/r/PlanCoWorld/" target="_blank" class="navbar-item">r/PlanCoWorld</a>
+                <router-link :to="{ name: 'ImportPark' }" class="navbar-item">Roadmap</router-link>
+                <router-link :to="{ name: 'ImportPark' }" class="navbar-item">About</router-link>
+              </div>
+            </div>
           </div>
           <div class="navbar-end">
           <div class="navbar-item">
-            <Search @selected="go"></Search>
+            <Search @selected="go" placeholder="Search for a coaster"></Search>
           </div>
           <div class="navbar-item has-dropdown is-hoverable" v-if="user.authenticated">
-            <a class="navbar-link"><span class="icon"><i class="fas fa-cloud-upload"></i></span></a>
+            <a class="navbar-link"><span class="icon"><i class="fas fa-plus-circle"></i></span></a>
             <div class="navbar-dropdown is-right">
               <router-link :to="{ name: 'ImportPark' }" class="navbar-item">Park</router-link>
               <router-link :to="{ name: 'ImportBlueprint' }" class="navbar-item">Blueprint</router-link>
               <router-link :to="{ name: 'ImportBillboard' }" class="navbar-item">Billboard</router-link>
-              <router-link :to="{ name: 'ImportAudio' }" class="navbar-item">Audio</router-link>
+              <!-- <router-link  class="navbar-item">Audio</router-link> -->
               <hr class="dropdown-divider" />
-              <router-link :to="{ name: 'Convert' }" class="navbar-item">Convert</router-link>
+              <router-link :to="{ name: 'Convert' }" class="navbar-item">Converter</router-link>
+              <router-link :to="{ name: 'Generator' }" class="navbar-item">Generator</router-link>
             </div>
           </div>
           <UserMenu v-if="user.authenticated"></UserMenu>
-          <router-link class="navbar-item" v-if="!user.authenticated && !isHome" to="/">Login</router-link>
+          <Login :steamOnly="true" v-if="!user.authenticated && !isHome" class="navbar-item"></Login>
         </div>
         </div>
     </nav>
     <vs-notify group="notifications"></vs-notify>
     <Toolbox v-if="user.authenticated" ref="toolbox"></Toolbox>
     <router-view></router-view>
+
+    <Modal @close="closeLogin" :show="loginOpen">
+      <div>
+        <h2 class="title has-text-centered has-text-primary">Login to PlanCo World</h2>
+        <Login v-if="!user.authenticated && !isHome" class="navbar-item"></Login>
+      </div>
+    </Modal>
+
 
     <footer class="main">
       <div class="container">
@@ -45,18 +65,21 @@
 </template>
 
 <script>
+import { store } from '@/store.js'
+
 import router from '@/router'
 import auth from '@/services/auth'
 import '@/components/ui/Notify'
+import Login from '@/components/Login'
 import Toolbox from '@/components/Toolbox'
+import Modal from '@/components/ui/Modal'
 import UserMenu from '@/components/ui/UserMenu'
 import Search from '@/components/ui/Search'
 
-import '@/styles/vendors/_font-awesome-core.scss';
-import '@/styles/vendors/_font-awesome-brands.scss';
-// import '@/styles/vendors/_font-awesome-light.scss';
-import '@/styles/vendors/_font-awesome-regular.scss';
-import '@/styles/vendors/_font-awesome-solid.scss';
+import '@/styles/vendors/_fontawesome-pro-core.scss';
+import '@/styles/vendors/_fontawesome-pro-brands.scss';
+import '@/styles/vendors/_fontawesome-pro-regular.scss';
+import '@/styles/vendors/_fontawesome-pro-solid.scss';
 
 import 'quill/dist/quill.core.css'
 import 'quill/dist/quill.snow.css'
@@ -64,6 +87,7 @@ import 'quill/dist/quill.snow.css'
 auth.checkAuth()
 
 export default {
+  store,
   data() {
     return {
       user: auth.user,
@@ -80,16 +104,26 @@ export default {
       }
     }
   },
+  computed: {
+    loginOpen() {
+      return this.$store.state.modals.login
+    }
+  },
   components: {
     Toolbox,
     UserMenu,
-    Search
+    Modal,
+    Search,
+    Login
   },
   methods: {
     go(match) {
       let type = match._type
       let name = type.charAt(0).toUpperCase() + type.slice(1)
       router.push({ name, params: { slug: match._source.slug }})
+    },
+    closeLogin(e) {
+      this.$store.commit('toggleModal',{ modal: 'login' })
     }
   },
   mounted () {

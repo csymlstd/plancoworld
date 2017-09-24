@@ -1,7 +1,7 @@
 <template>
   <div class="search">
     <div class="control has-icons-left is-medium" :class="{ 'is-loading': loading }">
-      <input type="text" class="input is-medium search-input" v-model="queryTerms" @keydown.enter="enter" @keydown.esc="cancel" @keydown.down="down" @keydown.up="up" @input="change" placeholder="Search for creations" />
+      <input type="text" class="input is-medium search-input" v-model="queryTerms" @keydown.enter="enter" @keydown.esc="cancel" @keydown.down="down" @keydown.up="up" @input="change" :placeholder="placeholder" />
       <span class="icon is-small is-left"><i class="fas fa-search"></i></span>
     </div>
     <div class="dropdown search-dropdown" :class="{ 'is-active': open }">
@@ -21,6 +21,10 @@ import API from '@/services/api'
 export default {
   name: 'sort',
   props: {
+    placeholder: {
+      type: String,
+      default: 'Search for parks, blueprints, billboards, and audio'
+    },
     models: {
       type: Array,
       default: () => {

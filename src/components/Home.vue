@@ -7,10 +7,10 @@
 
         <login v-if="!user.authenticated"></login>
         <div v-show="user.authenticated">
-        <router-link :to="{ name: 'Parks' }" class="button is-primary is-inverted is-medium show" data-cycle>Explore Other Parks</router-link>
-        <router-link :to="{ name: 'Blueprints' }" class="button is-primary is-inverted is-medium" data-cycle>Explore Other Blueprints</router-link>
-        <router-link :to="{ name: 'Billboards' }" class="button is-primary is-inverted is-medium" data-cycle>Explore Other Billboards</router-link>
-        <router-link :to="{ name: 'Audio' }" class="button is-primary is-inverted is-medium" data-cycle>Explore Other Audio</router-link>
+        <router-link :to="{ name: 'Parks' }" class="button is-primary is-medium show" data-cycle>Explore Parks</router-link>
+        <router-link :to="{ name: 'Blueprints' }" class="button is-primary is-medium" data-cycle>Explore Blueprints</router-link>
+        <router-link :to="{ name: 'Billboards' }" class="button is-primary is-medium" data-cycle>Explore Billboards</router-link>
+        <router-link :to="{ name: 'Audio' }" class="button is-primary is-medium" data-cycle>Explore Audio</router-link>
         </div>
 
       </div>

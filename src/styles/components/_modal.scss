@@ -1,11 +1,18 @@
-.modal.is-active {
-  z-index: 9060;
-}
-
-.modal-card, .modal-content {
-  width: 900px;
-}
-
 .modal-background {
   background: rgba(10, 10, 10, 0.3);
+}
+
+.modal {
+  &.is-active {
+    z-index: 9060;
+  }
+
+
+  &.is-wide {
+    .modal-card, .modal-content {
+      width: 100%;
+      max-width: 900px!important;
+    }
+  }
+
 }

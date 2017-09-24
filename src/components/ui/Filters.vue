@@ -35,7 +35,7 @@
             <p class="description" v-if="group.model == 'coasters'">Types of roller coasters available in-game</p>
             <p class="description" v-if="group.model == 'scenery'">Different types of decorations, displays, nature and objects</p>
             <p class="description" v-if="group.model == 'buildings'">Common building and structure types found through out theme parks</p>
-            <p class="description" v-if="group.model == 'style'">Creations influenced by real world styles, movements, and cultures.</p>
+            <p class="description" v-if="group.model == 'style'">Creations influenced by real world styles, movements, and cultures</p>
             <p class="description" v-if="group.model == 'regions'">Parks may have terrain spanning across 4 different biomes and regions</p>
             <p class="description" v-if="group.model == 'requirements'">Various gameplay settings and specs required to properly use this blueprint</p>
             <p class="description" v-if="options[group.model].dlc">You won't be able to interact with these props in-game if you haven't purchased them. <a href="http://store.steampowered.com/dlc/493340/" target="_blank">Shop DLC</a></p>
@@ -43,7 +43,12 @@
 
           <div class="field toggles columns is-mobile" v-if="options[group.model].type == 'toggle' && isVisible(group.model, options[group.model].visible) && !readOnly">
             <div class="column" :class="{ 'is-half': (group.tags.length > 3)}" v-for="tag in group.tags">
-              <a class="toggle is-box" :class="{ 'is-selected': isSelected(tag._id, group.model) }" @click="checkTag(tag._id, group.model)">{{ tag.name }}</a>
+              <a class="toggle is-box" :title="tag.name" :class="{ 'is-selected': isSelected(tag._id, group.model) }" @click="checkTag(tag._id, group.model)">
+                <span v-if="tag.slug == 'horizontal'" class="icon"><i class="far fa-rectangle-landscape"></i></span>
+                <span v-else-if="tag.slug == 'vertical'" class="icon"><i class="far fa-rectangle-portrait"></i></span>
+                <span v-else-if="tag.slug == 'square'" class="icon"><i class="far fa-square"></i></span>
+                <span v-else>{{ tag.name }}</span>
+              </a>
             </div>
           </div>
 
@@ -71,12 +76,15 @@
           <div v-else-if="!readOnly">
             <div class="controls" v-if="isVisible(group.model, options[group.model].visible)">
 
-              <label class="checkbox dropdown-item" @click="checkTag(tag._id, group.model)" :class="{ 'is-selected': isSelected(tag._id, group.model) }" v-for="tag in group.tags">
+              <label class="checkbox dropdown-item" :title="tag.name" @click="checkTag(tag._id, group.model)" :class="{ 'is-selected': isSelected(tag._id, group.model) }" v-for="tag in group.tags">
                 <!-- @click="checkTag(tag._id, group.model)" -->
                 <!-- <input type="checkbox":value="tag._id" :model="selected" /> -->
+                <span class="icon icon-spooky" v-if="tag.slug == 'spooky-pack'"></span>
                 {{ tag.name }}
 
                 <span class="tag is-rounded is-outlined" v-if="['back-to-the-future','knight-rider','the-munsters'].indexOf(tag.slug) > -1">$2.99</span>
+                <span class="tag is-rounded is-outlined" v-if="['spooky-pack'].indexOf(tag.slug) > -1">$10.99</span>
+                <span class="tag is-rounded is-outlined" v-if="['spooky'].indexOf(tag.slug) > -1">DLC</span>
 
                 <span class="tag is-rounded is-outlined" v-if="tag.slug == 'shop' && group.model == 'buildings'">Shop Category</span>
                 <span class="tag is-rounded is-outlined" v-if="tag.slug == 'building' && group.model == 'buildings'">Building Category</span>
