@@ -1,15 +1,21 @@
 <template>
   <div>
-
-  <section class="hero">
+  <section class="hero hero--tall text-center">
+    <div>
+      <h1 class="title">Explore the temples and traps <br /> built with the new <img alt="Adventure Pack" src="/assets/images/adventure-pack-logo.svg" style="width: 250px;transform:translateY(5px);" />!</h1>
+      <br />
+      <a href="#continue" data-scroll class="button is-warning is-medium" @click="$refs.filters.checkTag('5a2deba8c22ae923f29cc220')"><span>Search for Adventure Parks</span> <span class="icon"><i class="far fa-arrow-down"></i></span></a>
+    </div>
+  </section>
+  <section class="hero" id="continue">
     <div class="container">
       <div class="level">
         <div class="level-left">
-          <!-- <h1 class="title level-item">Parks</h1> -->
+          <h1 class="title level-item">Parks</h1>
         </div>
         <div class="level-right">
-          <a class="level-item">Learn to Build</a>
-          <a class="level-item">Glossary</a>
+          <router-link :to="{ name: 'GuidePage', params: { slug: 'glossary' }}" class="level-item">Read the Guide</router-link>
+          <router-link :to="{ name: 'GuidePage', params: { slug: 'glossary' }}" class="level-item">Glossary</router-link>
           <router-link :to="{ name: 'ImportPark' }" class="button is-primary is-medium level-item" v-if="isLoggedIn()">Add a Park</router-link>
         </div>
       </div>
@@ -18,7 +24,7 @@
   <main class="container">
     <div class="columns">
       <div class="column is-one-quarter content">
-        <Filters :options="filterOptions" @selected="filterParks"></Filters>
+        <Filters ref="filters" :options="filterOptions" @selected="filterParks"></Filters>
       </div>
       <div class="column">
         <div class="level">
@@ -42,7 +48,7 @@
 
           <Park :model="park" :key="park._id" v-for="(park, index) in parks" v-if="index < 4"></Park>
 
-          <div class="column is-one-third" v-if="parks.length > 4">
+          <!-- <div class="column is-one-third" v-if="parks.length > 4">
             <div class="card card--pcw bg--accent">
               <div class="card-content content">
                 <h2 class="has-text-white">We are hiring Mechanics!</h2>
@@ -51,7 +57,7 @@
                 <a class="button is-dark">Apply Within</a>
               </div>
             </div>
-          </div>
+          </div> -->
 
           <Park :model="park" :key="park._id" v-for="(park, index) in parks" v-if="index > 3"></Park>
 
@@ -110,7 +116,8 @@ export default {
           type: 'toggle',
           visible: true,
           force: true,
-          max: 1
+          max: 1,
+          guide: 'careers-challenges-sandbox-scenarios'
         },
         'parks-plans': {
           label: 'Park Plans',
@@ -120,7 +127,8 @@ export default {
         },
         'regions': {
           label: 'Biomes',
-          type: 'list'
+          type: 'toggle',
+          tooltips: true
         },
         'age-groups': {
           label: 'Age Groups',
@@ -209,11 +217,19 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" scoped>
-  section.hero {
-    background-image: url('/assets/images/hero-parks.png');
-    background-size: auto 100%!important;
+  // section.hero {
+  //   background-image: url('/assets/images/hero-parks.png');
+  //   background-size: auto 100%!important;
+  //   background-repeat: no-repeat!important;
+  //   background-position: 150px center!important;
+  // }
+
+  section.hero--tall {
+    background-image: url('/assets/images/adventure_pack.jpg');
+    background-size: cover!important;
     background-repeat: no-repeat!important;
-    background-position: 150px center!important;
+    background-position: center!important;
+    height: 650px!important;
   }
 
   .hero .title {

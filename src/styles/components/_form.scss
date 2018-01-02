@@ -36,7 +36,7 @@ label.checkbox {
     &::after {
       display: block;
       position: absolute;
-      font-family: 'Font Awesome 5 Solid';
+      font-family: 'Font Awesome 5 Pro';
       font-weight: 900;
       top: 1.1em;
       left: 0.25em;
@@ -111,7 +111,22 @@ label.checkbox {
   &.is-loading:after {
     animation: fa-spin 2s infinite linear;
     content: "\f013";
-    font-family: 'Font Awesome 5 Solid';
+    font-family: 'Font Awesome 5 Pro';
+    font-weight: 900;
+    font-size: 1.4em;
+    color: color('grey', 'light');
+    height: 1em;
+    width: 1em;
+    border: 0!important;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1;
+    vertical-align: -15%;
+  }
+
+  &.is-failed:after {
+    animation: none;
+    content: "\f071";
+    font-family: 'Font Awesome 5 Pro';
     font-weight: 900;
     font-size: 1.4em;
     color: color('grey', 'light');

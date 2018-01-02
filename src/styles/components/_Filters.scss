@@ -77,3 +77,37 @@ section.filters {
     border-color: color('accent');
   }
 }
+
+.filters-regions {
+  .toggle {
+    text-indent: -9999px;
+    background-size: cover!important;
+    background-position: center bottom;
+    min-height: 80px;
+  }
+
+  .option-alpine {
+    background: url('/assets/images/biome-alpine.jpg');
+  }
+  
+  .option-arctic {
+    background: url('/assets/images/biome-arctic.jpg');
+  }
+  
+  .option-deciduous {
+    background: url('/assets/images/biome-deciduous.jpg');
+  }
+  
+  .option-desert {
+    background: url('/assets/images/biome-desert.jpg');
+  }
+  
+  .option-grassland {
+    background: url('/assets/images/biome-grassland.jpg');
+  }
+  
+  .option-tropical {
+    background: url('/assets/images/biome-tropical.jpg');
+  }
+
+}

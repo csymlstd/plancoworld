@@ -1,6 +1,6 @@
 <template>
   <div class="search">
-    <div class="control has-icons-left is-medium" :class="{ 'is-loading': loading }">
+    <div class="control has-icons-left is-medium is-expanded" :class="{ 'is-loading': loading || failed, 'is-failed': failed }">
       <input type="text" class="input is-medium search-input" v-model="queryTerms" @keydown.enter="enter" @keydown.esc="cancel" @keydown.down="down" @keydown.up="up" @input="change" :placeholder="placeholder" />
       <span class="icon is-small is-left"><i class="fas fa-search"></i></span>
     </div>
@@ -21,6 +21,10 @@ import API from '@/services/api'
 export default {
   name: 'sort',
   props: {
+    path: {
+      type: String,
+      default: 'search'
+    },
     placeholder: {
       type: String,
       default: 'Search for parks, blueprints, billboards, and audio'
@@ -39,20 +43,24 @@ export default {
       highlighted: 0,
       selected: false,
       matches: [],
-      loading: false
+      loading: false,
+      failed: false,
     }
   },
   methods: {
     query(terms) {
       console.log('querying '+terms)
       this.loading = true
-      return API.fetch('search', { q: terms }).then((data) => {
+      this.failed = false
+      return API.fetch(this.path, { q: terms, type: this.models.join(',') }).then((data) => {
         console.log(data)
         this.matches = data.hits.hits
         this.loading = false
         return data
       }).catch((err) => {
-
+        this.loading = false
+        this.open = false
+        this.failed = true
       })
     },
     select(index) {

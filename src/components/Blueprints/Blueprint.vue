@@ -1,19 +1,23 @@
 <template>
   <div>
-  <!-- <div class="blueprint-status is-under-construction">
-    <div class="level">
-      <div class="level-left">
-        Under Construction
-      </div>
-      <div class="level-right">
-        <span class="level-item">Link your Blueprint to the Steam Workshop to make it public on Planco World.</span>
-        <a class="button is-link">Link to Workshop</a>
+  <section class="hero hero--tall" :style="{ backgroundImage: `url('${blueprint.media.length > 0 ? blueprint.media[0].url : '' }')` }">
+    <div class="hero-meta">
+      <div class="container">
+        <div class="level">
+          <div class="level-left">
+            <Filters :options="heroFilterOptions" :inline="true" :readOnly="true" :large="true" ref="heroTags" class="level-item"></Filters>
+            <div class="tags selected-tags level-item">
+              <a v-if="blueprint.billboards.length > 0" href="#billboards" class="tag is-rounded is-white is-large" data-scroll v-tooltip="'Download the custom Billboards for the best experience'"><span class="icon"><i class="fas fa-exclamation"></i></span> <span>Billboards</span></a>
+            </div>
+          </div>
+          <div class="level-right">
+            <a @click="openModal('uploadPhotos')" class="button level-item is-white is-medium" v-if="editMode"><span>Manage Photos</span></a>
+          </div>
+        </div>
       </div>
     </div>
-  </div> -->
-  <section class="hero hero--tall" :style="{ backgroundImage: `url('${blueprint.media.length > 0 ? blueprint.media[0].url : '' }')` }">
-
   </section>
+
   <section class="hero">
     <div class="container">
       <div class="level is-mobile">
@@ -22,14 +26,20 @@
           <h2 class="title level-item"> / {{ blueprint.name ? blueprint.name : '' | truncate(45) }}</h2>
         </div>
         <div class="level-right">
-          <button class="button level-item is-medium is-dark" v-tooltip="{ content: 'Copy Blueprint URL'  }"><span class="icon"><i class="fas fa-link"></i></span></button>
+          <button class="button level-item is-medium is-dark" @click="copy" v-tooltip="{ content: 'Copy Blueprint URL'  }"><span class="icon"><i class="fas fa-link"></i></span></button>
 
-          <a v-if="blueprint.steam_id" :href="'http://steamcommunity.com/sharedfiles/filedetails/?id='+blueprint.steam_id" target="_blank" class="button level-item is-medium is-primary"><span class="icon"><i class="fab fa-steam"></i></span> <span>Subscribe on Steam</span></a>
-          <a v-if="!blueprint.steam_id" @click="openModal('linkToWorkshop')" class="button level-item is-medium is-primary"><span class="icon"><i class="fas fa-exclamation-circle"></i></span> <span>Link to Workshop</span></a>
+          <a v-if="blueprint.steam_id" :href="'http://steamcommunity.com/sharedfiles/filedetails/?id='+blueprint.steam_id" target="_blank" class="button  level-item is-medium is-primary"><span class="icon"><i class="fab fa-steam"></i></span> <span>Subscribe on Steam</span></a>
+          <a v-if="!blueprint.steam_id && isOwner()" @click="openModal('linkToWorkshop')" class="button level-item is-medium is-primary"><span class="icon"><i class="fas fa-exclamation-circle"></i></span> <span>Link to Workshop</span></a>
 
-          <div class="button is-white is-medium" @click="toggleStatus()" v-if="isOwner()" v-tooltip="{ content: statusTooltip  }">
-            <div class="switch" :class="{ 'is-active': blueprint.status && blueprint.steam_id, 'is-warning': !blueprint.steam_id }">
-              <label></label>
+          <div class="field level-item has-addons" v-if="isOwner()">
+            <div class="control"><a @click="toggleEditMode" class="button is-warning is-medium construction">Edit</a></div>
+            <div class="control"><a @click="updateBlueprint()" class="button is-light is-medium" v-if="editMode">Save</a></div>
+            <div class="control">
+              <div class="button is-white is-medium" @click="toggleStatus()" v-tooltip="{ content: statusTooltip }">
+                <div class="switch" :class="{ 'is-active': blueprint.status && blueprint.steam_id, 'is-warning': !blueprint.steam_id }">
+                  <label></label>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -38,67 +48,135 @@
       </div>
     </div>
   </section>
-  <main class="content container">
 
-    <!-- <section class="notification is-warning" v-if="!loading && !blueprint.steam_id" v-cloak>
-      <span class="icon"><i class="fas fa-exclamation-circle"></i></span>&nbsp;
-      <span>This Blueprint will not be visible to the community until you link it to a Steam Workshop item.</span>
-    </section> -->
-
-    <Modal :class="{ 'linkToWorkshop': true }" @close="closeModal('linkToWorkshop')" :show="modalOpen('linkToWorkshop')">
-      <div class="form">
-        <div class="field">
-          <div class="control">
-            <input type="text" class="input is-medium" placeholder="http://steamcommunity.com/sharedfiles/filedetails/?id=#########" />
-          </div>
-        </div>
-        <div class="field">
-          <a class="button is-primary is-medium">Link to Workshop</a>
+  <Modal :class="{ 'linkToWorkshop': true }" @close="closeModal('linkToWorkshop')" :show="modalOpen('linkToWorkshop')">
+    <div class="form">
+      <div class="field">
+        <div class="control">
+          <input type="text" v-model="modals.linkToWorkshop.url" class="input is-medium" placeholder="http://steamcommunity.com/sharedfiles/filedetails/?id=#########" />
         </div>
       </div>
-    </Modal>
+      <div class="field">
+        <a class="button is-primary is-medium" @click="linkToWorkshop()">Link to Workshop</a>
+      </div>
+    </div>
+  </Modal>
 
+  <main class="content container">
     <div class="columns">
       <div class="column is-one-quarter">
-        <Filters :options="filterOptions" :readOnly="true" ref="tags"></Filters>
+        <div class="box blueprint-info">
+          <Creator :user="blueprint.user"></Creator>
+
+          <hr />
+
+          <ColorPalette v-model="blueprint.colors" :editMode="editMode"></ColorPalette>
+        </div>
+
+        <Filters class="field" :options="filterOptions" :readOnly="!editMode" ref="tags"></Filters>
+
+        <a href="#" class="button is-white is-fluid field">Report Blueprint</a>
+
+        <a href="#" class="button is-warning is-fluid" v-if="editMode">Delete Blueprint</a>
+
       </div>
 
       <div class="column">
 
-        <section class="box blueprint-description" :class="{ 'truncate': blueprint.description && blueprint.description.length > 500 && shorten }" v-html="blueprint.description"></section>
-        <a href="#" class="button is-outlined" @click="readMore" v-if="shorten"> Read More</a>
+        <section class="box blueprint-description">
+          <div class="blueprint-description-editor editor" v-if="editMode" v-html="blueprint.description"></div>
+          <div class="blueprint-description-content" v-show="!editMode" v-html="blueprint.description"></div>
+        </section>
 
 
-
-        <h3 class="ui header">Billboards <a class="is-text">Download All ({{ blueprint.billboards.length }})</a></h3>
+        <div class="level" id="billboards">
+          <div class="level-left">
+            <h3 class="ui header level-item">Billboards <a @click="openModal('downloadBillboards')" class="is-text">Download All ({{ blueprint.billboards.length }})</a></h3>
+          </div>
+          <div class="level-right">
+            <!-- <router-link :to="{ name: 'Generator' }" class="button level-item is-white is-medium"><span class="icon"><i class="fas fa-paint-brush has-text-primary"></i></span> <span>Generator</span></router-link> -->
+            <a @click="openModal('addBillboard')" class="button level-item is-white is-medium" v-if="editMode"><span class="icon"><i class="fas fa-plus has-text-primary"></i></span> <span>Add Billboard</span></a>
+          </div>
+        </div>
         <Billboard :model="billboard" :key="billboard._id" v-for="billboard in blueprint.billboards"></Billboard>
+
+        <Modal :class="{ 'downloadBillboards': true }" @close="closeModal('downloadBillboards')" :show="modalOpen('downloadBillboards')">
+          <p>Be sure to place in Documents\Frontier Developments\Planet Coaster\UserMedia</p>
+        </Modal>
+
+        <Modal :class="{ 'addBillboard': true }" @close="closeModal('addBillboard')" :show="modalOpen('addBillboard')">
+          <div class="form">
+            <div class="field">
+              <Search @selected="addToBlueprint($event, 'addBillboard')" placeholder="Search for Billboards" :models="['billboards']"></Search>
+            </div>
+            <div class="field">
+              <a class="button is-primary is-medium">Add to Blueprint</a>
+            </div>
+          </div>
+        </Modal>
+
+        <div class="level">
+          <div class="level-left">
+            <h3 class="ui header level-item">Blueprints</h3>
+          </div>
+          <div class="level-right">
+            <a @click="openModal('addBlueprint')" class="button is-white is-medium" v-if="editMode"><span class="icon"><i class="fas fa-plus has-text-primary"></i></span> <span>Add Blueprint</span></a>
+          </div>
+        </div>
+        <Blueprint :model="blueprint" :key="blueprint._id" v-for="blueprint in blueprint.blueprints"></Blueprint>
+
+        <Modal :class="{ 'addBlueprint': true }" @close="closeModal('addBlueprint')" :show="modalOpen('addBlueprint')">
+          <div class="form">
+            <div class="field">
+              <Search @selected="addToBlueprint($event, 'addBlueprint')" placeholder="Search for Blueprints" :models="['blueprints']"></Search>
+            </div>
+            <div class="field">
+              <a class="button is-primary is-medium">Add to Blueprint</a>
+            </div>
+          </div>
+        </Modal>
 
       </div>
     </div>
 
-
+    <Modal :class="{ 'uploadPhotos': true }" @close="closeModal('uploadPhotos')" :show="modalOpen('uploadPhotos')">
+      <Upload @uploaded="addPhoto" folder="blueprints" instructions="Drop your blueprint photos here, or click to browse your computer" v-if="blueprint && isOwner() && editMode"></Upload>
+    </Modal>
 
   </main>
   </div>
 </template>
 
 <script>
+import Search from '@/components/ui/Search'
 import Filters from '@/components/ui/Filters'
+import Upload from '@/components/ui/Upload'
 import SaveToToolbox from '@/components/ui/SaveToToolbox'
+import ColorPalette from '@/components/ui/ColorPalette'
 import Modal from '@/components/ui/Modal'
 import Dropdown from '@/components/ui/Dropdown'
+import Creator from '@/components/ui/ProfileMini'
+import Blueprint from '@/components/Blueprints/Card'
 import Billboard from '@/components/Billboards/Card'
 import API from '@/services/api'
 import auth from '@/services/auth'
 import { store } from '@/store.js'
 
+import Quill from 'quill'
+import SmoothScroll from 'smooth-scroll'
+
 export default {
   name: 'blueprints',
   store,
   components: {
+    Search,
     Filters,
+    Upload,
     SaveToToolbox,
+    ColorPalette,
     Dropdown,
+    Creator,
+    Blueprint,
     Billboard,
     auth,
     Modal
@@ -106,18 +184,44 @@ export default {
   data () {
     return {
       loading: true,
+      editMode: false,
+      shareURL: '',
       modals: {
         linkToWorkshop: {
-          show: false
+          show: false,
+          url: ''
+        },
+        uploadPhotos: {
+          show: false,
+          loading: false
+        },
+        addBillboard: {
+          show: false,
+          loading: false
+        },
+        addBlueprint: {
+          show: false,
+          loading: false
+        },
+        downloadBillboards: {
+          show: false,
+          loading: false
         }
       },
+      editor: false,
       blueprint: {
         media: [ { url: '' } ],
         billboards: [],
         shops: [],
         attractions: []
       },
-      shorten: true,
+      heroFilterOptions: {
+        'buildings': {
+          label: false,
+          type: 'tags',
+          description: false,
+        }
+      },
       filterOptions: {
         'buildings': {
           label: 'Buildings',
@@ -187,11 +291,15 @@ export default {
     }
   },
   methods: {
+    notify() {
+      this.$notify('notifications', 'Your Blueprint has been saved', '')
+    },
     isOwner() {
       return auth.isOwner(this.blueprint)
     },
     closeModal(modal) {
       this.modals[modal].show = false
+      this.modals[modal].loading = false
     },
     openModal(modal) {
       this.modals[modal].show = true
@@ -199,11 +307,57 @@ export default {
     modalOpen(modal) {
       return this.modals[modal].show
     },
+    addToBlueprint(match, modal) {
+      this.modals[modal].loading = true
+
+      let plural = match._type+'s'
+      let model = this.blueprint[plural]
+      let data = {}
+
+      data[plural] = [match._id]
+      model.forEach((m) => {
+        data[plural].push(m._id)
+      })
+
+      console.log('putting', data)
+      API.put(this.apiURL(), data).then(() => {
+        return this.getBlueprint()
+      }).then(() => {
+
+      }).catch(() => {
+
+      })
+    },
     getTagGroup(model) {
       return this.$store.getters.getTagGroup(model)
     },
     setModalData(modal, field, data) {
       this.$set(this.modals[modal].data, field, data)
+    },
+    linkToWorkshop() {
+      API.post(this.apiURL()+'/link', { url: this.modals.linkToWorkshop.url }).then((blueprint) => {
+        this.$notify('notifications', 'Blueprint linked to workshop', 'success')
+        this.modals.linkToWorkshop.show = false
+        this.blueprint.steam_id = blueprint.steam_id
+      }).catch((err) => {
+        this.$notify('notifications', 'Could not link to Workshop', 'error')
+        console.log(err)
+      })
+    },
+    addPhoto(newMedia) {
+      console.log('adding', media)
+      this.blueprint.media.push(newMedia)
+
+      let media = []
+      this.blueprint.media.forEach((m) => {
+        media.push(m._id)
+      })
+
+      API.put(this.apiURL(), { media }).then((blueprint) => {
+        this.blueprint.status = blueprint.status
+      }).catch(() => {
+        this.blueprint.status = status
+      })
     },
     toggleStatus() {
       let status = this.blueprint.status
@@ -215,19 +369,60 @@ export default {
       })
       this.blueprint.status = newStatus
     },
+    toggleEditMode(state) {
+      if(state === true || state === false) {
+         this.editMode = state
+      } else {
+        this.editMode = this.editMode ? false : true
+      }
+
+      if(this.editMode == true) {
+        this.$nextTick(() => {
+          this.attachEditor()
+        })
+      } else {
+        let toolbar = this.editor.container.parentNode.querySelector('.ql-toolbar')
+        console.log(toolbar)
+        if(toolbar) toolbar.remove()
+        this.$nextTick(() => {
+          this.editor = null
+          this.getBlueprint()
+        })
+
+      }
+    },
     getBlueprint() {
+      this.loading = true
+
       API.fetch(this.apiURL(false)).then((blueprint) => {
         this.blueprint = blueprint
+        this.shareURL = `http://planco.world/blueprints/${this.blueprint.slug}`
         this.loading = false
+        this.editMode = false
+        this.$refs.heroTags.setPopulated(this.blueprint.tags)
+        this.$refs.tags.setPopulated(this.blueprint.tags)
 
-        let tagIDs = []
-
-        for(let t=0;t<this.blueprint.tags.length;t++) {
-          tagIDs.push(this.blueprint.tags[t]._id)
-        }
-        this.$refs.tags.set(tagIDs)
       }).catch((err) => {
         API.handleError(err, 'blueprints')
+      })
+    },
+    updateBlueprint() {
+      this.toggleEditMode(false)
+      this.loading = true
+      let data = this.blueprint
+
+      let media = []
+      this.blueprint.media.forEach((m) => {
+        media.push(m._id)
+      })
+      data.media = media
+      data.user = data.user._id
+      data.description = this.editor.container.firstChild.innerHTML
+      data.tags = this.$refs.tags.selected
+
+      return API.put(this.apiURL(), data).then((blueprint) => {
+        this.$notify('notifications', 'Your Blueprint has been saved', 'success')
+        return this.getBlueprint()
       })
     },
     apiURL(force = true) {
@@ -246,35 +441,35 @@ export default {
       }
       return url
     },
-    readMore(e) {
-      e.preventDefault()
-      if(this.shorten) return this.shorten = false
-      return this.shorten = true
+    attachEditor() {
+      let wrapper = this.$el.querySelector('.blueprint-description-editor')
+      this.editor = new Quill(wrapper, {
+        modules: {
+          toolbar: [
+            [{ header: [1, 2, false] }],
+            ['bold', 'italic'],
+            ['link', { 'list': 'ordered'}, { 'list': 'bullet' }],
+            ['clean']
+          ]
+        },
+        theme: 'snow'
+      })
+    },
+    copy() {
+      this.$clipboard(this.shareURL)
+      this.$notify('notifications', 'Blueprint URL Copied', 'success')
     }
   },
   created () {
     this.getBlueprint()
+  },
+  mounted () {
+    new SmoothScroll('a[data-scroll]')
   }
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss">
-  .truncate {
-    position: relative;
-    max-height: 250px;
-    overflow: hidden;
-
-    &:after {
-      display: block;
-      content: ' ';
-      position: absolute;
-      width: 100%;
-      height: 100px;
-      bottom: 0;
-      left: 0;
-      background: linear-gradient(0deg, rgba(255,255,255,1), rgba(255,255,255,0));
-      pointer-events: none;
-    }
-  }
+  
 </style>

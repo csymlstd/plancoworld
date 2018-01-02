@@ -1,11 +1,11 @@
 <template>
   <div class="filters">
     <div class="field" :class="{ 'is-grouped': inline }">
-      <div class="control" :class="{ 'box': options[group.model].type != 'tags' }" v-for="group in groups" v-if="(calcSelected(group.model) > 0 && !options[group.model].hidden && readOnly) || !readOnly">
+      <div class="control" :key="group.model" :class="[{ 'box': options[group.model].type != 'tags' }, 'filters-'+group.model, { 'is-danger-outline': !group.valid }]" v-for="group in groups" v-if="(calcSelected(group.model) > 0 && !options[group.model].hidden && readOnly) || !readOnly">
         <div class="field filter-list">
           <div class="level" v-if="group.label">
             <div class="level-left">
-              <div class="level-item"><h5 class="title is-5">{{ group.label }}</h5></div>
+              <div class="level-item"><h5 class="title is-5">{{ group.label }} <router-link :to="{ name: 'GuidePage', params: { slug: options[group.model].guide } }" v-if="options[group.model].guide" v-tooltip="'Guide Quicklook'" target="_blank"><span class="icon has-text-grey-light"><i class="far fa-question-circle"></i></span></router-link></h5></div>
               <div class="level-item"><div class="tag is-rounded is-outlined" v-if="options[group.model].dlc">DLC</div></div>
             </div>
             <div class="level-right">
@@ -15,6 +15,7 @@
                 <a class="button is-white" v-if="isVisible(group.model, options[group.model].visible)" @click="toggleVisibility(group.model)"><span class="icon has-text-grey-light"><i class="far fa-chevron-up"></i></span></a>
                 <a class="button is-white" v-if="!isVisible(group.model, options[group.model].visible)" @click="toggleVisibility(group.model)"><span class="icon"><i class="far fa-chevron-down has-text-grey-light"></i></span></a>
               </div>
+              
             </div>
           </div>
 
@@ -43,7 +44,7 @@
 
           <div class="field toggles columns is-mobile" v-if="options[group.model].type == 'toggle' && isVisible(group.model, options[group.model].visible) && !readOnly">
             <div class="column" :class="{ 'is-half': (group.tags.length > 3)}" v-for="tag in group.tags">
-              <a class="toggle is-box" :title="tag.name" :class="{ 'is-selected': isSelected(tag._id, group.model) }" @click="checkTag(tag._id, group.model)">
+              <a class="toggle is-box" :title="tag.name" :class="[{ 'is-selected': isSelected(tag._id, group.model) }, 'option-'+tag.slug]" @click="checkTag(tag._id, group.model)" v-tooltip="options[group.model].tooltips ? tag.name : false">
                 <span v-if="tag.slug == 'horizontal'" class="icon"><i class="far fa-rectangle-landscape"></i></span>
                 <span v-else-if="tag.slug == 'vertical'" class="icon"><i class="far fa-rectangle-portrait"></i></span>
                 <span v-else-if="tag.slug == 'square'" class="icon"><i class="far fa-square"></i></span>
@@ -79,19 +80,19 @@
               <label class="checkbox dropdown-item" :title="tag.name" @click="checkTag(tag._id, group.model)" :class="{ 'is-selected': isSelected(tag._id, group.model) }" v-for="tag in group.tags">
                 <!-- @click="checkTag(tag._id, group.model)" -->
                 <!-- <input type="checkbox":value="tag._id" :model="selected" /> -->
-                <span class="icon icon-spooky" v-if="tag.slug == 'spooky-pack'"></span>
+                <!-- <span class="icon icon-spooky" v-if="tag.slug == 'spooky-pack'"></span> -->
                 {{ tag.name }}
 
                 <span class="tag is-rounded is-outlined" v-if="['back-to-the-future','knight-rider','the-munsters'].indexOf(tag.slug) > -1">$2.99</span>
-                <span class="tag is-rounded is-outlined" v-if="['spooky-pack'].indexOf(tag.slug) > -1">$10.99</span>
-                <span class="tag is-rounded is-outlined" v-if="['spooky'].indexOf(tag.slug) > -1">DLC</span>
+                <span class="tag is-rounded is-outlined" v-if="['spooky-pack','adventure-pack'].indexOf(tag.slug) > -1">$10.99</span>
+                <span class="tag is-rounded is-outlined" v-if="['spooky', 'adventure', 'temple', 'temple-gold', 'crypt'].indexOf(tag.slug) > -1">DLC</span>
 
-                <span class="tag is-rounded is-outlined" v-if="tag.slug == 'shop' && group.model == 'buildings'">Shop Category</span>
+                <span class="tag is-rounded is-outlined" v-if="tag.slug == 'scenery' && group.model == 'scenery'">Scenery Category</span>
                 <span class="tag is-rounded is-outlined" v-if="tag.slug == 'building' && group.model == 'buildings'">Building Category</span>
-                <span class="tag is-rounded is-outlined" v-if="['display-sequence','entertainment-point'].indexOf(tag.slug) > -1">Special Object</span>
                 <span class="tag is-rounded is-outlined" v-if="['festive'].indexOf(tag.slug) > -1">1.1</span>
                 <span class="tag is-rounded is-outlined" v-if="['security-camera','racing'].indexOf(tag.slug) > -1">1.2</span>
                 <span class="tag is-rounded is-outlined" v-if="['screen','projection-screen','stars-and-stripes'].indexOf(tag.slug) > -1">1.3</span>
+                <span class="tag is-rounded is-outlined" v-if="['vista-point'].indexOf(tag.slug) > -1">1.5</span>
               </label>
             </div>
           </div>
@@ -146,39 +147,46 @@ export default {
     return {
       selected: [],
       groups: [],
-      tags: [],
       visibility: {},
-      valid: false
+    }
+  },
+  computed: {
+    tags() {
+      return this.$store.state.tags
+    }
+  },
+  watch: {
+    tags(tags) {
+      if(tags.length == 0) return
+      this.getTags()
     }
   },
   methods: {
     getTags () {
-      this.$store.dispatch('fetchTags').then(() => {
-        let tags = this.$store.state.tags
-        this.$set(this, 'groups', [])
-        this.$set(this, 'tags', tags)
-
-        for(let model in this.options) {
-          this.groups.push({
-            label: this.options[model].label || null,
-            model: model,
-            tags: this.filterTags(model, tags),
-          })
-        }
-
-        return
-      })
+      this.groups = []
+      for(let model in this.options) {
+        this.groups.push({
+          label: this.options[model].label || null,
+          model: model,
+          tags: this.filterTags(model, this.tags),
+          valid: true,
+        })
+      }
     },
     calcSelected(model) {
       let group = this.groups.filter((g) => {
         return g.model == model
       })
 
-      let selected = group[0].tags.filter((s) => {
-        return this.selected.indexOf(s._id) > -1
-      })
+      if(group[0]) {
+        let selected = group[0].tags.filter((s) => {
+          return this.selected.indexOf(s._id) > -1
+        })
 
-      return selected.length;
+        return selected.length
+      } else {
+        return 0
+      }
     },
     getSelected(model) {
       let group = this.groups.filter((g) => {
@@ -195,17 +203,17 @@ export default {
       if(isSelected > -1) {
         this.selected.splice(isSelected, 1)
       } else {
-        if(this.options[model].max == 1 && total == 1) {
+        if(this.options[model] && this.options[model].max == 1 && total == 1) {
           let selected = this.getSelected(model)[0]._id
           let index = this.selected.indexOf(selected)
           this.selected.splice(index, 1)
-        } else if(this.options[model].max == total) {
+        } else if(this.options[model] && this.options[model].max == total) {
            return false
         }
 
         this.selected.push(value);
       }
-
+      this.isValid(model)
       this.$emit('selected', this.selected)
       // this.$emit('valid', this.valid)
     },
@@ -215,7 +223,7 @@ export default {
     isChecked(key) {
       return (this.checked.indexOf(key) > -1)
     },
-    filterTags(model, data) {
+    filterTags(model, data = []) {
       return data.filter((tag) => {
         return tag.model == model;
       })
@@ -244,10 +252,30 @@ export default {
       })
       //console.log('as: '+ids)
       this.$set(this, 'selected', ids)
+    },
+    isValid(model = false) {
+      let valid = true
+
+      this.groups.forEach(group => {
+        if(model && group.model !== model) return
+        if(this.options[group.model] && this.options[group.model].required) {
+          if(this.getSelected(group.model).length == 0) {
+            console.log(model, 'is invalid')
+            group.valid = false
+            valid = false
+          } else {
+            console.log(model, 'is valid')
+            group.valid = true
+          }
+        }
+      })
+
+      console.log('is valid', valid)
+      return valid
     }
   },
   mounted () {
-    this.getTags()
+    if(this.tags.length > 0) this.getTags()
   }
 }
 </script>

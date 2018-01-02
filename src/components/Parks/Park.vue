@@ -11,6 +11,7 @@
             </div>
           </div>
           <div class="level-right">
+            <a class="button level-item is-medium is-primary is-inverted"><span class="icon"><i class="far fa-map"></i></span> <span>Park Map</span></a>
             <a @click="openModal('uploadPhotos')" class="button level-item is-white is-medium" v-if="editMode"><span>Manage Photos</span></a>
           </div>
         </div>
@@ -67,9 +68,24 @@
       <div class="column is-one-quarter">
         <div class="box park-info">
           <Creator :user="park.user"></Creator>
+          <br />
+          <table class="table is-not-hoverable">
+            <tbody>
+            <tr>
+              <td colspan="2">
+                <div class="reactions-meter--wrapper">
+                  <div class="reactions-meter meter fear">
+                    <div class="reaction is-selectable boring"></div>
+                  </div>
+                  <p class="text-center">Reactions</p>
+                </div>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
 
-          <hr />
-
+        <div class="box">
           <ColorPalette v-model="park.colors" :editMode="editMode"></ColorPalette>
         </div>
 
@@ -83,6 +99,42 @@
 
       <div class="column">
 
+        <div class="box">
+          <h3 class="h3">Amenities @ this Park</h3>
+          <div class="amenity" v-if="hasTag('entertainment-points')">
+            <h4>Entertainment Points</h4>
+            <p>Look for our world-classed entertainers at various points around the park.</p>
+          </div>
+          <div class="amenity" v-if="hasTag('fireworks')">    
+            <h4>Fireworks</h4>
+            <p>Stay for the show, we'll light up the sky once the sun goes down.</p>
+          </div>
+          <div class="amenity" v-if="hasTag('priority-pass')">
+            <h4>Priority Pass</h4>
+            <p>Purchase a pass and skip the lines, you'll be given priority at our most popular rides.</p>
+          </div>
+          <div class="amenity" v-if="hasTag('recycling')">
+            <h4>Recycling</h4>
+            <p>Keep our park green and recycle in our designated bins.</p>
+          </div>
+          <div class="amenity" v-if="hasTag('security')">
+            <h4>Security</h4>
+            <p>Feel safe with our security staff watching on the ground and through CCTV.</p>
+          </div>
+          <div class="amenity" v-if="hasTag('transport')">
+            <h4>Transport</h4>
+            <p>Get to your favorite rides across the park quickly by our transit system.</p>
+          </div>
+          <div class="amenity" v-if="hasTag('vista-points')">
+            <h4>Vista Points</h4>
+            <p>A picture is worth a thousand words. Find our designated photo points.</p>
+          </div>
+          <div class="amenity" v-if="hasTag('water-rides')">
+            <h4>Water Rides</h4>
+            <p>Warning you may get wet!</p>
+          </div>
+        </div>
+
         <section class="box park-description">
           <div class="park-description-editor editor" v-if="editMode" v-html="park.description"></div>
           <div class="park-description-content" v-show="!editMode" v-html="park.description"></div>
@@ -91,11 +143,11 @@
 
         <div class="level" id="billboards">
           <div class="level-left">
-            <h3 class="ui header level-item">Billboards <a @click="openModal('downloadBillboards')" class="is-text">Download All ({{ park.billboards.length }})</a></h3>
+            <h3 class="level-item">Billboards <a @click="openModal('downloadBillboards')" class="is-text">Download All ({{ park.billboards.length }})</a></h3>
           </div>
           <div class="level-right">
-            <router-link :to="{ name: 'Generator' }" class="button level-item is-white is-medium"><span class="icon"><i class="fas fa-paint-brush has-text-primary"></i></span> <span>Generator</span></router-link>
-            <a @click="openModal('addBillboard')" class="button level-item is-white is-medium"><span class="icon"><i class="fas fa-plus has-text-primary"></i></span> <span>Add Billboard</span></a>
+            <!-- <router-link :to="{ name: 'Generator' }" class="button level-item is-white is-medium"><span class="icon"><i class="fas fa-paint-brush has-text-primary"></i></span> <span>Generator</span></router-link> -->
+            <a @click="openModal('addBillboard')" class="button level-item is-white is-medium" v-if="editMode"><span class="icon"><i class="fas fa-plus has-text-primary"></i></span> <span>Add Billboard</span></a>
           </div>
         </div>
         <Billboard :model="billboard" :key="billboard._id" v-for="billboard in park.billboards"></Billboard>
@@ -120,7 +172,7 @@
             <h3 class="ui header level-item">Blueprints</h3>
           </div>
           <div class="level-right">
-            <a @click="openModal('addBlueprint')" class="button is-white is-medium"><span class="icon"><i class="fas fa-plus has-text-primary"></i></span> <span>Add Blueprint</span></a>
+            <a @click="openModal('addBlueprint')" class="button is-white is-medium" v-if="editMode"><span class="icon"><i class="fas fa-plus has-text-primary"></i></span> <span>Add Blueprint</span></a>
           </div>
         </div>
         <Blueprint :model="blueprint" :key="blueprint._id" v-for="blueprint in park.blueprints"></Blueprint>
@@ -140,6 +192,14 @@
     </div>
 
     <Modal :class="{ 'uploadPhotos': true }" @close="closeModal('uploadPhotos')" :show="modalOpen('uploadPhotos')">
+      <div class="park-media">
+        <div class="park-photo level" :key="media._id" v-for="(media, key) in park.media">
+          <div class="level-item">
+            <img :src="media.url" class="is-64h" />
+            <div class="tag is-rounded" v-if="key == 0">Primary</div>
+          </div>
+        </div>
+      </div>
       <Upload @uploaded="addPhoto" folder="parks" instructions="Drop your park photos here, or click to browse your computer" v-if="park && isOwner() && editMode"></Upload>
     </Modal>
 
@@ -244,6 +304,10 @@ export default {
           max: 1,
           hidden: true
         },
+        'amenities': {
+          label: 'Amenities',
+          hidden: true
+        },
         'regions': {
           label: 'Biomes',
           type: 'list'
@@ -251,10 +315,6 @@ export default {
         'age-groups': {
           label: 'Age Groups',
           type: 'toggle',
-        },
-        'amenities': {
-          label: 'Amenities',
-          type: 'list'
         },
         'content-packs': {
           label: 'Content Packs',
@@ -276,7 +336,11 @@ export default {
           label: 'Requirements',
           type: 'list',
           readOnly: 'checklist'
-        }
+        },
+        'language': {
+          label: 'Language',
+          type: 'list'
+        },
       }
     }
   },
@@ -455,6 +519,15 @@ export default {
         theme: 'snow'
       })
     },
+    hasTag(slug) {
+      if(typeof this.park.tags !== 'undefined') {
+        return this.park.tags.filter(t => {
+          return t.slug == slug
+        })
+      }
+
+      return false
+    },
     copy() {
       this.$clipboard(this.shareURL)
       this.$notify('notifications', 'Park URL Copied', 'success')
@@ -471,21 +544,5 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss">
-  .truncate {
-    position: relative;
-    max-height: 250px;
-    overflow: hidden;
-
-    &:after {
-      display: block;
-      content: ' ';
-      position: absolute;
-      width: 100%;
-      height: 100px;
-      bottom: 0;
-      left: 0;
-      background: linear-gradient(0deg, rgba(255,255,255,1), rgba(255,255,255,0));
-      pointer-events: none;
-    }
-  }
+  
 </style>

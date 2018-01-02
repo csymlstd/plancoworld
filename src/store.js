@@ -23,7 +23,10 @@ export const store = new Vuex.Store({
     },
     modals: {
       login: false
-    }
+    },
+    requesting: {
+      tags: false,
+    },
   },
   getters: {
     getTagGroup: (state, getters) => (model) => {
@@ -52,12 +55,16 @@ export const store = new Vuex.Store({
     },
     toMetric(state) {
       state.measurements = 'metric'
+    },
+    requesting(state, property) {
+      state[property] = true
     }
   },
   actions: {
     fetchTags(context) {
       return new Promise((resolve, reject) => {
         if(context.state.tags.length == 0) {
+          context.commit('requesting', 'tags')
           return API.fetch('tags').then((tags) => {
            context.commit('replaceTags', tags)
            resolve()

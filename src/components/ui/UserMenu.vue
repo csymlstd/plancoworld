@@ -1,6 +1,6 @@
 <template>
   <div class="navbar-item has-dropdown is-hoverable">
-    <div class="navbar-link"><div class="ui avatar image"><img :src="user.avatar ? user.avatar.url : 'http://placehold.it/100x100'" style="width: auto;" /></div></div>
+    <div class="navbar-link"><div class="ui avatar"><img :src="user.avatar.url" /></div></div>
     <div class="navbar-dropdown is-right">
       <router-link to="/my/account" class="navbar-item">{{ user.name.display }}</router-link>
       <router-link to="/my/account" class="navbar-item">Your Account</router-link>

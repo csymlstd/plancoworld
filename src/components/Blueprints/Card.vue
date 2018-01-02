@@ -1,22 +1,23 @@
 <template>
-  <div class="column is-one-third">
-    <div class="card">
-      <div class="card-image" :style="{ 'backgroundImage': `url('${thumbnail}')` }" @click="viewBlueprint">
-        <div class="level top">
+  <div class="column is-one-third-desktop is-half-tablet">
+    <div class="card has-level-bottom">
+      <a class="card-image" :style="{ 'backgroundImage': `url('${thumbnail}')` }" @click="viewBlueprint">
+        <div class="level bottom">
           <div class="level-left"><div class="tag is-primary is-rounded is-medium" v-if="isBuilding()">Building</div></div>
+          <div class="level-left"><div class="tag is-primary is-rounded is-medium" v-if="isScenery()">Scenery</div></div>
           <div class="level-right"><div class="level-item" v-if="isSaved()"><span class="tag is-rounded is-warning is-medium" v-tooltip="'Saved to Toolbox'"><span class="icon"><i class="fas fa-archive"></i></span></span></div></div>
         </div>
           <!-- <img :src="thunbnail ? thumbnail : ''" class="fadeIn" @load="$event.target.classList.toggle('is-active')" /> -->
-      </div>
+      </a>
       <div class="card-content">
         <div class="content">
-          <h3><a @click="viewBlueprint">{{ model.name }}</a> <span class="tag is-warning" v-if="isSaved()"><i class="fas fa-archive"></i></span></h3>
+          <h3 class="title"><a @click="viewBlueprint">{{ model.name | truncate(70) }}</a></h3>
           <div class="level bottom">
             <div class="level-left">
               <Creator :user="model.user" class="level-item"></Creator>
             </div>
             <div class="level-right">
-
+              <Reaction :model="model" :type="'blueprints'"></Reaction>
             </div>
           </div>
         </div>
@@ -31,10 +32,12 @@ import router from '@/router'
 import Media from '@/services/media'
 import Auth from '@/services/auth'
 import Creator from '@/components/ui/ProfileMicro'
+import Reaction from '@/components/ui/Reaction'
 
 export default {
   components: {
-    Creator
+    Creator,
+    Reaction
   },
   props: {
     model: {},
@@ -54,7 +57,14 @@ export default {
       return (this.model.toolbox.indexOf(Auth.user.profile._id) > -1)
     },
     isBuilding() {
-      return this.model.tags.indexOf('597cfc8c23e62646b0c8f7a7' > -1)
+      return this.model.tags.filter(t => {
+        return t._id == '597cfc8c23e62646b0c8f7a7'
+      }).length > 0
+    },
+    isScenery() {
+      return this.model.tags.filter(t => {
+        return t._id == '5a442a25c42b1d290831e007'
+      }).length > 0
     }
    },
   mounted () {

@@ -25,23 +25,6 @@ export default new Router({
       }
     },
     {
-      path: '/steam/verify',
-      name: 'SteamVerify',
-      component: require('@/components/Account/SteamVerify'),
-      beforeEnter: (to, from, next) => {
-        console.log(to)
-        return next()
-      }
-    },
-    {
-      path: '/steam/authorize',
-      name: 'SteamAuthorize',
-      component: require('@/components/Account/SteamAuthorize'),
-      beforeEnter: (to, from, next) => {
-        return next()
-      }
-    },
-    {
       path: '/parks',
       name: 'Parks',
       component: require('@/components/Parks/Parks'),
@@ -53,6 +36,11 @@ export default new Router({
       //     component: require('@/components/Parks/Import')
       //   }
       // ]
+    },
+    {
+      path: '/kits',
+      name: 'Kits',
+      component: require('@/components/Kits/Kits'),
     },
     {
       path: '/parks/import',
@@ -78,12 +66,6 @@ export default new Router({
           component: require('@/components/Account/My')
         },
         {
-          path: 'linked-accounts',
-          name: 'LinkedAccounts',
-          meta: { auth: true },
-          component: require('@/components/Account/Linked')
-        },
-        {
           path: '',
           name: 'MyWorld',
           meta: { auth: true },
@@ -106,6 +88,11 @@ export default new Router({
       ]
     },
     {
+      path: '/by/:username',
+      name: 'Profile',
+      component: require('@/components/Profile/Profile')
+    },
+    {
       path: '/blueprints',
       name: 'Blueprints',
       component: require('@/components/Blueprints/Blueprints')
@@ -119,7 +106,7 @@ export default new Router({
     {
       path: '/billboards',
       name: 'Billboards',
-      meta: { auth: true },
+      meta: { },
       component: require('@/components/Billboards/Billboards'),
 
     },
@@ -136,12 +123,12 @@ export default new Router({
       component: require('@/components/Billboards/Convert'),
 
     },
-    {
-      path: '/billboards/generator',
-      name: 'Generator',
-      meta: { auth: false },
-      component: require('@/components/Billboards/Generator'),
-    },
+    // {
+    //   path: '/billboards/generator',
+    //   name: 'Generator',
+    //   meta: { },
+    //   component: require('@/components/Billboards/Generator'),
+    // },
     {
       path: '/billboards/:slug',
       name: 'Billboard',
@@ -151,6 +138,18 @@ export default new Router({
       path: '/blueprints/:slug',
       name: 'Blueprint',
       component: require('@/components/Blueprints/Blueprint')
+    },
+    {
+      path: '/guides',
+      name: 'Guides',
+      component: require('@/components/Wiki/Wiki'),
+      children: [
+        {
+          path: ':slug',
+          name: 'GuidePage',
+          component: require('@/components/Wiki/Page')
+        }
+      ]
     },
     {
       path: '/audio',

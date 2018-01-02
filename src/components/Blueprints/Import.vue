@@ -1,6 +1,6 @@
 <template>
   <div>
-    <section class="hero hero--tall" :style="{ 'background-image': 'url('+(imported.media.length > 0 ? imported.media[0].url : '')+')' }" v-if="step > 0">
+    <section class="hero hero--tall" :style="{ 'background-image': 'url('+(imported.media.length > 0 ? imported.media[0].url : '')+')' }">
       <div class="container">
         <Upload @uploaded="addPhoto" folder="blueprints" :instant="true" :isDark="true" instructions="Drop your blueprint photos here, or click to browse your computer" v-if="imported.media.length == 0"></Upload>
 
@@ -21,12 +21,17 @@
       </div>
     </section>
     <section class="section">
-      <div class="columns is-centered">
-        <div class="column is-three-quarters" v-if="step == 0">
+
+      <Modal :class="['importFromSteam', 'is-wide']" :show="step == 0">
+        <header>
+          <i class="fab fa-steam fa-3x"></i>
+          <h2 class="title">Import and Connect to Steam Workshop</h2>
+          <p>Enter the URL to your Park in the Workshop to import your descriptions, tags, and photos.</p>
+        </header>
+        <main>
           <div class="field">
-            <h2 class="title">Import and Connect to Steam Workshop</h2>
             <div class="field">
-              <p>Enter the URL to your Blueprint in the Workshop to import your descriptions, tags, and photos.</p>
+                
             </div>
             <div class="notification is-warning" v-if="errors.import">
               {{ errors.import }}
@@ -37,152 +42,157 @@
               </div>
             </div>
           </div>
+
           <div class="level">
             <div class="level-left">
-              <button class="button is-medium is-primary level-item" :class="{ 'is-loading': loading.importing }" @click="importItem()"><span class="icon"><i class="fas fa-cloud-upload"></i></span> <span>Import Blueprint</span></button>
-              <button class="button is-white is-medium level-item" @click="importLater()">Import Later</button>
-              <p class="level-item has-text-grey">You can connect it later if you're still working on it. <br /> It will be unpublished until you do.</p>
+              <button class="button is-medium is-primary level-item" :class="{ 'is-loading': loading.importing }" @click="importItem()"><span class="icon"><i class="fab fa-steam"></i></span> <span>Import Park</span></button>
+              <button class="button is-light is-medium level-item" @click="importLater()">Connect Later</button>
             </div>
           </div>
-        </div>
-          <!-- <button class="ui button" @click="addField()" :disabled="fields >= max">Add Another</button> -->
-        </div>
-        <div class="form for-blueprint columns is-centered" v-show="step == 1">
-          <div class="column is-three-quarters content">
-            <div class="field">
-              <label class="label">Blueprint Name</label>
-              <div class="control">
-                <input type="text" name="title" v-model="imported.title" class="input is-medium" placeholder="PlanCo World!" />
-              </div>
-            </div>
 
-            <div class="field">
-              <label class="label">About Your Blueprint</label>
-              <p v-if="wasImported">If you have links to billboards and audio files, you can upload them directly to PlanCo World in the next step.</p>
-              <div class="box">
-                <div class="description editor" v-html="imported.description"></div>
-              </div>
-            </div>
+          <p class="has-text-grey">You can connect it later if you're still working on it, but it will be unpublished until you do.</p>
+        </main>
+      </Modal>
 
-            <div class="field">
-              <div class="box">
-                <div class="level">
-                  <div class="level-left">
-                    <h5 class="title is-5">Ratings</h5>
-                  </div>
-                  <div class="level-right">
-                    <div class="switch level-item" :class="{'is-active is-primary':enableRatings }" @click="enableRatings = enableRatings ? false: true">
-                      <label></label>
-                    </div>
-                  </div>
-                </div>
-                <div class="columns" v-if="enableRatings">
-                  <div class="column">
-                    <div class="reaction is-large fun"></div>
-                  </div>
-                  <div class="column">
-                    <div class="reaction is-large nauseating"></div>
-                  </div>
-                  <div class="column">
-                    <div class="reaction is-large scary"></div>
-                  </div>
-                </div>
-              </div>
-              <div class="box">
-                <div class="level">
-                  <div class="level-left">
-                    <h5 class="title is-5">Ride Stats</h5>
-                  </div>
-                  <div class="level-right">
-                    <div class="switch level-item" :class="{'is-active is-primary':enableStats }" @click="enableStats = enableStats ? false: true">
-                      <label></label>
-                    </div>
-                  </div>
-                </div>
-                <div class="columns" v-if="enableStats">
-                  <div class="column">
-                    <label class="label">Duration</label>
-                    <div class="field has-addons">
-                      <div class="control">
-                        <input type="number" class="input" v-model="imported.stats.duration" />
-                      </div>
-                      <div class="control">
-                        <div class="button is-static">minutes</div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="column">
-                    <label class="label">Length</label>
-                    <div class="field has-addons">
-                      <div class="control">
-                        <input type="number" class="input" v-model="imported.stats.length" />
-                      </div>
-                      <div class="control">
-                        <div class="button is-static" v-if="isImperial()">feet</div>
-                        <div class="button is-static" v-else>meters</div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="column">
-                    <label class="label">Biggest Drop</label>
-                    <div class="field has-addons">
-                      <div class="control">
-                        <input type="number" class="input" v-model="imported.stats.biggestDrop" />
-                      </div>
-                      <div class="control">
-                        <div class="button is-static" v-if="isImperial()">feet</div>
-                        <div class="button is-static" v-else>meters</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="columns" v-if="enableStats">
-                  <div class="column">
-                    <label class="label">Max Speed</label>
-                    <div class="field has-addons">
-                      <div class="control">
-                        <input type="number" max="149" class="input" v-model="imported.stats.maxSpeed" />
-                      </div>
-                      <div class="control">
-                        <div class="button is-static" v-if="isImperial()">mph</div>
-                        <div class="button is-static" v-else>kmh</div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="column">
-                    <label class="label">Average Speed</label>
-                    <div class="field has-addons">
-                      <div class="control">
-                        <input type="number" max="149" class="input" v-model="imported.stats.avgSpeed" />
-                      </div>
-                      <div class="control">
-                        <div class="button is-static" v-if="isImperial()">mph</div>
-                        <div class="button is-static" v-else>kmh</div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="columns">
-
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="field">
-              <Filters :options="filterOptions" @selected="addTags" ref="tags"></Filters>
-              <!-- <a class="button" @click="">Add Tags</a><div class="field is-grouped is-grouped-multiline">
-                <div class="control" v-for="tag in imported.tags">
-                  <div class="tag is-primary is-medium">{{ tag.name }} <button class="delete is-small"></button></div>
-                </div>
-              </div> -->
-            </div>
-
-            <div class="field is-grouped">
-              <div class="control"><a class="button is-primary is-medium" @click="addBlueprint()">Save &amp; View</a></div>
-              <div class="control"><a class="button is-medium is-white" @click="addBlueprint()">Save &amp; Add Another</a></div>
+      <div class="form for-blueprint columns is-centered">
+        <div class="column is-three-quarters content">
+          <div class="field">
+            <label class="label">Blueprint Name</label>
+            <div class="control">
+              <input type="text" name="title" v-model="imported.title" class="input is-medium" placeholder="PlanCo World!" />
             </div>
           </div>
+
+          <div class="field">
+            <label class="label">About Your Blueprint</label>
+            <p v-if="wasImported">If you have links to billboards and audio files, you can upload them directly to PlanCo World in the next step.</p>
+            <div class="box">
+              <div class="description editor" v-html="imported.description"></div>
+            </div>
+          </div>
+
+          <div class="field">
+            <div class="box">
+              <div class="level">
+                <div class="level-left">
+                  <h5 class="title is-5">Ratings</h5>
+                </div>
+                <div class="level-right">
+                  <div class="switch level-item" :class="{'is-active is-primary':enableRatings }" @click="enableRatings = enableRatings ? false: true">
+                    <label></label>
+                  </div>
+                </div>
+              </div>
+              <div class="columns" v-if="enableRatings">
+                <div class="column">
+                  <div class="reaction is-large fun" v-tooltip="'Excitement'"></div>
+                  <Range v-model="imported.stats.excitement"></Range>
+                </div>
+                <div class="column">
+                  <div class="reaction is-large scary" v-tooltip="'Fear'"></div>
+                  <Range v-model="imported.stats.fear"></Range>
+                </div>
+                <div class="column">
+                  <div class="reaction is-large nauseating" v-tooltip="'Nausea'"></div>
+                  <Range v-model="imported.stats.nausea"></Range>
+                </div>
+              </div>
+            </div>
+            <div class="box">
+              <div class="level">
+                <div class="level-left">
+                  <h5 class="title is-5">Ride Stats</h5>
+                </div>
+                <div class="level-right">
+                  <div class="switch level-item" :class="{'is-active is-primary':enableStats }" @click="enableStats = enableStats ? false: true">
+                    <label></label>
+                  </div>
+                </div>
+              </div>
+              <div class="columns" v-if="enableStats">
+                <div class="column">
+                  <label class="label">Duration</label>
+                  <div class="field has-addons">
+                    <div class="control">
+                      <input type="number" class="input" v-model="imported.stats.duration" />
+                    </div>
+                    <div class="control">
+                      <div class="button is-static">minutes</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="column">
+                  <label class="label">Length</label>
+                  <div class="field has-addons">
+                    <div class="control">
+                      <input type="number" class="input" v-model="imported.stats.length" />
+                    </div>
+                    <div class="control">
+                      <div class="button is-static" v-if="isImperial()">feet</div>
+                      <div class="button is-static" v-else>meters</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="column">
+                  <label class="label">Biggest Drop</label>
+                  <div class="field has-addons">
+                    <div class="control">
+                      <input type="number" class="input" v-model="imported.stats.biggestDrop" />
+                    </div>
+                    <div class="control">
+                      <div class="button is-static" v-if="isImperial()">feet</div>
+                      <div class="button is-static" v-else>meters</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="columns" v-if="enableStats">
+                <div class="column">
+                  <label class="label">Max Speed</label>
+                  <div class="field has-addons">
+                    <div class="control">
+                      <input type="number" max="149" class="input" v-model="imported.stats.maxSpeed" />
+                    </div>
+                    <div class="control">
+                      <div class="button is-static" v-if="isImperial()">mph</div>
+                      <div class="button is-static" v-else>kmh</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="column">
+                  <label class="label">Average Speed</label>
+                  <div class="field has-addons">
+                    <div class="control">
+                      <input type="number" max="149" class="input" v-model="imported.stats.avgSpeed" />
+                    </div>
+                    <div class="control">
+                      <div class="button is-static" v-if="isImperial()">mph</div>
+                      <div class="button is-static" v-else>kmh</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="columns">
+
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="field">
+            <Filters :options="filterOptions" @selected="addTags" ref="tags"></Filters>
+            <!-- <a class="button" @click="">Add Tags</a><div class="field is-grouped is-grouped-multiline">
+              <div class="control" v-for="tag in imported.tags">
+                <div class="tag is-primary is-medium">{{ tag.name }} <button class="delete is-small"></button></div>
+              </div>
+            </div> -->
+          </div>
+
+          <div class="field is-grouped">
+            <div class="control"><a class="button is-primary is-medium" @click="addBlueprint()">Save &amp; View</a></div>
+            <div class="control"><a class="button is-medium is-white" @click="addBlueprint()">Save &amp; Add Another</a></div>
+          </div>
         </div>
+      </div>
     </section>
   </div>
 </template>
@@ -193,7 +203,9 @@ import slug from 'slug'
 import Filters from '@/components/ui/Filters'
 import API from '@/services/api'
 
+import Range from '@/components/ui/Range'
 import Upload from '@/components/ui/Upload'
+import Modal from '@/components/ui/Modal'
 
 import Quill from 'quill'
 
@@ -201,7 +213,9 @@ export default {
   store,
   components: {
     Upload,
-    Filters
+    Filters,
+    Modal,
+    Range
   },
   data () {
     return {
@@ -217,7 +231,9 @@ export default {
         title: '',
         media: [],
         tags: [],
-        stats: {}
+        stats: {
+          excitement: 0
+        }
       },
       wasImported: false,
       enableStats: false,
@@ -310,13 +326,8 @@ export default {
 
           }
 
-
           this.step = 1
           this.wasImported = true
-
-          this.$nextTick(() => {
-            this.attachEditor()
-          })
         }
 
         this.loading.importing = false
@@ -349,9 +360,6 @@ export default {
     },
     importLater() {
       this.step = 1
-      this.$nextTick(() => {
-        this.attachEditor()
-      })
     },
     isImperial() {
       return this.$store.state.measurements == 'imperial'
@@ -383,7 +391,9 @@ export default {
     }
   },
   mounted () {
-    console.log(this.$store.measurements)
+    this.$nextTick(() => {
+      this.attachEditor()
+    })
   }
 }
 </script>

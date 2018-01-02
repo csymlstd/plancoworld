@@ -24,10 +24,16 @@
     <section class="section">
 
         <Modal :class="['importFromSteam', 'is-wide']" :show="step == 0">
-            <div class="field">
+            <header>
+              <i class="fab fa-steam fa-3x"></i>
               <h2 class="title">Import and Connect to Steam Workshop</h2>
+              <p>Enter the URL to your Park in the Workshop to import your descriptions, tags, and photos.</p>
+            </header>
+            <main>
+            <div class="field">
+              
               <div class="field">
-                <p>Enter the URL to your Park in the Workshop to import your descriptions, tags, and photos.</p> <p class="has-text-grey">You can connect it later if you're still working on it. It will be unpublished until you do.</p>
+                 
               </div>
               <div class="notification is-warning" v-if="errors.import">
                 {{ errors.import }}
@@ -38,6 +44,7 @@
                 </div>
               </div>
             </div>
+
             <div class="level">
               <div class="level-left">
                 <button class="button is-medium is-primary level-item" :class="{ 'is-loading': loading.importing }" @click="importItem()"><span class="icon"><i class="fab fa-steam"></i></span> <span>Import Park</span></button>
@@ -45,14 +52,16 @@
               </div>
             </div>
 
+            <p class="has-text-grey">You can connect it later if you're still working on it, but it will be unpublished until you do.</p>
+            </main>
         </Modal>
 
-      <div class="form content for-park columns is-centered">
+      <div class="form content for-park columns is-centered" id="form">
           <div class="column is-three-quarters">
             <h2 class="title is-4">Tell us about your park</h2>
             <div class="field">
               <div class="control">
-                <input type="text" name="title" v-model="imported.title" class="input is-medium" placeholder="Park Name" />
+                <input type="text" name="title" v-model="imported.title" @input="$v.imported.title.$touch()" class="input is-medium" :class="{ 'is-danger': $v.imported.title.$error }" placeholder="Park Name" />
               </div>
             </div>
 
@@ -62,7 +71,7 @@
               </div>
             </div>
 
-            <h2 class="title is-4">What does your park offer to your guests?</h2>
+            
             <div class="field">
               <Filters :options="filterOptions" @selected="addTags" ref="tags" ></Filters>
               <!-- <a class="button" @click="">Add Tags</a><div class="field is-grouped is-grouped-multiline">
@@ -83,6 +92,7 @@
 </template>
 
 <script>
+import SmoothScroll from 'smooth-scroll'
 import Modal from '@/components/ui/Modal'
 import Filters from '@/components/ui/Filters'
 import API from '@/services/api'
@@ -93,6 +103,8 @@ import Upload from '@/components/ui/Upload'
 import Quill from 'quill'
 //
 //
+
+import { required } from 'vuelidate/lib/validators'
 
 export default {
   name: 'Import',
@@ -110,7 +122,7 @@ export default {
       errors: {
         import: false
       },
-      url: 'http://steamcommunity.com/sharedfiles/filedetails/?id=1112379208',
+      url: '',
       imported: {
         title: '',
         media: [],
@@ -130,12 +142,13 @@ export default {
         },
         'regions': {
           label: 'Biomes',
-          type: 'list',
+          type: 'toggle',
           visible: true,
           force: true,
           required: true,
           min: 1,
-          max: 4
+          max: 4,
+          tooltips: true,
         },
         'parks-plans': {
           label: 'Park Plans',
@@ -167,10 +180,22 @@ export default {
           label: 'Styles',
           type: 'list'
         },
+        'requirements': {
+          label: 'Requirements',
+          type: 'list'
+        },
         'language': {
           label: 'Language',
           type: 'list'
         },
+      }
+    }
+  },
+  validations: {
+    imported: {
+      title: {
+        required: required,
+
       }
     }
   },
@@ -197,10 +222,6 @@ export default {
 
           this.step = 1
           this.wasImported = true
-
-          this.$nextTick(() => {
-            this.attachEditor()
-          })
         }
 
         this.loading.importing = false
@@ -208,6 +229,7 @@ export default {
         console.log(err)
         if(err.response && err.response.data.message) this.errors.import = err.response.data.message
         this.loading.importing = false
+        this.errors.import = true
       })
     },
     attachEditor() {
@@ -232,17 +254,7 @@ export default {
       this.imported.tags = tags
     },
     importLater() {
-      this.imported = {
-        title: '',
-        type: 'park',
-        media: [],
-        tags: []
-      }
-
       this.step = 1
-      this.$nextTick(() => {
-        this.attachEditor()
-      })
     },
     addPark() {
       let newPark = {
@@ -257,6 +269,13 @@ export default {
         newPark.media.push(this.imported.media[i]._id)
       }
 
+      this.$v.imported.$touch()
+      let isTagsValid = this.$refs.tags.isValid()
+      if(!this.$v.imported.$valid || !isTagsValid) {
+        new SmoothScroll().animateScroll(this.$el.querySelector('#form'), false, { offset: 100 })
+        return
+      }
+
       API.post('parks', newPark).then((data) => {
         this.$notify('notifications', 'Park created!', 'success')
       }).catch((err) => {
@@ -267,7 +286,9 @@ export default {
     }
   },
   mounted () {
-
+    this.$nextTick(() => {
+      this.attachEditor()
+    })
   }
 }
 </script>

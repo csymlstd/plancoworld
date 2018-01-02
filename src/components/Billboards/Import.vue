@@ -8,9 +8,8 @@
             <h1 class="title level-item"> / Add a Billboard</h1>
           </div>
           <div class="level-right">
-            <router-link :to="{ name: 'Generator' }" class="level-item">Generator</router-link>
-            <router-link :to="{ name: 'Convert' }" class="level-item">Convert to WebM</router-link>
-            <a class="level-item">Glossary</a>
+            <!-- <router-link :to="{ name: 'Generator' }" class="level-item">Generator</router-link> -->
+            <!-- <router-link :to="{ name: 'Convert' }" class="level-item">Convert to WebM</router-link> -->
             <router-link :to="{ name: 'ImportBillboard' }" class="button is-primary is-medium">Add a Billboard</router-link>
           </div>
         </div>
@@ -19,49 +18,65 @@
     <section class="hero hero--tall">
         <Upload @uploaded="addMedia" :maxItems="1" folder="billboards" :isDark="true" :instant="true" instructions="Drop your billboard image or webm here, or click to browse your computer" v-if="imported.media.length == 0"></Upload>
         <img :src="imported.media[0].url" v-if="imported.media[0] && imported.media[0].type == 'image'" class="cover-photo" />
-        <video class="cover-photo" autoplay loop>
+        <video class="cover-photo" v-if="imported.media[0] && imported.media[0].type == 'video'" autoplay loop>
           <source :src="imported.media[0].url" v-if="imported.media[0] && imported.media[0].type == 'video'">
         </video>
     </section>
     <section class="section">
       <div class="columns is-centered">
-        <div class="form for-park column is-three-quarters is-centered">
+        <div class="form content for-billboard column is-three-quarters is-centered">
 
-          <h4 class="title is-4">Billboard Title</h4>
+         
           <div class="field">
+            <h4 class="title is-4">Billboard Title</h4>
             <div class="control">
               <input type="text" name="title" v-model="imported.title" class="input is-medium" placeholder="PlanCo World Entrance Sign" />
             </div>
           </div>
 
-          <h4 class="title is-4">About your Billboard</h4>
           <div class="field">
-            <p v-if="wasImported">If you have links to billboards and audio files, you can upload them directly to PlanCo World in the next step.</p>
+            <h4 class="title is-4">About your Billboard</h4>
             <div class="box">
               <div class="description editor" v-html="imported.description"></div>
             </div>
           </div>
 
-          <h4 class="title is-4">Add to a Pack</h4>
-          <div class="field has-addons">
-
-            <div class="control has-icons-left is-expanded">
-              <input type="text" name="title" v-model="imported.pack" class="input is-medium" placeholder="" />
-              <span class="icon is-left"><i class="far fa-search"></i></span>
+          <div class="field box">
+            <h4 class="title is-4">Add to a Kit</h4>
+            <p class="field">If you are creating a pack of related billboards: Upload and tag them individually and add them to a Kit! Kits can include Parks and Blueprints as well.</p>
+            <div class="field is-grouped">
+              <Autocomplete path="kits" :owned="true" placeholder="Search for your Kits" class="control is-expanded" @selected="addToKit"></Autocomplete>
+              <div class="control">
+                <button class="button is-primary is-medium" @click="creatingKit = creatingKit ? false : true">Create New Kit</button>
+              </div>
             </div>
-            <div class="control">
-              <button class="button is-success is-medium">Create New Pack</button>
+            <div class="field" v-if="kits.length > 0">
+              <div class="tag is-primary is-rounded is-large" :key="kit._id" v-for="(kit, index) in kits">{{ kit.name }} &nbsp;<button class="delete is-small" @click="removeFromKit(index)"></button></div>
             </div>
           </div>
 
+          <Modal :class="['is-wide']" :show="creatingKit">
+            <header>
+              <h2 class="title">Create a Kit</h2>
+            </header>
+            <main>
+            <div class="field">
+              <div class="control">
+                <input type="text" placeholder="Name" class="input is-medium" />
+              </div>
+              
+            </div>
 
-        </div>
-      </div>
-    </section>
+            <div class="level">
+              <div class="level-left">
+                <button class="button is-medium is-primary level-item" :class="{ 'is-loading': loading.creatingKit }" @click=""><span>Create Kit</span></button>
+                <button class="button is-light is-medium level-item" @click="creatingKit = false">Cancel</button>
+              </div>
+            </div>
 
-    <section class="section">
-      <div class="columns is-centered">
-        <div class="form for-park column is-three-quarters is-centered">
+            </main>
+        </Modal>
+          
 
           <div class="field">
             <Filters :options="filterOptions" @selected="addTags" ref="tags" ></Filters>
@@ -76,6 +91,8 @@
             <div class="control"><a class="button is-medium is-primary" @click="addBillboard()">Save Billboard</a></div>
             <div class="control"><a class="button is-medium is-white" @click="addBillboard()">Save &amp; Add Another</a></div>
           </div>
+
+
         </div>
       </div>
     </section>
@@ -83,7 +100,9 @@
 </template>
 
 <script>
+import Modal from '@/components/ui/Modal'
 import Filters from '@/components/ui/Filters'
+import Autocomplete from '@/components/ui/Autocomplete'
 import API from '@/services/api'
 import Media from '@/services/media'
 
@@ -92,13 +111,13 @@ import Upload from '@/components/ui/Upload'
 import Quill from 'quill'
 import slug from 'slug'
 
-
-
 export default {
   name: 'Import',
   components: {
     Upload,
-    Filters
+    Filters,
+    Autocomplete,
+    Modal
   },
   data () {
     return {
@@ -111,6 +130,8 @@ export default {
         media: [],
         tags: []
       },
+      kits: [],
+      creatingKit: false,
       wasImported: false,
       filterOptions: {
         'billboards': {
@@ -203,11 +224,30 @@ export default {
 
       API.post('billboards', newBillboard).then((data) => {
         this.$notify('notifications', 'Billboard created!', 'success')
+
+        let addToKits = []
+        kits.forEach(kit => {
+          kit.billboards.push(data._id)
+          addToKits.push(API.put('kits/'+kit._id, { billboards: kit.billboards }))
+        })
+        return Promise.all(addToKits)
+      }).then((addedToKits) => {
+        this.$notify('notifications', 'Billboard added to your Kits', 'success')
       }).catch((err) => {
         console.log(err)
         this.$notify('notifications', 'Error creating Billboard', 'error')
       })
 
+    },
+    addToKit(kit) {
+      let existing = this.kits.filter(k => {
+        return k._id == kit._id
+      })[0]
+
+      if(!existing) this.kits.push(kit)
+    },
+    removeFromKit(index) {
+      this.kits.splice(index, 1)
     }
   },
   mounted () {

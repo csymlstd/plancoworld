@@ -7,9 +7,10 @@
         <!-- <h1 class="title">Billboards</h1> -->
       </div>
       <div class="level-right">
-        <router-link :to="{ name: 'Generator' }" class="level-item">Generator</router-link>
-        <router-link :to="{ name: 'Convert' }" class="level-item">Convert to WebM</router-link>
-        <a class="level-item">Glossary</a>
+        <!-- <router-link :to="{ name: 'Generator' }" class="level-item">Generator</router-link> -->
+        <!-- <router-link :to="{ name: 'Convert' }" class="level-item">Convert to WebM</router-link> -->
+        <router-link :to="{ name: 'GuidePage', params: { slug: 'glossary' }}" class="level-item">Read the Guide</router-link>
+        <router-link :to="{ name: 'GuidePage', params: { slug: 'glossary' }}" class="level-item">Glossary</router-link>
         <router-link :to="{ name: 'ImportBillboard' }" class="button is-primary is-medium">Add a Billboard</router-link>
       </div>
     </div>

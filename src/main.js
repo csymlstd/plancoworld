@@ -15,6 +15,9 @@ Vue.use(VTooltip)
 import Clipboard from 'v-clipboard'
 Vue.use(Clipboard)
 
+import Vuelidate from 'vuelidate'
+Vue.use(Vuelidate)
+
 import VueI18n from 'vue-i18n'
 Vue.use(VueI18n)
 
@@ -89,5 +92,5 @@ new Vue({
     title: 'PlanCo World'
   },
   template: '<App/>',
-  components: { App }
+  components: { App },
 })

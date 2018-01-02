@@ -1,6 +1,6 @@
 <template>
-  <div class="column is-one-third">
-    <div class="card">
+  <div class="column is-one-third-desktop is-half-tablet">
+    <div class="card has-level-bottom">
       <div class="card-image" @click="viewBillboard">
         <img :src="model.media[0].url" v-if="model.media[0] && model.media[0].type == 'image'" />
         <video autoplay loop muted>
@@ -15,16 +15,7 @@
               <Creator :user="model.user" class="level-item"></Creator>
             </div>
             <div class="level-right">
-              <div class="reactions is-selectable">
-                <div class="add-reaction" v-show="addReaction">
-                  <a class="reaction boring">Boring..</a>
-                  <a class="reaction scary">Scary!</a>
-                  <a class="reaction nauseating">Bleh!</a>
-                </div>
-                <i class="far fa-plus-circle has-text-grey-light" @click="addReaction ? addReaction = false : addReaction = true"></i>
-                <a class="reaction love">Love It!</a>
-                <a class="reaction fun">So Fun!</a>
-              </div>
+              <Reaction :model="model" :type="'billboards'"></Reaction>
               <!-- <div class="vote level-item"><span class="icon"><i class="fas fa-heart"></i></span><span class="count">{{ model.votes.upTotal || 0 }}</span></div> -->
             </div>
           </div>
@@ -38,11 +29,13 @@
 
 import router from '@/router'
 import Creator from '@/components/ui/ProfileMicro'
+import Reaction from '@/components/ui/Reaction'
 
 export default {
   name: 'billboard-card',
   components: {
     Creator,
+    Reaction
   },
   props: {
     model: {},

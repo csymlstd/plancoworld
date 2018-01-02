@@ -11,7 +11,7 @@
             <div class="tabs is-toggle level-item">
               <ul>
                 <li :class="{ 'is-active': context == 'user' }" @click="tab(active, 'user')"><a>Your {{ panes[active].title }}</a></li>
-                <li :class="{ 'is-active': context == 'saved' }" @click="tab(active, 'saved')"><a>Saved {{ panes[active].title }}</a></li>
+                <li :class="{ 'is-active': context == 'saved' }" @click="tab(active, 'saved')" v-if="canSave(active)"><a>Saved {{ panes[active].title }}</a></li>
               </ul>
             </div>
           </div>
@@ -35,14 +35,12 @@
 
           <Pagination :total="pagination.total" :current="pagination.current" :pages="pagination.pages" @goTo="goToPage" v-if="pagination.pages > 1"></Pagination>
         </div>
-
-
-
       </main>
       <nav class="toolbox--nav">
         <a @click="tab('parks')"><span class="icon"><i class="fas fa-cubes"></i></span> <span>Parks</span></a>
         <a @click="tab('blueprints')"><span class="icon"><i class="fas fa-cube"></i></span> <span>Blueprints</span></a>
         <a @click="tab('billboards')"><span class="icon"><i class="far fa-rectangle-portrait"></i></span> <span>Billboards</span></a>
+        <a @click="tab('kits')"><span class="icon"><i class="fas fa-cubes"></i></span> <span>Kits</span></a>
         <a @click="tab('videos')"><span class="icon"><i class="fas fa-film"></i></span> <span>Videos</span></a>
         <a @click="tab('images')"><span class="icon"><i class="fas fa-image"></i></span> <span>Images</span></a>
       </nav>
@@ -100,6 +98,11 @@ export default {
         'billboards': {
           title: 'Billboards',
           query: 'billboards',
+          data: []
+        },
+        'kits': {
+          title: 'Kits',
+          query: 'kits',
           data: []
         },
         'videos': {
@@ -180,6 +183,9 @@ export default {
       this.getParks().then(() => {
         this.loading = false
       })
+    },
+    canSave(model) {
+      return ['parks','blueprints','billboards'].indexOf(model) > -1
     }
   },
   mounted () {

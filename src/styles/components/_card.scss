@@ -39,7 +39,7 @@
   }
 
   .card-content {
-
+    
   }
 
   &.has-level-bottom {
@@ -123,6 +123,14 @@
   &.is-warning {
     background: $warning;
     color: $grey-darker;
+  }
+
+  &.is-danger-outline {
+    border: 2px solid $danger;
+  }
+
+  &.is-warning-outline {
+    border: 2px solid $warning;
   }
 
   &.is-primary {

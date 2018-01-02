@@ -61,22 +61,65 @@
   }
 
   &.love {
-    background: url('/assets/images/emojis/smiling-face-with-heart-shaped-eyes.png');
+    background: url('/assets/images/emojis/love.png');
   }
 
   &.fun {
-    background: url('/assets/images/emojis/grinning-face-with-smiling-eyes.png');
+    background: url('/assets/images/emojis/exciting.png');
   }
 
   &.boring {
-    background: url('/assets/images/emojis/face-with-rolling-eyes.png');
+    background: url('/assets/images/emojis/boring.png');
   }
 
   &.scary {
-    background: url('/assets/images/emojis/face-screaming-in-fear.png');
+    background: url('/assets/images/emojis/scary.png');
   }
 
   &.nauseating {
-    background: url('/assets/images/emojis/nauseated-face.png');
+    background: url('/assets/images/emojis/nauseating.png');
+  }
+}
+
+.meter {
+  display: flex;
+  align-items: center;
+  position: relative;
+  height: 20px;
+  border-radius: 25px;
+  background: linear-gradient(90deg, #C94448 0%, #E56F36 50%, #1D8922 100%); //excitement
+  margin: 1rem 0 0.5rem;
+
+  .reaction {
+    height: 2rem;
+    width: 2rem;
+  }
+
+  &.reverse { // nausea
+    background: linear-gradient(90deg, #1D8922 0%, #E56F36 50%, #C94448 100%);
+  }
+
+  &.fear {
+    background: linear-gradient(90deg, color('grey','light') 25%, #1D8922 50%, #E56F36 75%, #C94448 100%);
+  }
+
+  &.teeter {
+    background: linear-gradient(90deg, #C94448 0%, #E56F36 25%, #1D8922 50%, #E56F36 75%, #C94448 100%);
+  }
+
+  &.speed {
+    background: linear-gradient(90deg, color('grey','light') 0%, #5794D0 100%);
+  }
+
+  &.lateral-force {
+    background: linear-gradient(90deg, #9B7DAE 0%, color('grey','light') 33%, color('grey','light') 66%, #9B7DAE 100%);
+  } //5794D0
+
+  &.vertical-force {
+    background: linear-gradient(90deg, #5794D0 0%, color('grey','light') 33%, color('grey','light') 66%, #9B7DAE 100%);
+  }
+
+  &.forward-force {
+    background: linear-gradient(90deg, #9B7DAE 0%, color('grey','light') 33%, color('grey','light') 66%, #5794D0 100%);
   }
 }

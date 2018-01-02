@@ -10,17 +10,7 @@
       </div>
     </section>
     <main class="container">
-      <div class="columns">
-        <div class="column">
-          <aside class="menu">
-            <ul class="menu-list">
-              <li><router-link :to="{ name: 'MyAccount' }" class="item">Your Account</router-link></li>
-              <li><router-link :to="{ name: 'LinkedAccounts' }" class="item">Linked Accounts</router-link></li>
-              <li><a class="item">Notifications</a></li>
-            </ul>
-
-          </aside>
-        </div>
+      <div class="columns is-centered">
         <div class="column is-three-quarters">
           <router-view></router-view>
         </div>

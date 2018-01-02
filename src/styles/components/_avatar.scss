@@ -1,9 +1,22 @@
 .avatar {
+  display: flex!important;
   background: color('grey','light');
   border-radius: 50%;
   background-size: cover!important;
   background-repeat: no-repeat;
   background-position: center!important;
+  overflow: hidden;
+  
+  justify-content: center;
+  text-align: center;
+  width: 2.5rem;
+  height: 2.5rem;
+
+  img {
+    max-width: none!important;
+    max-height: 100%!important;
+    object-fit: cover;
+  }
 }
 
 .profile--micro {
