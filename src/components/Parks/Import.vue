@@ -15,7 +15,7 @@
             <h1 class="title level-item"> / {{ imported.title || 'Add a Park' }}</h1>
           </div>
           <div class="level-right">
-            <button class="button is-primary is-medium level-item" @click="step = 0" v-if="!imported.steam_id"><span>Connect to </span><span class="icon"><i class="fab fa-steam"></i></span></button>
+            <button class="button is-primary is-medium level-item" @click="connect()" v-if="!imported.steam_id"><span>Connect to </span><span class="icon"><i class="fab fa-steam"></i></span></button>
             <button class="button is-success is-medium level-item" v-if="imported.steam_id"><span>Connected to</span><span class="icon"><i class="fab fa-steam"></i></span></button>
           </div>
         </div>
@@ -40,7 +40,7 @@
               </div>
               <div class="field has-addons">
                 <div class="control is-expanded">
-                  <input type="text" name="url" v-model="url" class="input is-medium" placeholder="http://steamcommunity.com/sharedfiles/filedetails/?id=#########" />
+                  <input type="text" ref="url" name="url" v-model="url" class="input is-medium" :class="{ 'is-danger': this.$v.url.$error }" placeholder="http://steamcommunity.com/sharedfiles/filedetails/?id=#########" />
                 </div>
               </div>
             </div>
@@ -58,18 +58,41 @@
 
       <div class="form content for-park columns is-centered" id="form">
           <div class="column is-three-quarters">
-            <h2 class="title is-4">Tell us about your park</h2>
-            <div class="field">
-              <div class="control">
-                <input type="text" name="title" v-model="imported.title" @input="$v.imported.title.$touch()" class="input is-medium" :class="{ 'is-danger': $v.imported.title.$error }" placeholder="Park Name" />
+            <div class="box">
+              <h4>Park Name</h4>
+              <div class="field">
+                <div class="control">
+                  <input type="text" name="title" v-model="imported.title" @input="$v.imported.title.$touch()" class="input is-medium" :class="{ 'is-danger': $v.imported.title.$error }" placeholder="PlanCo World" />
+                </div>
               </div>
             </div>
 
-            <div class="field">
-              <div class="box">
-                <div class="description editor" v-html="imported.description"></div>
+            <div class="box">
+              <h4>About Your Park</h4>
+              <div class="description editor" v-html="imported.description"></div>
+            </div>
+
+            <div class="box filter-list">
+              <h4>Color Palette</h4>
+              <p class="description">Save the scenery and building colors used across your park. You'll be able to click on them later to copy.</p>
+              <ColorPalette v-model="imported.colors" :editMode="true"></ColorPalette>
+            </div>
+
+            <div class="field box filter-list">
+            <h5 class="title is-5">Add to a Kit</h5>
+            <p class="field description">Kits allow you to share a collection of related Parks, Blueprints and Billboards.</p>
+            <div class="field is-grouped">
+              <Autocomplete path="kits" :owned="true" placeholder="Search for your Kits" class="control is-expanded" @selected="addToKit"></Autocomplete>
+              <div class="control">
+                <button class="button is-primary is-medium" @click="creatingKit = creatingKit ? false : true">Create New Kit</button>
               </div>
             </div>
+            <div class="field" v-if="kits.length > 0">
+              <div class="tag is-primary is-rounded is-large" :key="kit._id" v-for="(kit, index) in kits">{{ kit.name }} &nbsp;<button class="delete is-small" @click="removeFromKit(index)"></button></div>
+            </div>
+          </div>
+
+          <CreateKit :show="creatingKit" @cancel="creatingKit = false"></CreateKit>
 
             
             <div class="field">
@@ -94,12 +117,14 @@
 <script>
 import SmoothScroll from 'smooth-scroll'
 import Modal from '@/components/ui/Modal'
+import CreateKit from '@/components/Kits/CreateModal'
+import Autocomplete from '@/components/ui/Autocomplete'
 import Filters from '@/components/ui/Filters'
 import API from '@/services/api'
 import slug from 'slug'
 
 import Upload from '@/components/ui/Upload'
-
+import ColorPalette from '@/components/ui/ColorPalette'
 import Quill from 'quill'
 //
 //
@@ -111,7 +136,10 @@ export default {
   components: {
     Upload,
     Filters,
-    Modal
+    Modal,
+    ColorPalette,
+    CreateKit,
+    Autocomplete
   },
   data () {
     return {
@@ -123,10 +151,14 @@ export default {
         import: false
       },
       url: '',
+      kits: [],
+      creatingKit: false,
       imported: {
         title: '',
         media: [],
-        tags: []
+        tags: [],
+        colors: [],
+        kits: [],
       },
       wasImported: false,
       filterOptions: {
@@ -138,7 +170,7 @@ export default {
           required: true,
           min: 1,
           max: 1,
-          description: 'Different park types allow varying levels of challenge and freedom'
+          description: 'Different park types allow varying levels of challenge and freedom',
         },
         'regions': {
           label: 'Biomes',
@@ -155,43 +187,53 @@ export default {
           type: 'toggle',
           visible: true,
           max: 1,
+          showDescriptionsClosed: true,
         },
         'age-groups': {
           label: 'Age Groups',
           type: 'toggle',
           visible: true,
+          showDescriptionsClosed: true,
         },
         'amenities': {
           label: 'Amenities',
-          type: 'list'
+          type: 'list',
+          showDescriptionsClosed: true,
         },
         'content-packs': {
           label: 'Content Packs',
           type: 'list',
           dlc: true,
           visible: true,
-          force: true
+          force: true,
+          description: 'Select all content packs that contain items used in this Park'
         },
         'themes': {
           label: 'Themes',
-          type: 'list'
+          type: 'list',
+          showDescriptionsClosed: true,
         },
         'style': {
           label: 'Styles',
-          type: 'list'
+          type: 'list',
+          showDescriptionsClosed: true,
         },
         'requirements': {
           label: 'Requirements',
-          type: 'list'
+          type: 'list',
+          showDescriptionsClosed: true,
         },
         'language': {
           label: 'Language',
-          type: 'list'
+          type: 'list',
         },
       }
     }
   },
   validations: {
+    url: {
+      required
+    },
     imported: {
       title: {
         required: required,
@@ -200,7 +242,17 @@ export default {
     }
   },
   methods: {
+    connect() {
+      this.step = 0
+      this.$nextTick(() => { this.$refs.url.focus() })
+    },
     importItem() {
+      this.$v.url.$touch()
+      if(!this.$v.url.$valid) {
+        this.$refs.url.focus()
+        return
+      }
+
       this.loading.importing = true
       this.errors.import = false
       API.post('import', { url: this.url }).then((data) => {
@@ -254,6 +306,7 @@ export default {
       this.imported.tags = tags
     },
     importLater() {
+      this.$v.url.$reset()
       this.step = 1
     },
     addPark() {
@@ -283,10 +336,21 @@ export default {
         this.$notify('notifications', 'Error creating Park', 'error')
       })
 
+    },
+    addToKit(kit) {
+      let existing = this.kits.filter(k => {
+        return k._id == kit._id
+      })[0]
+
+      if(!existing) this.kits.push(kit)
+    },
+    removeFromKit(index) {
+      this.kits.splice(index, 1)
     }
   },
   mounted () {
     this.$nextTick(() => {
+      this.$refs.url.focus()
       this.attachEditor()
     })
   }

@@ -1,11 +1,12 @@
 <template>
-    <div class="control">
+    <div class="control range-wrapper">
         <div class="range"></div>
         <input type="number" :value="value" :min="min" :max="max" :step="step" v-model="value" />
     </div>
 </template>
 
 <script>
+import '@/styles/ui/_range.scss'
 import slider from 'nouislider'
 import 'nouislider/distribute/nouislider.css'
 

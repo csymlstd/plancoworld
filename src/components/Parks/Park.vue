@@ -73,19 +73,14 @@
             <tbody>
             <tr>
               <td colspan="2">
-                <div class="reactions-meter--wrapper">
-                  <div class="reactions-meter meter fear">
-                    <div class="reaction is-selectable boring"></div>
-                  </div>
-                  <p class="text-center">Reactions</p>
-                </div>
+                <ReactionMeter />
               </td>
             </tr>
             </tbody>
           </table>
         </div>
 
-        <div class="box">
+        <div class="box" v-if="park.colors.length > 0 || editMode">
           <ColorPalette v-model="park.colors" :editMode="editMode"></ColorPalette>
         </div>
 
@@ -99,7 +94,7 @@
 
       <div class="column">
 
-        <div class="box">
+        <!-- <div class="box">
           <h3 class="h3">Amenities @ this Park</h3>
           <div class="amenity" v-if="hasTag('entertainment-points')">
             <h4>Entertainment Points</h4>
@@ -133,7 +128,7 @@
             <h4>Water Rides</h4>
             <p>Warning you may get wet!</p>
           </div>
-        </div>
+        </div> -->
 
         <section class="box park-description">
           <div class="park-description-editor editor" v-if="editMode" v-html="park.description"></div>
@@ -143,7 +138,8 @@
 
         <div class="level" id="billboards">
           <div class="level-left">
-            <h3 class="level-item">Billboards <a @click="openModal('downloadBillboards')" class="is-text">Download All ({{ park.billboards.length }})</a></h3>
+            <h3 class="level-item">Billboards</h3>
+            <div class="level-item"><a @click="openModal('downloadBillboards')" class="is-text">Download All ({{ park.billboards.length }})</a></div>
           </div>
           <div class="level-right">
             <!-- <router-link :to="{ name: 'Generator' }" class="button level-item is-white is-medium"><span class="icon"><i class="fas fa-paint-brush has-text-primary"></i></span> <span>Generator</span></router-link> -->
@@ -175,7 +171,10 @@
             <a @click="openModal('addBlueprint')" class="button is-white is-medium" v-if="editMode"><span class="icon"><i class="fas fa-plus has-text-primary"></i></span> <span>Add Blueprint</span></a>
           </div>
         </div>
-        <Blueprint :model="blueprint" :key="blueprint._id" v-for="blueprint in park.blueprints"></Blueprint>
+
+        <div class="columns cards is-multiline loader--parent">
+          <Blueprint :model="blueprint" :key="blueprint._id" v-for="blueprint in park.blueprints"></Blueprint>
+        </div>
 
         <Modal :class="{ 'addBlueprint': true }" @close="closeModal('addBlueprint')" :show="modalOpen('addBlueprint')">
           <div class="form">
@@ -213,6 +212,7 @@ import Filters from '@/components/ui/Filters'
 import Upload from '@/components/ui/Upload'
 import SaveToToolbox from '@/components/ui/SaveToToolbox'
 import ColorPalette from '@/components/ui/ColorPalette'
+import ReactionMeter from '@/components/ui/ReactionMeter'
 import Modal from '@/components/ui/Modal'
 import Dropdown from '@/components/ui/Dropdown'
 import Creator from '@/components/ui/ProfileMini'
@@ -234,6 +234,7 @@ export default {
     Upload,
     SaveToToolbox,
     ColorPalette,
+    ReactionMeter,
     Dropdown,
     Creator,
     Blueprint,
@@ -306,7 +307,6 @@ export default {
         },
         'amenities': {
           label: 'Amenities',
-          hidden: true
         },
         'regions': {
           label: 'Biomes',

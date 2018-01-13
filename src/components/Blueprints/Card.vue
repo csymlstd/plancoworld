@@ -3,8 +3,11 @@
     <div class="card has-level-bottom">
       <a class="card-image" :style="{ 'backgroundImage': `url('${thumbnail}')` }" @click="viewBlueprint">
         <div class="level bottom">
-          <div class="level-left"><div class="tag is-primary is-rounded is-medium" v-if="isBuilding()">Building</div></div>
-          <div class="level-left"><div class="tag is-primary is-rounded is-medium" v-if="isScenery()">Scenery</div></div>
+          <div class="level-left">
+            <div class="tag is-primary is-rounded is-medium level-item" v-if="isBuilding()">Building</div>
+            <div class="tag is-primary is-rounded is-medium level-item" v-if="isScenery()">Scenery</div>
+          </div>
+          <div class="level-left"></div>
           <div class="level-right"><div class="level-item" v-if="isSaved()"><span class="tag is-rounded is-warning is-medium" v-tooltip="'Saved to Toolbox'"><span class="icon"><i class="fas fa-archive"></i></span></span></div></div>
         </div>
           <!-- <img :src="thunbnail ? thumbnail : ''" class="fadeIn" @load="$event.target.classList.toggle('is-active')" /> -->

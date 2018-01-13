@@ -4,7 +4,7 @@
   <div class="container">
     <div class="level">
       <div class="level-left">
-        <!-- <h1 class="title">Billboards</h1> -->
+        <h1 class="title">Billboards</h1>
       </div>
       <div class="level-right">
         <!-- <router-link :to="{ name: 'Generator' }" class="level-item">Generator</router-link> -->
@@ -95,7 +95,8 @@ export default {
           label: 'Orientation',
           type: 'toggle',
           visible: true,
-          force: true
+          force: true,
+          tooltips: true,
         },
         'billboards-context': {
           label: 'Context',

@@ -18,10 +18,10 @@
   &.is-loading:after {
     animation: fa-spin 2s infinite linear;
     content: "\f013";
-    font-family: 'Font Awesome 5 Solid';
+    font-family: 'Font Awesome 5 Pro';
     font-weight: 900;
     font-size: 1.4em;
-    color: rgba(255,255,255,0.75);
+    color: color('grey', 'light');
     height: 1em;
     width: 1em;
     border: 0!important;

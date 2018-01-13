@@ -5,8 +5,10 @@
       <div class="color is-new" v-tooltip="'Add New Color'" @click="addColor()" v-if="editMode"><span class="icon"><i class="fas fa-plus"></i></span></div>
     </div>
 
-    <Chrome :value="picker" @input="changeHex" v-if="editMode" v-show="active !== false" ref="colorPicker"></Chrome>
-    <div class="text-center"><a class="button is-light is-small is-rounded" v-if="active !== false && editMode" @click="active = false">Hide</a></div>
+    <div class="color-palette-picker" v-show="active !== false">
+      <Chrome :value="picker" @input="changeHex" v-if="editMode" ref="colorPicker"></Chrome>
+      <div class="text-center"><a class="button is-light is-small is-rounded" @click="active = false">Hide</a></div>
+    </div>
   </div>
 </template>
 

@@ -5,7 +5,7 @@
         <div class="field filter-list">
           <div class="level" v-if="group.label">
             <div class="level-left">
-              <div class="level-item"><h5 class="title is-5">{{ group.label }} <router-link :to="{ name: 'GuidePage', params: { slug: options[group.model].guide } }" v-if="options[group.model].guide" v-tooltip="'Guide Quicklook'" target="_blank"><span class="icon has-text-grey-light"><i class="far fa-question-circle"></i></span></router-link></h5></div>
+              <div class="level-item"><h5 class="title is-5">{{ group.label }} <router-link :to="{ name: 'GuidePage', params: { slug: options[group.model].guide } }" v-if="options[group.model].guide" v-tooltip="'Guide'" target="_blank"><span class="icon has-text-grey-light"><i class="far fa-question-circle"></i></span></router-link></h5></div>
               <div class="level-item"><div class="tag is-rounded is-outlined" v-if="options[group.model].dlc">DLC</div></div>
             </div>
             <div class="level-right">
@@ -19,11 +19,11 @@
             </div>
           </div>
 
-          <div v-if="(options[group.model].description && isVisible(group.model, options[group.model].visible)) || (readOnly && options[group.model].description)">
+          <div v-if="(typeof options[group.model].description == 'string') && (isVisible(group.model, options[group.model].visible) || readOnly)">
             <p class="description">{{ options[group.model].description }}</p>
           </div>
           <div v-else-if="options[group.model].description == false"></div>
-          <div v-else-if="isVisible(group.model, options[group.model].visible) || readOnly">
+          <div v-else-if="isVisible(group.model, options[group.model].visible) || readOnly || options[group.model].showDescriptionsClosed == true">
             <p class="description" v-if="group.model == 'age-groups'">Families stick around the gentle rides, while older guests enjoy the thrills</p>
             <p class="description" v-if="group.model == 'parks-plans'">Starting points from fresh land to bustling parks</p>
             <p class="description" v-if="group.model == 'billboards-context'">What the billboards represent, and where they would be placed</p>

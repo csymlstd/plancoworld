@@ -4,7 +4,7 @@
     <div class="container">
       <div class="level">
         <div class="level-left">
-          <!-- <h1 class="title level-item">Blueprints</h1> -->
+          <h1 class="title level-item">Blueprints</h1>
         </div>
         <div class="level-right">
           <a class="level-item">Learn to Build</a>

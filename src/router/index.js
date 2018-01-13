@@ -43,6 +43,11 @@ export default new Router({
       component: require('@/components/Kits/Kits'),
     },
     {
+      path: '/kits/:slug',
+      name: 'Kit',
+      component: require('@/components/Kits/Kit'),
+    },
+    {
       path: '/parks/import',
       name: 'ImportPark',
       meta: { auth: true },

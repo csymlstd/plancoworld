@@ -10,7 +10,7 @@
           <div class="level-right">
             <!-- <router-link :to="{ name: 'Generator' }" class="level-item">Generator</router-link> -->
             <!-- <router-link :to="{ name: 'Convert' }" class="level-item">Convert to WebM</router-link> -->
-            <router-link :to="{ name: 'ImportBillboard' }" class="button is-primary is-medium">Add a Billboard</router-link>
+            <router-link :to="{ name: 'GuidePage', params: { slug: 'advertising-and-billboards' }}" class="level-item">Learn about Billboards</router-link>
           </div>
         </div>
       </div>
@@ -27,23 +27,21 @@
         <div class="form content for-billboard column is-three-quarters is-centered">
 
          
-          <div class="field">
-            <h4 class="title is-4">Billboard Title</h4>
+          <div class="box">
+            <h5 class="title is-5">Billboard Title</h5>
             <div class="control">
-              <input type="text" name="title" v-model="imported.title" class="input is-medium" placeholder="PlanCo World Entrance Sign" />
+              <input type="text" name="title" v-model="imported.title" class="input is-medium" placeholder="" />
             </div>
           </div>
 
-          <div class="field">
-            <h4 class="title is-4">About your Billboard</h4>
-            <div class="box">
-              <div class="description editor" v-html="imported.description"></div>
-            </div>
+          <div class="box">
+            <h5 class="title is-5">About your Billboard</h5>
+            <div class="description editor" v-html="imported.description"></div>
           </div>
 
-          <div class="field box">
-            <h4 class="title is-4">Add to a Kit</h4>
-            <p class="field">If you are creating a pack of related billboards: Upload and tag them individually and add them to a Kit! Kits can include Parks and Blueprints as well.</p>
+          <div class="field box filter-list">
+            <h5 class="title is-5">Add to a Kit</h5>
+            <p class="field description">If you are creating a pack of related billboards: Upload and tag them individually and add them to a Kit! Kits can include Parks and Blueprints as well.</p>
             <div class="field is-grouped">
               <Autocomplete path="kits" :owned="true" placeholder="Search for your Kits" class="control is-expanded" @selected="addToKit"></Autocomplete>
               <div class="control">
@@ -55,27 +53,7 @@
             </div>
           </div>
 
-          <Modal :class="['is-wide']" :show="creatingKit">
-            <header>
-              <h2 class="title">Create a Kit</h2>
-            </header>
-            <main>
-            <div class="field">
-              <div class="control">
-                <input type="text" placeholder="Name" class="input is-medium" />
-              </div>
-              
-            </div>
-
-            <div class="level">
-              <div class="level-left">
-                <button class="button is-medium is-primary level-item" :class="{ 'is-loading': loading.creatingKit }" @click=""><span>Create Kit</span></button>
-                <button class="button is-light is-medium level-item" @click="creatingKit = false">Cancel</button>
-              </div>
-            </div>
-
-            </main>
-        </Modal>
+          <CreateKit :show="creatingKit" @cancel="creatingKit = false"></CreateKit>
           
 
           <div class="field">
@@ -100,6 +78,7 @@
 </template>
 
 <script>
+import CreateKit from '@/components/Kits/CreateModal'
 import Modal from '@/components/ui/Modal'
 import Filters from '@/components/ui/Filters'
 import Autocomplete from '@/components/ui/Autocomplete'
@@ -117,7 +96,8 @@ export default {
     Upload,
     Filters,
     Autocomplete,
-    Modal
+    Modal,
+    CreateKit,
   },
   data () {
     return {

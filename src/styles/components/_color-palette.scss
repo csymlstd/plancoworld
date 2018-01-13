@@ -1,4 +1,6 @@
 .color-palette {
+  position: relative;
+
   .colors {
     display: flex;
     flex-wrap: wrap;
@@ -31,6 +33,16 @@
     &:active {
       transform: scale(0.95);
     }
+  }
+
+  .color-palette-picker {
+    position: absolute;
+    background: #fff;
+    border-radius: 4px;
+    padding: 1rem;
+    z-index: 1000;
+    box-shadow: 0 0 2.5rem rgba(0,0,0,0.2);
+    transform: translateY(0.5rem);
   }
 
   .vc-chrome {

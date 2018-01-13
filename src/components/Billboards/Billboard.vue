@@ -40,7 +40,15 @@
     <main class="content container">
       <div class="columns">
         <div class="column is-one-quarter">
-          <ColorPalette v-model="billboard.colors" :editMode="editMode"></ColorPalette>
+          <div class="box billboard-info">
+            <Creator :user="billboard.user"></Creator>
+            <hr />
+            <ReactionMeter />
+          </div>
+
+          <div class="box" v-if="billboard.colors.length > 0 || editMode">
+            <ColorPalette v-model="billboard.colors" :editMode="editMode"></ColorPalette>
+          </div>
 
           <Filters :options="filterOptions" :readOnly="!editMode" ref="tags"></Filters>
         </div>
@@ -63,6 +71,8 @@ import SaveToToolbox from '@/components/ui/SaveToToolbox'
 import Filters from '@/components/ui/Filters'
 import Blueprint from '@/components/Blueprints/Card'
 import Billboard from '@/components/Billboards/Card'
+import ReactionMeter from '@/components/ui/ReactionMeter'
+import Creator from '@/components/ui/ProfileMini'
 import API from '@/services/api'
 import auth from '@/services/auth'
 
@@ -77,6 +87,8 @@ export default {
     Billboard,
     Dropdown,
     ColorPalette,
+    ReactionMeter,
+    Creator,
     SaveToToolbox,
     Filters
   },

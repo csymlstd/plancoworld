@@ -9,7 +9,7 @@
       </a>
       <div class="card-content">
         <div class="content">
-          <h3 class="title"><a @click="viewPark">{{ model.name | truncate(70) }}</a></h3>
+          <h3 class="title"><a @click="viewKit">{{ model.name | truncate(70) }}</a></h3>
           <div class="level bottom">
             <div class="level-left">
               <Creator :user="model.user" class="level-item"></Creator>
@@ -35,7 +35,7 @@ import Media from '@/services/media'
 import Auth from '@/services/auth'
 
 export default {
-  name: 'park-card',
+  name: 'kit-card',
   components: {
     Filters,
     Creator,
@@ -59,9 +59,9 @@ export default {
     }
   },
   methods: {
-    viewPark (e) {
+    viewKit (e) {
       e.preventDefault()
-      router.push({ name: 'Park', params: { slug: this.model.slug }})
+      router.push({ name: 'Kit', params: { slug: this.model.slug }})
     },
     isSaved() {
       return (this.model.toolbox.indexOf(Auth.user.profile._id) > -1)

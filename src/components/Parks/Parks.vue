@@ -128,12 +128,13 @@ export default {
         'regions': {
           label: 'Biomes',
           type: 'toggle',
+          visible: true,
           tooltips: true
         },
         'age-groups': {
           label: 'Age Groups',
           type: 'toggle',
-          visible: true,
+          guide: 'guests'
         },
         'amenities': {
           label: 'Amenities',

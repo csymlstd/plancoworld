@@ -5,7 +5,7 @@
     <div class="container">
       <div class="level">
         <div class="level-left">
-          <!-- <h1 class="title level-item">Kits</h1> -->
+          <h1 class="title level-item">Kits</h1>
         </div>
         <div class="level-right">
           <router-link :to="{ name: 'GuidePage', params: { slug: 'glossary' }}" class="level-item">Read the Guide</router-link>
@@ -105,7 +105,49 @@ export default {
         limit: 25
       },
       filterOptions: {
-        
+        'coasters': {
+          label: 'Coasters',
+          type: 'list'
+        },
+        'rides': {
+          label: 'Rides',
+          type: 'list'
+        },
+        'shops': {
+          label: 'Shops',
+          type: 'list'
+        },
+        'facilities': {
+          label: 'Facilities & Utilities',
+          type: 'list'
+        },
+        'buildings': {
+          label: 'Buildings',
+          type: 'list',
+          visible: true
+        },
+        'scenery': {
+          label: 'Scenery',
+          type: 'list',
+          visible: true
+        },
+        'age-groups': {
+          label: 'Age Groups',
+          type: 'toggle',
+          visible: true,
+        },
+        'materials': {
+          label: 'Materials',
+          type: 'list'
+        },
+        'themes': {
+          label: 'Themes',
+          type: 'list'
+        },
+        'style': {
+          label: 'Styles',
+          type: 'list'
+        },
       }
     }
   },

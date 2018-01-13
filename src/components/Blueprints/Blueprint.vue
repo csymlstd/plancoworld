@@ -5,7 +5,8 @@
       <div class="container">
         <div class="level">
           <div class="level-left">
-            <Filters :options="heroFilterOptions" :inline="true" :readOnly="true" :large="true" ref="heroTags" class="level-item"></Filters>
+            <div class="tag is-primary is-rounded is-large level-item" v-if="isBuilding()">Building</div>
+            <div class="tag is-primary is-rounded is-large level-item" v-if="isScenery()">Scenery</div>
             <div class="tags selected-tags level-item">
               <a v-if="blueprint.billboards.length > 0" href="#billboards" class="tag is-rounded is-white is-large" data-scroll v-tooltip="'Download the custom Billboards for the best experience'"><span class="icon"><i class="fas fa-exclamation"></i></span> <span>Billboards</span></a>
             </div>
@@ -70,6 +71,10 @@
 
           <hr />
 
+          <ReactionMeter />
+        </div>
+
+        <div class="box" v-if="blueprint.colors.length > 0 || editMode">
           <ColorPalette v-model="blueprint.colors" :editMode="editMode"></ColorPalette>
         </div>
 
@@ -153,6 +158,7 @@ import Filters from '@/components/ui/Filters'
 import Upload from '@/components/ui/Upload'
 import SaveToToolbox from '@/components/ui/SaveToToolbox'
 import ColorPalette from '@/components/ui/ColorPalette'
+import ReactionMeter from '@/components/ui/ReactionMeter'
 import Modal from '@/components/ui/Modal'
 import Dropdown from '@/components/ui/Dropdown'
 import Creator from '@/components/ui/ProfileMini'
@@ -174,6 +180,7 @@ export default {
     Upload,
     SaveToToolbox,
     ColorPalette,
+    ReactionMeter,
     Dropdown,
     Creator,
     Blueprint,
@@ -213,14 +220,8 @@ export default {
         media: [ { url: '' } ],
         billboards: [],
         shops: [],
-        attractions: []
-      },
-      heroFilterOptions: {
-        'buildings': {
-          label: false,
-          type: 'tags',
-          description: false,
-        }
+        attractions: [],
+        tags: [],
       },
       filterOptions: {
         'buildings': {
@@ -293,6 +294,16 @@ export default {
   methods: {
     notify() {
       this.$notify('notifications', 'Your Blueprint has been saved', '')
+    },
+    isBuilding() {
+      return this.blueprint.tags.filter(t => {
+        return t._id == '597cfc8c23e62646b0c8f7a7'
+      }).length > 0
+    },
+    isScenery() {
+      return this.blueprint.tags.filter(t => {
+        return t._id == '5a442a25c42b1d290831e007'
+      }).length > 0
     },
     isOwner() {
       return auth.isOwner(this.blueprint)
@@ -399,7 +410,6 @@ export default {
         this.shareURL = `http://planco.world/blueprints/${this.blueprint.slug}`
         this.loading = false
         this.editMode = false
-        this.$refs.heroTags.setPopulated(this.blueprint.tags)
         this.$refs.tags.setPopulated(this.blueprint.tags)
 
       }).catch((err) => {
