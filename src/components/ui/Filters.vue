@@ -253,6 +253,10 @@ export default {
       //console.log('as: '+ids)
       this.$set(this, 'selected', ids)
     },
+    clear() {
+      this.$set(this, 'selected', [])
+      this.$emit('selected', this.selected)
+    },
     isValid(model = false) {
       let valid = true
 

@@ -7,8 +7,8 @@
           <h1 class="title level-item">Blueprints</h1>
         </div>
         <div class="level-right">
-          <a class="level-item">Learn to Build</a>
-          <a class="level-item">Glossary</a>
+          <router-link :to="{ name: 'GuidePage', params: { slug: 'blueprints' }}" class="level-item">Read the Guide</router-link>
+          <router-link :to="{ name: 'GuidePage', params: { slug: 'glossary' }}" class="level-item">Glossary</router-link>
           <router-link :to="{ name: 'ImportBlueprint' }" class="button is-primary is-medium level-item" v-if="isLoggedIn()">Add a Blueprint</router-link>
         </div>
       </div>
@@ -92,17 +92,20 @@ export default {
         'buildings': {
           label: 'Buildings',
           type: 'list',
-          visible: true
+          visible: true,
+          guide: 'buildings',
         },
         'scenery': {
           label: 'Scenery',
           type: 'list',
-          visible: true
+          visible: true,
+          guide: 'scenery',
         },
         'age-groups': {
           label: 'Age Groups',
           type: 'toggle',
           visible: true,
+          guide: 'guests',
         },
         'materials': {
           label: 'Materials',
@@ -118,11 +121,13 @@ export default {
         },
         'shops': {
           label: 'Shops',
-          type: 'list'
+          type: 'list',
+          guide: 'shops-and-facilities'
         },
         'facilities': {
           label: 'Facilities & Utilities',
-          type: 'list'
+          type: 'list',
+          guide: 'shops-and-facilities'
         },
         'content-packs': {
           label: 'Content Packs',
@@ -133,15 +138,17 @@ export default {
         },
         'coasters': {
           label: 'Coasters',
-          type: 'list'
+          type: 'list',
+          guide: 'coasters',
         },
         'rides': {
           label: 'Rides',
-          type: 'list'
+          type: 'list',
+          guide: 'flat-rides'
         },
         'regions': {
           label: 'Biomes',
-          type: 'list'
+          type: 'list',
         },
       }
     }

@@ -274,7 +274,8 @@ export default {
         media: [ { url: '' } ],
         billboards: [],
         shops: [],
-        attractions: []
+        attractions: [],
+        colors: [],
       },
       heroFilterOptions: {
         'parks': {

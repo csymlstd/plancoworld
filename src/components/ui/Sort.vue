@@ -1,8 +1,7 @@
 <template>
   <div class="tabs is-toggle level-item">
     <ul>
-      <li :class="{ 'is-active': (sort == 'hot' && order == 'desc') }"><a @click="updateSort('hot'); updateOrder('desc')">Hot</a></li>
-      <li :class="{ 'is-active': (sort == 'popular') }"><a @click="updateSort('popular', 'Popular')">Popular</a></li>
+      <li :class="{ 'is-active': (sort == 'popular') }"><a @click="updateSort('popular', 'Popular'); updateOrder('desc')">Popular</a></li>
       <li :class="{ 'is-active': (sort == 'added' && order == 'desc') }"><a @click="updateSort('added'); updateOrder('desc')">Newest</a></li>
       <li :class="{ 'is-active': (sort == 'added' && order == 'asc') }"><a @click="updateSort('added'); updateOrder('asc')">Oldest</a></li>
     </ul>
@@ -25,7 +24,7 @@ export default {
   },
   data () {
     return {
-      sort: 'hot',
+      sort: 'popular',
       order: 'desc',
       selected: [],
       selectedLabels: {

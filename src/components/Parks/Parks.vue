@@ -1,12 +1,5 @@
 <template>
   <div>
-  <section class="hero hero--tall text-center">
-    <div>
-      <h1 class="title">Explore the temples and traps <br /> built with the new <img alt="Adventure Pack" src="/assets/images/adventure-pack-logo.svg" style="width: 250px;transform:translateY(5px);" />!</h1>
-      <br />
-      <a href="#continue" data-scroll class="button is-warning is-medium" @click="$refs.filters.checkTag('5a2deba8c22ae923f29cc220')"><span>Search for Adventure Parks</span> <span class="icon"><i class="far fa-arrow-down"></i></span></a>
-    </div>
-  </section>
   <section class="hero" id="continue">
     <div class="container">
       <div class="level">
@@ -14,7 +7,7 @@
           <h1 class="title level-item">Parks</h1>
         </div>
         <div class="level-right">
-          <router-link :to="{ name: 'GuidePage', params: { slug: 'glossary' }}" class="level-item">Read the Guide</router-link>
+          <router-link :to="{ name: 'GuidePage', params: { slug: 'careers-challenges-sandbox-scenarios' }}" class="level-item">Read the Guide</router-link>
           <router-link :to="{ name: 'GuidePage', params: { slug: 'glossary' }}" class="level-item">Glossary</router-link>
           <router-link :to="{ name: 'ImportPark' }" class="button is-primary is-medium level-item" v-if="isLoggedIn()">Add a Park</router-link>
         </div>
@@ -30,6 +23,7 @@
         <div class="level">
           <div class="level-left">
             <div class="level-item"><Sort @sort="sortParks" @order="orderParks"></Sort></div>
+            <div class="level-item"><a @click="$refs.filters.clear()" class="button">Reset</a></div>
           </div>
           <div class="level-right">
             <a class="delete level-item" @click="globalParams.name = ''; getParks()" v-if="globalParams.name"></a>
@@ -41,6 +35,14 @@
             </div>
           </div>
         </div>
+
+        <section class="box adventure-promo" v-if="pagination.current == 1 && !globalParams.tags">
+          <div>
+            <h1 class="title">Explore the temples and traps <br /> built with the new <img alt="Adventure Pack" src="/assets/images/adventure-pack-logo.svg" style="width: 250px;transform:translateY(5px);" />!</h1>
+            <br />
+            <a class="button is-warning is-medium" @click="$refs.filters.checkTag('5a2deba8c22ae923f29cc220')"><span>Search for Adventure Parks</span> <span class="icon"><i class="far fa-arrow-down"></i></span></a>
+          </div>
+        </section>
 
 
         <div class="columns cards is-multiline loader--parent">
@@ -190,7 +192,7 @@ export default {
         this.loading = false
       })
     },
-    filterParks(tags) {
+    filterParks(tags = []) {
       this.loading = true
       tags = tags.join(',')
       this.globalParams.tags = tags
@@ -225,12 +227,17 @@ export default {
   //   background-position: 150px center!important;
   // }
 
-  section.hero--tall {
+  .adventure-promo {
+    padding: 4rem 1rem;
     background-image: url('/assets/images/adventure_pack.jpg');
     background-size: cover!important;
     background-repeat: no-repeat!important;
     background-position: center!important;
-    height: 650px!important;
+    text-align: center;
+
+    h1 {
+      color: #fff;
+    }
   }
 
   .hero .title {

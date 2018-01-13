@@ -9,7 +9,7 @@
       <div class="level-right">
         <!-- <router-link :to="{ name: 'Generator' }" class="level-item">Generator</router-link> -->
         <!-- <router-link :to="{ name: 'Convert' }" class="level-item">Convert to WebM</router-link> -->
-        <router-link :to="{ name: 'GuidePage', params: { slug: 'glossary' }}" class="level-item">Read the Guide</router-link>
+        <router-link :to="{ name: 'GuidePage', params: { slug: 'advertising-and-billboards' }}" class="level-item">Read the Guide</router-link>
         <router-link :to="{ name: 'GuidePage', params: { slug: 'glossary' }}" class="level-item">Glossary</router-link>
         <router-link :to="{ name: 'ImportBillboard' }" class="button is-primary is-medium">Add a Billboard</router-link>
       </div>
@@ -89,7 +89,7 @@ export default {
         'billboards': {
           label: null,
           type: 'toggle',
-          visible: true
+          visible: true,
         },
         'orientation': {
           label: 'Orientation',
@@ -103,6 +103,7 @@ export default {
           type: 'list',
           visible: true,
           force: true,
+          guide: 'billboards-and-adverising',
         },
         'language': {
           label: 'Language',
@@ -111,15 +112,18 @@ export default {
         },
         'coasters': {
           label: 'Coasters',
-          type: 'list'
+          type: 'list',
+          guide: 'coasters',
         },
         'rides': {
           label: 'Rides',
-          type: 'list'
+          type: 'list',
+          guide: 'flat-rides',
         },
         'shops': {
           label: 'Shops',
-          type: 'list'
+          type: 'list',
+          guide: 'shops-and-facilities',
         },
         'facilities': {
           label: 'Facilities & Utilities',
