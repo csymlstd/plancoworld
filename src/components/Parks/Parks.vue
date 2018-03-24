@@ -122,7 +122,7 @@ export default {
           guide: 'careers-challenges-sandbox-scenarios'
         },
         'parks-plans': {
-          label: 'Park Plans',
+          label: 'Starting Points',
           type: 'toggle',
           visible: true,
           max: 1,

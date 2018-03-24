@@ -51,6 +51,10 @@ router.beforeEach((to, from, next) => {
     }
   }
 
+  if(auth.checkAuth() && !auth.user.profile._id) {
+    auth.refreshUser()
+  }
+
   if(to.name !== 'Home' && auth.checkAuth() && auth.accessTokenExpired()) {
     auth.refreshToken(this).then(() => {
       console.log('Token refreshed')
@@ -89,7 +93,8 @@ new Vue({
   el: '#app',
   router,
   metaInfo: {
-    title: 'PlanCo World'
+    title: 'Explore and organize your creations from Planet Coaster',
+    titleTemplate: '%s • PlanCo World',
   },
   template: '<App/>',
   components: { App },

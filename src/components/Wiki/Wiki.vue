@@ -45,7 +45,7 @@ import Auth from '@/services/auth'
 export default {
   name: 'wiki',
   metaInfo: {
-    title: 'Wiki'
+    title: 'Guides to gameplay, tools, controls, and the Steam Workshop'
   },
   components: {
     Loader,

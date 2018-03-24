@@ -362,7 +362,6 @@ export default {
       console.log(media)
       let allowed = Media.isAllowedType(media.contentType)
       if(allowed) {
-        this.$notify('notifications', 'Media added from Toolbox', 'success')
         this.$emit('uploaded', media)
       } else {
         this.$notify('notifications', 'That is not allowed here', 'error')

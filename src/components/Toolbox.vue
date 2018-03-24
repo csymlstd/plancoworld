@@ -185,7 +185,7 @@ export default {
       })
     },
     canSave(model) {
-      return ['parks','blueprints','billboards'].indexOf(model) > -1
+      return ['parks','blueprints','billboards','kits'].indexOf(model) > -1
     }
   },
   mounted () {

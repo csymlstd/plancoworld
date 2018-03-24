@@ -30,12 +30,28 @@ export default {
       this.user.authenticated = true
       this.user.profile = response.user
 
-      this.$emit('logged in', response.user)
-
       if(redirect) {
         router.push(redirect)
       }
 
+    })
+  },
+
+  loginLink(credentials) {
+    return api.post('auth/login-link', credentials, false)
+  },
+
+  loginLinkVerify(token) {
+    return api.post('auth/login-link/verify', {
+      token
+    }, false).then(response => {
+      console.log('verified', response)
+      localStorage.setItem('access_token', response.access_token)
+      localStorage.setItem('refresh_token', response.refresh_token)
+
+      this.user.authenticated = true
+      this.user.profile = response.user
+      document.body.classList.add('logged-in')
     })
   },
 
@@ -130,7 +146,7 @@ export default {
       return api.post('auth/refresh', body, {
         headers: { 'Authorization': authHeader }
       }).then((response) => {
-        console.log('refresh', response)
+        console.log('token refreshed')
         localStorage.setItem('access_token', response.access_token)
 
         this.tokens.access_token = {}
@@ -139,7 +155,7 @@ export default {
   },
 
   signup(creds, redirect) {
-    api.post('auth/register', creds).then((response) => {
+    api.post('auth/register', creds, false).then((response) => {
       localStorage.setItem('access_token', response.access_token)
       localStorage.setItem('refresh_token', response.refresh_token)
 
@@ -156,6 +172,7 @@ export default {
 
   // @todo delete token on server
   logout() {
+    api.post('auth/logout', { token: localStorage.getItem('refresh_token') })
     localStorage.removeItem('access_token')
     localStorage.removeItem('refresh_token')
     this.user.authenticated = false

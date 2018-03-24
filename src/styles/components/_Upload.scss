@@ -9,6 +9,9 @@
   }
 
   .upload--drop-area {
+      display: flex;
+      justify-content: center;
+      align-items: center;
       position: relative;
       flex-grow: 1;
       height: 150px;
@@ -16,7 +19,7 @@
       border: 3px dashed color('grey','light');
       background: #fff;
       padding: 1em;
-      margin: 0 0 1em;
+      margin: 0 auto 1em;
       border-radius: 1rem;
 
       input {

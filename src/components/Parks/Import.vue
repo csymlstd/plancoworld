@@ -2,7 +2,8 @@
   <div>
     <section class="hero hero--tall" :style="{ 'background-image': 'url('+(imported.media.length > 0 ? imported.media[0].url : '')+')' }">
       <div class="container">
-        <Upload @uploaded="addPhoto" folder="parks" :instant="true" :isDark="true" instructions="Drop your park photos here, or click to browse your computer" v-if="imported.media.length == 0"></Upload>
+        <Loader v-if="loading.importingMedia"></Loader>
+        <Upload @uploaded="addPhoto" folder="parks" :instant="true" :isDark="true" instructions="Drop your park photos here, or click to browse your computer" v-if="imported.media.length == 0 && !loading.importingMedia"></Upload>
 
       </div>
       <!-- <img :src="imported.media ? imported.media[0].url : ''" v-if="imported.media.length > 0" class="cover-photo" @load="$event.target.classList.toggle('is-active')" /> -->
@@ -69,7 +70,7 @@
 
             <div class="box">
               <h4>About Your Park</h4>
-              <div class="description editor" v-html="imported.description"></div>
+              <div class="description editor"></div>
             </div>
 
             <div class="box filter-list">
@@ -82,17 +83,17 @@
             <h5 class="title is-5">Add to a Kit</h5>
             <p class="field description">Kits allow you to share a collection of related Parks, Blueprints and Billboards.</p>
             <div class="field is-grouped">
-              <Autocomplete path="kits" :owned="true" placeholder="Search for your Kits" class="control is-expanded" @selected="addToKit"></Autocomplete>
+              <Autocomplete path="kits" :owned="true" placeholder="Search for your Kits" class="control is-expanded" @selected="addKit"></Autocomplete>
               <div class="control">
                 <button class="button is-primary is-medium" @click="creatingKit = creatingKit ? false : true">Create New Kit</button>
               </div>
             </div>
             <div class="field" v-if="kits.length > 0">
-              <div class="tag is-primary is-rounded is-large" :key="kit._id" v-for="(kit, index) in kits">{{ kit.name }} &nbsp;<button class="delete is-small" @click="removeFromKit(index)"></button></div>
+              <div class="tag is-primary is-rounded is-large" :key="kit._id" v-for="(kit, index) in kits">{{ kit.name }} &nbsp;<button class="delete is-small" @click="removeKit(index)"></button></div>
             </div>
           </div>
 
-          <CreateKit :show="creatingKit" @cancel="creatingKit = false"></CreateKit>
+          <CreateKit :show="creatingKit" @created="addKit" @cancel="creatingKit = false"></CreateKit>
 
             
             <div class="field">
@@ -105,8 +106,7 @@
             </div>
 
             <div class="field is-grouped">
-              <div class="control"><a class="button is-primary is-medium" @click="addPark()">Save &amp; Visit</a></div>
-              <div class="control"><a class="button is-medium is-white" @click="addPark()">Save &amp; Add Another</a></div>
+              <div class="control"><a class="button is-primary is-large" @click="addPark()">Save &amp; Visit</a></div>
             </div>
           </div>
         </div>
@@ -119,6 +119,7 @@ import SmoothScroll from 'smooth-scroll'
 import Modal from '@/components/ui/Modal'
 import CreateKit from '@/components/Kits/CreateModal'
 import Autocomplete from '@/components/ui/Autocomplete'
+import Loader from '@/components/ui/Loader'
 import Filters from '@/components/ui/Filters'
 import API from '@/services/api'
 import slug from 'slug'
@@ -139,13 +140,15 @@ export default {
     Modal,
     ColorPalette,
     CreateKit,
-    Autocomplete
+    Autocomplete,
+    Loader
   },
   data () {
     return {
       step: 0,
       loading: {
-        importing: false
+        importing: false,
+        importingMedia: false,
       },
       errors: {
         import: false
@@ -183,7 +186,7 @@ export default {
           tooltips: true,
         },
         'parks-plans': {
-          label: 'Park Plans',
+          label: 'Starting Points',
           type: 'toggle',
           visible: true,
           max: 1,
@@ -247,14 +250,18 @@ export default {
       this.$nextTick(() => { this.$refs.url.focus() })
     },
     importItem() {
+      this.loading.importing = true
+      this.errors.import = false
+
       this.$v.url.$touch()
-      if(!this.$v.url.$valid) {
+      if(this.$v.url.$invalid) {
+        console.log(this.$v.url)
+        this.loading.importing = false
+        this.errors.import = true
         this.$refs.url.focus()
         return
       }
 
-      this.loading.importing = true
-      this.errors.import = false
       API.post('import', { url: this.url }).then((data) => {
 
         if(data.type != 'park') {
@@ -264,11 +271,17 @@ export default {
           this.$refs.tags.setPopulated(this.imported.tags)
           this.imported.slug = slug(this.imported.title)
 
+          this.editor.clipboard.dangerouslyPasteHTML(this.imported.description)
+
           if(this.imported.cover) {
+            this.loading.importingMedia = true
             API.post('media/import', {
               url: this.imported.cover,
             }).then((cover) => {
               this.addPhoto(cover.media)
+              this.loading.importingMedia = false
+            }).catch(err => {
+              this.loading.importingMedia = false
             })
           }
 
@@ -278,10 +291,9 @@ export default {
 
         this.loading.importing = false
       }).catch((err) => {
-        console.log(err)
+        console.log(err.response)
         if(err.response && err.response.data.message) this.errors.import = err.response.data.message
         this.loading.importing = false
-        this.errors.import = true
       })
     },
     attachEditor() {
@@ -324,27 +336,29 @@ export default {
 
       this.$v.imported.$touch()
       let isTagsValid = this.$refs.tags.isValid()
-      if(!this.$v.imported.$valid || !isTagsValid) {
+      if(this.$v.imported.$invalid || !isTagsValid) {
         new SmoothScroll().animateScroll(this.$el.querySelector('#form'), false, { offset: 100 })
         return
       }
 
       API.post('parks', newPark).then((data) => {
         this.$notify('notifications', 'Park created!', 'success')
+        this.$router.push({ name: 'Park', params: { slug: data.slug }})
       }).catch((err) => {
         console.log(err)
         this.$notify('notifications', 'Error creating Park', 'error')
       })
 
     },
-    addToKit(kit) {
+    addKit(kit) {
+      this.creatingKit = false
       let existing = this.kits.filter(k => {
         return k._id == kit._id
       })[0]
 
       if(!existing) this.kits.push(kit)
     },
-    removeFromKit(index) {
+    removeKit(index) {
       this.kits.splice(index, 1)
     }
   },

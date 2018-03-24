@@ -6,11 +6,12 @@
       <div class="level">
         <div class="level-left">
           <h1 class="title level-item">Kits</h1>
+          <div class="level-item">&bull; Collections of Parks, Blueprints and Billboards</div>
         </div>
         <div class="level-right">
           <router-link :to="{ name: 'GuidePage', params: { slug: 'kits' }}" class="level-item">Read the Guide</router-link>
           <router-link :to="{ name: 'GuidePage', params: { slug: 'glossary' }}" class="level-item">Glossary</router-link>
-          <router-link :to="{ name: 'ImportKit' }" class="button is-primary is-medium level-item" v-if="isLoggedIn()">Add a Kit</router-link>
+          <!-- <router-link :to="{ name: 'ImportKit' }" class="button is-primary is-medium level-item" v-if="isLoggedIn()">Add a Kit</router-link> -->
         </div>
       </div>
     </div>
@@ -134,7 +135,6 @@ export default {
         'age-groups': {
           label: 'Age Groups',
           type: 'toggle',
-          visible: true,
         },
         'materials': {
           label: 'Materials',
@@ -147,6 +147,13 @@ export default {
         'style': {
           label: 'Styles',
           type: 'list'
+        },
+        'content-packs': {
+          label: 'Content Packs',
+          type: 'list',
+          dlc: true,
+          visible: true,
+          force: true
         },
       }
     }

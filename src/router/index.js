@@ -79,6 +79,11 @@ export default new Router({
       ]
     },
     {
+      path: '/login-link',
+      name: 'VerifyLink',
+      component: require('@/components/Account/VerifyLink')
+    },
+    {
       path: '/admin',
       name: 'Admin',
       component: require('@/components/Admin/Admin'),
@@ -93,7 +98,7 @@ export default new Router({
       ]
     },
     {
-      path: '/by/:username',
+      path: '/creator/:username',
       name: 'Profile',
       component: require('@/components/Profile/Profile')
     },

@@ -188,6 +188,12 @@ export default {
     auth,
     Modal
   },
+  metaInfo() {
+    return {
+      title: this.blueprint.name,
+      titleTemplate: '%s • Blueprints • PlanCoWorld'
+    }
+  },
   data () {
     return {
       loading: true,
@@ -228,17 +234,20 @@ export default {
         'buildings': {
           label: 'Buildings',
           type: 'list',
-          visible: true
+          visible: true,
+          guide: 'buildings',
         },
         'scenery': {
           label: 'Scenery',
           type: 'list',
-          visible: true
+          visible: true,
+          guide: 'scenery',
         },
         'age-groups': {
           label: 'Age Groups',
           type: 'toggle',
           visible: true,
+          guide: 'guests',
         },
         'materials': {
           label: 'Materials',
@@ -254,14 +263,16 @@ export default {
         },
         'shops': {
           label: 'Shops',
-          type: 'list'
+          type: 'list',
+          guide: 'shops-and-facilities'
         },
         'facilities': {
           label: 'Facilities & Utilities',
-          type: 'list'
+          type: 'list',
+          guide: 'shops-and-facilities'
         },
-        'construction-kits': {
-          label: 'Construction Kits',
+        'content-packs': {
+          label: 'Content Packs',
           type: 'list',
           dlc: true,
           visible: true,
@@ -269,15 +280,17 @@ export default {
         },
         'coasters': {
           label: 'Coasters',
-          type: 'list'
+          type: 'list',
+          guide: 'coasters',
         },
         'rides': {
           label: 'Rides',
-          type: 'list'
+          type: 'list',
+          guide: 'flat-rides'
         },
         'regions': {
           label: 'Biomes',
-          type: 'list'
+          type: 'list',
         },
       }
     }

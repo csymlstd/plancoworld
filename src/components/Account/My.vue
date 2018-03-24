@@ -22,8 +22,8 @@
         <div class="control"><input type="text" v-model="user.name.real" class="input is-medium"></div>
       </div>
       <div class="field">
-        <label class="label">Display Name (Steam)</label>
-        <div class="control"><input type="text" v-model="user.name.display" class="input is-medium"></div>
+        <label class="label">Steam Name</label>
+        <div class="control"><input type="text" v-model="user.name.display" class="input is-medium" disabled></div>
       </div>
     </div>
     </div>
@@ -32,6 +32,32 @@
       <label class="label">Email</label>
       <div class="control"><input type="email" v-model="user.email" class="input is-medium"></div>
       <div class="notification is-warning" v-if="this.errors.email">{{ this.errors.email }}</div>
+    </div>
+
+    <div class="field">
+    <div class="field-body">
+      <div class="field">
+        <label class="label">Distance Unit</label>
+        <div class="control">
+          <select v-model="user.settings.distanceUnit" class="input is-medium">
+            <option value="ft">Feet (ft)</option>
+            <option value="m">Meters (m)</option>
+            <option value="yd">Yards (yd)</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label class="label">Speed Unit</label>
+        <div class="control">
+          <select v-model="user.settings.speedUnit" class="input is-medium">
+            <option value="mph">Miles Per Hour (mph)</option>
+            <option value="kph">Kilometers Per Hour (kph)</option>
+            <option value="ms">Meters Per Second (m/s)</option>
+            <option value="fts">Feet Per Second (ft/s)</option>
+          </select>
+        </div>
+      </div>
+    </div>
     </div>
 
 
@@ -65,7 +91,8 @@ export default {
       uploadAvatar: false,
       user: {
         name: {},
-        avatar: {}
+        avatar: {},
+        settings: {}
       },
       errors: {
         email: false
@@ -75,8 +102,10 @@ export default {
   methods: {
     getUser (params = {}) {
       return API.fetch('user', params).then((data) => {
-        Object.assign(this.user, data)
-        auth.user.profile = data
+        this.user.name = data.name
+        this.user.avatar = data.avatar
+        this.user.email = data.email
+        this.user.settings = data.settings
         return data
       }).catch((err) => {
         console.log(err)

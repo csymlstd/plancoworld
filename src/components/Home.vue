@@ -10,19 +10,12 @@
         <router-link :to="{ name: 'Parks' }" class="button is-primary is-medium show" data-cycle>Explore Parks</router-link>
         <router-link :to="{ name: 'Blueprints' }" class="button is-primary is-medium" data-cycle>Explore Blueprints</router-link>
         <router-link :to="{ name: 'Billboards' }" class="button is-primary is-medium" data-cycle>Explore Billboards</router-link>
-        <router-link :to="{ name: 'Audio' }" class="button is-primary is-medium" data-cycle>Explore Audio</router-link>
+        <router-link :to="{ name: 'Kits' }" class="button is-primary is-medium" data-cycle>Explore Kits</router-link>
+        <router-link :to="{ name: 'Guides' }" class="button is-primary is-medium" data-cycle>Explore Guides</router-link>
         </div>
 
       </div>
     </div>
-    <router-link :to="{ name: 'Park', params: { slug: 'pixel-island-discover-the-adventure-highly-decorated-theme-park' } }" class="version has-text-white">Pixel Island by PixelWess89</router-link>
-    <!-- <div class="tags version has-addons">
-      <div class="tag is-warning is-inverted">Alpha</div>
-      <div class="tag">0.0.1</div>
-    </div> -->
-    <video class="texture" muted autoplay playsinline loop poster="">
-      <source src="https://s3-us-west-2.amazonaws.com/plancoworld/parks/hero.webm" type="video/webm">
-    </video>
   </main>
 </template>
 

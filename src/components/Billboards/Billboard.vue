@@ -92,6 +92,12 @@ export default {
     SaveToToolbox,
     Filters
   },
+  metaInfo() {
+    return {
+      title: this.billboard.name,
+      titleTemplate: '%s • Billboards • PlanCoWorld'
+    }
+  },
   data () {
     return {
       loading: false,
@@ -110,34 +116,44 @@ export default {
           min: 1,
           max: 1
         },
+        'orientation': {
+          label: 'Orientation',
+          type: 'toggle',
+          visible: true,
+          inline: true,
+          force: true,
+          tooltips: true,
+        },
         'billboards-context': {
           label: 'Context',
           type: 'list',
           visible: true,
           force: true,
           min: 1,
+          guide: 'billboards-and-adverising',
         },
         'language': {
           label: 'Language',
           type: 'list',
-          inline: true,
-          min: 1,
           visible: true
-        },
-        'shops': {
-          label: 'Shops',
-          type: 'list'
-        },
-        'facilities': {
-          label: 'Facilities & Utilities',
-          type: 'list'
         },
         'coasters': {
           label: 'Coasters',
-          type: 'list'
+          type: 'list',
+          guide: 'coasters',
         },
         'rides': {
           label: 'Rides',
+          type: 'list',
+          guide: 'flat-rides',
+        },
+        'shops': {
+          label: 'Shops',
+          type: 'list',
+          guide: 'shops-and-facilities',
+        },
+        'facilities': {
+          label: 'Facilities & Utilities',
           type: 'list'
         },
         'themes': {

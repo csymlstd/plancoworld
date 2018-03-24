@@ -34,7 +34,7 @@
 
           <div class="field level-item has-addons" v-if="isOwner()">
             <div class="control"><a @click="toggleEditMode" class="button is-warning is-medium construction">Edit</a></div>
-            <div class="control"><a @click="updatePark()" class="button is-light is-medium" v-if="editMode">Save</a></div>
+            <div class="control"><a @click="updatePark()" class="button is-primary is-medium" v-if="editMode">Save</a></div>
             <div class="control">
               <div class="button is-white is-medium" @click="toggleStatus()" v-tooltip="{ content: statusTooltip }">
                 <div class="switch" :class="{ 'is-active': park.status && park.steam_id, 'is-warning': !park.steam_id }">
@@ -68,16 +68,8 @@
       <div class="column is-one-quarter">
         <div class="box park-info">
           <Creator :user="park.user"></Creator>
-          <br />
-          <table class="table is-not-hoverable">
-            <tbody>
-            <tr>
-              <td colspan="2">
-                <ReactionMeter />
-              </td>
-            </tr>
-            </tbody>
-          </table>
+          <hr />
+          <ReactionMeter />
         </div>
 
         <div class="box" v-if="park.colors.length > 0 || editMode">
@@ -94,52 +86,26 @@
 
       <div class="column">
 
-        <!-- <div class="box">
-          <h3 class="h3">Amenities @ this Park</h3>
-          <div class="amenity" v-if="hasTag('entertainment-points')">
-            <h4>Entertainment Points</h4>
-            <p>Look for our world-classed entertainers at various points around the park.</p>
-          </div>
-          <div class="amenity" v-if="hasTag('fireworks')">    
-            <h4>Fireworks</h4>
-            <p>Stay for the show, we'll light up the sky once the sun goes down.</p>
-          </div>
-          <div class="amenity" v-if="hasTag('priority-pass')">
-            <h4>Priority Pass</h4>
-            <p>Purchase a pass and skip the lines, you'll be given priority at our most popular rides.</p>
-          </div>
-          <div class="amenity" v-if="hasTag('recycling')">
-            <h4>Recycling</h4>
-            <p>Keep our park green and recycle in our designated bins.</p>
-          </div>
-          <div class="amenity" v-if="hasTag('security')">
-            <h4>Security</h4>
-            <p>Feel safe with our security staff watching on the ground and through CCTV.</p>
-          </div>
-          <div class="amenity" v-if="hasTag('transport')">
-            <h4>Transport</h4>
-            <p>Get to your favorite rides across the park quickly by our transit system.</p>
-          </div>
-          <div class="amenity" v-if="hasTag('vista-points')">
-            <h4>Vista Points</h4>
-            <p>A picture is worth a thousand words. Find our designated photo points.</p>
-          </div>
-          <div class="amenity" v-if="hasTag('water-rides')">
-            <h4>Water Rides</h4>
-            <p>Warning you may get wet!</p>
-          </div>
-        </div> -->
-
         <section class="box park-description">
           <div class="park-description-editor editor" v-if="editMode" v-html="park.description"></div>
           <div class="park-description-content" v-show="!editMode" v-html="park.description"></div>
         </section>
 
+        <div class="level">
+          <div class="level-left">
+            <h3 class="level-item">Scenario Specs</h3>
+          </div>
+          <div class="level-right">
+          </div>
+        </div>
+        <section class="box park-scenario">
+          <Scenario :model="park.scenario" @update="updateScenario" :editMode="editMode"></Scenario>
+        </section>
 
-        <div class="level" id="billboards">
+        <div class="level" id="billboards" v-if="park.billboards.length > 0 || editMode">
           <div class="level-left">
             <h3 class="level-item">Billboards</h3>
-            <div class="level-item"><a @click="openModal('downloadBillboards')" class="is-text">Download All ({{ park.billboards.length }})</a></div>
+            <!-- <div class="level-item"><a @click="openModal('downloadBillboards')" class="is-text">Download All ({{ park.billboards.length }})</a></div> -->
           </div>
           <div class="level-right">
             <!-- <router-link :to="{ name: 'Generator' }" class="button level-item is-white is-medium"><span class="icon"><i class="fas fa-paint-brush has-text-primary"></i></span> <span>Generator</span></router-link> -->
@@ -163,7 +129,7 @@
           </div>
         </Modal>
 
-        <div class="level">
+        <div class="level" v-if="park.blueprints.length > 0 || editMode">
           <div class="level-left">
             <h3 class="ui header level-item">Blueprints</h3>
           </div>
@@ -193,9 +159,12 @@
     <Modal :class="{ 'uploadPhotos': true }" @close="closeModal('uploadPhotos')" :show="modalOpen('uploadPhotos')">
       <div class="park-media">
         <div class="park-photo level" :key="media._id" v-for="(media, key) in park.media">
-          <div class="level-item">
-            <img :src="media.url" class="is-64h" />
-            <div class="tag is-rounded" v-if="key == 0">Primary</div>
+          <div class="level-left">
+            <img :src="media.url" class="is-64h level-item" />
+          </div>
+          <div class="level-right">
+            <div class="tag is-rounded level-item" v-if="key == 0">Cover Photo</div>
+            <a class="icon level-item" v-tooltip="'Remove from Park'" @click="removePhoto(key)"><i class="fas fa-trash"></i></a>
           </div>
         </div>
       </div>
@@ -207,6 +176,8 @@
 </template>
 
 <script>
+import '@/styles/components/_Park.scss'
+
 import Search from '@/components/ui/Search'
 import Filters from '@/components/ui/Filters'
 import Upload from '@/components/ui/Upload'
@@ -218,6 +189,7 @@ import Dropdown from '@/components/ui/Dropdown'
 import Creator from '@/components/ui/ProfileMini'
 import Blueprint from '@/components/Blueprints/Card'
 import Billboard from '@/components/Billboards/Card'
+import Scenario from '@/components/Parks/Scenario'
 import API from '@/services/api'
 import auth from '@/services/auth'
 import { store } from '@/store.js'
@@ -239,8 +211,15 @@ export default {
     Creator,
     Blueprint,
     Billboard,
+    Scenario,
     auth,
     Modal
+  },
+  metaInfo() {
+    return {
+      title: this.park.name,
+      titleTemplate: '%s • Parks • PlanCoWorld'
+    }
   },
   data () {
     return {
@@ -271,7 +250,8 @@ export default {
       },
       editor: false,
       park: {
-        media: [ { url: '' } ],
+        media: [],
+        blueprints: [],
         billboards: [],
         shops: [],
         attractions: [],
@@ -298,7 +278,7 @@ export default {
           hidden: true
         },
         'parks-plans': {
-          label: 'Park Plans',
+          label: 'Starting Points',
           description: false,
           type: 'toggle',
           visible: true,
@@ -420,9 +400,26 @@ export default {
 
       API.put(this.apiURL(), { media }).then((park) => {
         this.park.status = park.status
+        this.$notify('notifications', 'Photo added', 'success')
       }).catch(() => {
         this.park.status = status
       })
+    },
+    removePhoto(key) {
+      this.park.media.splice(key, 1)
+
+      let media = []
+      this.park.media.forEach((m) => {
+        media.push(m._id)
+      })
+
+      API.put(this.apiURL(), { media }).then((park) => {
+        this.park.status = park.status
+        this.$notify('notifications', 'Photo removed', 'success')
+      }).catch(() => {
+        this.park.status = status
+      })
+
     },
     toggleStatus() {
       let status = this.park.status
@@ -447,7 +444,6 @@ export default {
         })
       } else {
         let toolbar = this.editor.container.parentNode.querySelector('.ql-toolbar')
-        console.log(toolbar)
         if(toolbar) toolbar.remove()
         this.$nextTick(() => {
           this.editor = null
@@ -505,6 +501,9 @@ export default {
         url = `parks/slug/${SLUG}`
       }
       return url
+    },
+    updateScenario(scenario) {
+      this.park.scenario = Object.assign({}, this.park.scenario, scenario)
     },
     attachEditor() {
       let wrapper = this.$el.querySelector('.park-description-editor')

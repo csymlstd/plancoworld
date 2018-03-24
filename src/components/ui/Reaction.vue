@@ -8,12 +8,12 @@
       <a class="reaction love" @click="react('love')">Love It!</a>
     </div>
     <i class="far fa-plus-circle has-text-grey-light" @mouseover="open = true" @click="open ? open = false : open = true"></i>
-    <a class="reaction nauseating" v-if="hasReacted('nauseating')" v-tooltip="this.model.reactions['nauseating'].length">Nauseating!</a>
-    <a class="reaction boring" v-if="hasReacted('boring')" v-tooltip="this.model.reactions['boring'].length">Boring..</a>
+    <a class="reaction nauseating" v-if="hasReacted('nauseating')" v-tooltip="model.reactions['nauseating'].length">Nauseating!</a>
+    <a class="reaction boring" v-if="hasReacted('boring')" v-tooltip="model.reactions['boring'].length">Boring..</a>
     
-    <a class="reaction scary" v-if="hasReacted('scary')" v-tooltip="this.model.reactions['scary'].length">Scary!</a>
-    <a class="reaction fun" v-if="hasReacted('exciting')" v-tooltip="this.model.reactions['exciting'].length">Exciting!</a>
-    <a class="reaction love" v-if="hasReacted('love')" v-tooltip="this.model.reactions['love'].length">Love It!</a>
+    <a class="reaction scary" v-if="hasReacted('scary')" v-tooltip="model.reactions['scary'].length">Scary!</a>
+    <a class="reaction fun" v-if="hasReacted('exciting')" v-tooltip="model.reactions['exciting'].length">Exciting!</a>
+    <a class="reaction love" v-if="hasReacted('love')" v-tooltip="model.reactions['love'].length">Love It!</a>
   </div>
 </template>
 

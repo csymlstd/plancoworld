@@ -8,7 +8,7 @@
       <div class="dropdown-menu">
         <div class="dropdown-content">
           <a class="dropdown-item" :class="{ 'is-active': isActive(index) }" @click="select(index)" v-for="(match, index) in matches">
-            <span class="name">{{ match._source.name }}</span> <span class="tag is-rounded is-dark">{{ getType(match._type) }}</span>
+            <span class="name">{{ match._source.name }}</span> <span class="tag is-rounded is-dark">{{ getType(match._source.type) }}</span>
           </a>
         </div>
       </div>
@@ -32,7 +32,7 @@ export default {
     models: {
       type: Array,
       default: () => {
-        return ['parks','blueprints','billboards','audio']
+        return ['park','blueprint','billboard','audio']
       }
     }
   },
@@ -101,10 +101,10 @@ export default {
         this.open = true
         this.highlighted = 0
       }
-      if(this.queryTerms.length < 4) {
+      if(this.queryTerms.length < 3) {
         this.clear()
       }
-      if(this.queryTerms.length > 3) {
+      if(this.queryTerms.length > 2) {
         this.query(this.queryTerms)
       }
     },
@@ -121,6 +121,12 @@ export default {
           break;
         case 'audio':
           return 'Audio'
+          break;
+        case 'kit':
+          return 'Kit'
+          break;
+        case 'user':
+          return 'User'
           break;
       }
     }

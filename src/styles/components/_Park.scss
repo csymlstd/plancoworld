@@ -41,3 +41,48 @@
     opacity: 1;
   }
 }
+
+
+.scenario {
+  .scenario-objectives {
+    .objective {
+      background: color('grey', 'light');
+      margin-bottom: 0.5rem;
+
+      ul {
+        padding: 0;
+        margin: 0;
+
+        li {
+          position: relative;
+          display: flex;
+          align-items: center;
+          list-style: none;
+          margin: 0;
+          padding: 0.5rem 0 0;
+          transform: translateX(-0.5rem);
+
+          &::before {
+            display: inline;
+            content: ' ';
+            width: 2rem;
+            height: 1px;
+            background: color('grey','dark');
+            margin-right: 0.5rem;
+          }
+
+          &::after {
+            position: absolute;
+            display: inline;
+            content: ' ';
+            width: 1px;
+            height: 2rem;
+            background: color('grey','dark');
+            margin-right: 0.5rem;
+            transform: translateY(-50%);
+          }
+        }
+      }
+    }
+  }
+}

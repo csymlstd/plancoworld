@@ -24,6 +24,12 @@ export default {
             page: {}
         }
     },
+    metaInfo() {
+        return {
+        title: this.page.name,
+        titleTemplate: '%s • Guides • PlanCoWorld'
+        }
+    },
     watch: {
         $route(to ,from) {
             this.getPage()

@@ -82,16 +82,16 @@
                 </div>
               </div>
               <div class="columns blueprint-ratings" v-if="enableRatings">
-                <div class="column">
-                  <div class="reaction is-large fun" v-tooltip="'Excitement'"></div>
+                <div class="column" v-tooltip="'Excitement'">
+                  <div class="reaction is-large fun"></div>
                   <div class="control"><input type="number" class="input" min="0" max="10" step="0.01" v-model="imported.stats.excitement" /></div>
                 </div>
-                <div class="column">
-                  <div class="reaction is-large scary" v-tooltip="'Fear'"></div>
+                <div class="column" v-tooltip="'Fear'">
+                  <div class="reaction is-large scary"></div>
                   <div class="control"><input type="number" class="input" :value="value" min="0" max="10" step="0.01" v-model="imported.stats.fear" /></div>
                 </div>
-                <div class="column">
-                  <div class="reaction is-large nauseating" v-tooltip="'Nausea'"></div>
+                <div class="column" v-tooltip="'Nausea'">
+                  <div class="reaction is-large nauseating"></div>
                   <div class="control"><input type="number" class="input" :value="value" min="0" max="10" step="0.01" v-model="imported.stats.nausea" /></div>
                 </div>
               </div>
@@ -291,6 +291,9 @@ export default {
     Modal,
     Range,
     ColorPalette
+  },
+  metaInfo: {
+    title: 'Import Blueprint'
   },
   data () {
     return {

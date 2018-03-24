@@ -6,16 +6,16 @@ module.exports = {
   apps : [
 
     // First application
-    {
-      name      : 'Web Client',
-      script    : 'app.js',
-      env: {
-        PORT: 8000,
-      },
-      env_production : {
-        NODE_ENV: 'production'
-      }
-    }
+    // {
+    //   name      : 'Web Client',
+    //   script    : 'app.js',
+    //   env: {
+    //     PORT: 8000,
+    //   },
+    //   env_production : {
+    //     NODE_ENV: 'production'
+    //   }
+    // }
   ],
 
   /**

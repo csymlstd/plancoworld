@@ -20,8 +20,6 @@
                 <a href="https://www.reddit.com/r/PlanetCoaster/" target="_blank" class="navbar-item">r/PlanetCoaster</a>
                 <hr class="dropdown-divider" />
                 <a href="https://www.reddit.com/r/PlanCoWorld/" target="_blank" class="navbar-item">r/PlanCoWorld</a>
-                <router-link :to="{ name: 'ImportPark' }" class="navbar-item">Roadmap</router-link>
-                <router-link :to="{ name: 'ImportPark' }" class="navbar-item">About</router-link>
               </div>
             </div>
           </div>
@@ -53,7 +51,7 @@
     <Modal @close="closeLogin" :show="loginOpen">
       <div>
         <h2 class="title has-text-centered has-text-primary">Login to PlanCo World</h2>
-        <Login v-if="!user.authenticated && !isHome" class="navbar-item"></Login>
+        <Login :form="true"></Login>
       </div>
     </Modal>
 
@@ -88,7 +86,7 @@ import 'quill/dist/quill.core.css'
 import 'quill/dist/quill.snow.css'
 
 let words = ['coaster','castle','ride skin','park','scenario','blueprint','billboard','sci-fi toilet','Chief Beef','fireworks show','statue','custom lamp',
-      'gift shop', 'building', 'starter land', 'western scene', 'tropical park', 'spooky ride','ferris wheel','ufo','billboard pack', 'park you visit']
+      'gift shop', 'building', 'starter land', 'western scene', 'tropical park', 'spooky ride','ferris wheel','ufo','billboard kit', 'park you visit']
 
 auth.checkAuth()
 
@@ -103,7 +101,6 @@ export default {
   },
   watch: {
     $route () {
-      console.log(this.$route.path)
       this.searchPlaceholder()
       if(this.$route.path === '/') {
         this.isHome = true
@@ -126,7 +123,7 @@ export default {
   },
   methods: {
     go(match) {
-      let type = match._type
+      let type = match._source.type
       let name = type.charAt(0).toUpperCase() + type.slice(1)
       router.push({ name, params: { slug: match._source.slug }})
     },

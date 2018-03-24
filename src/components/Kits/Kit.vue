@@ -195,6 +195,12 @@ export default {
     auth,
     Modal
   },
+  metaInfo() {
+    return {
+      title: this.kit.name,
+      titleTemplate: '%s • Kits • PlanCoWorld'
+    }
+  },
   data () {
     return {
       loading: true,
@@ -273,7 +279,7 @@ export default {
       API.put(this.apiURL(), data).then(() => {
         return this.getKit()
       }).then(() => {
-
+        
       }).catch(() => {
 
       })

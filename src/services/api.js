@@ -12,7 +12,7 @@ const api = axios.create({
 
 let refreshing = false
 function refreshExpiredToken() {
-  if(auth.user.authenticated && auth.accessTokenExpired()) {
+  if(auth.isLoggedIn() && auth.accessTokenExpired()) {
     if(refreshing) {
       // Set a delay to try the request, the token is probably refreshed by now
       // from a previous request
@@ -64,9 +64,11 @@ export default {
     })
   },
 
-  post(resource, data = {}) {
+  post(resource, data = {}, useHeaders = true) {
+    let headers = {}
+    if(useHeaders) headers = { 'Authorization': auth.getAuthHeader() }
     return refreshExpiredToken().then(() => {
-      return api.post('/'+resource, data, { headers: { 'Authorization': auth.getAuthHeader() }})
+      return api.post('/'+resource, data, { headers })
     }).then((response) => {
       return response.data
     })
