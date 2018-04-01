@@ -45,7 +45,15 @@
       text-align: center;
       color: rgba(0, 0, 0, 0.7);
 
-      a { color: rgba(0, 0, 0, 0.7); display: block; margin: 0 0 1.5rem; }
+      a { 
+        color: rgba(0, 0, 0, 0.7); 
+        display: block; 
+        margin: 0 0 1.5rem; 
+
+        &.is-active {
+          opacity: 0.6;
+        }
+      }
 
       .icon {
         display: flex;

@@ -8,8 +8,8 @@
             <div class="tag is-primary is-rounded is-medium level-item" v-if="isScenery()">Scenery</div>
           </div>
           <div class="level-left"></div>
-          <div class="level-right">
-            <a :href="'http://steamcommunity.com/sharedfiles/filedetails/?id='+model.steam_id" @click.stop target="_blank" class="level-item subscribe"><span class="tag is-rounded is-primary is-medium" v-tooltip="'Subscribe on Steam'"><span class="icon"><i class="fab fa-steam"></i></span></span></a>
+          <div class="level-right" @click.stop>
+            <a :href="'http://steamcommunity.com/sharedfiles/filedetails/?id='+model.steam_id" target="_blank" class="level-item subscribe"><span class="tag is-rounded is-primary is-medium" v-tooltip="'Subscribe on Steam'"><span class="icon"><i class="fab fa-steam"></i></span></span></a>
             <div class="level-item" v-if="isSaved()"><span class="tag is-rounded is-warning is-medium" v-tooltip="'Saved to Toolbox'"><span class="icon"><i class="fas fa-archive"></i></span></span></div>
           </div>
         </div>
@@ -17,7 +17,7 @@
       </div>
       <div class="card-content">
         <div class="content">
-          <h3 class="title"><a :href="'/blueprints/'+model.slug" @click="viewBlueprint">{{ model.name | truncate(70) }}</a></h3>
+          <h3 class="title"><a :href="'/blueprints/'+model.slug" @click="viewBlueprint" @click.prevent>{{ model.name | truncate(70) }}</a></h3>
           <div class="level bottom">
             <div class="level-left">
               <Creator :user="model.user" class="level-item"></Creator>

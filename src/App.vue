@@ -19,9 +19,10 @@
               <a class="navbar-link"><span class="icon"><i class="far fa-lg fa-ellipsis-h"></i></span></a>
               <div class="navbar-dropdown is-right">
                 <a href="http://steamcommunity.com/app/493340/workshop/" target="_blank" class="navbar-item">Workshop</a>
-                <a href="https://www.reddit.com/r/PlanetCoaster/" target="_blank" class="navbar-item">r/PlanetCoaster</a>
+                <a href="https://reddit.com/r/PlanetCoaster/" target="_blank" class="navbar-item">r/PlanetCoaster</a>
                 <hr class="dropdown-divider" />
-                <a href="https://www.reddit.com/r/PlanCoWorld/" target="_blank" class="navbar-item">r/PlanCoWorld</a>
+                <a href="https://patreon.com/plancoworld" target="_blank" class="navbar-item">Give Support</a>
+                <a href="https://reddit.com/r/PlanCoWorld/" target="_blank" class="navbar-item">r/PlanCoWorld</a>
               </div>
             </div>
           </div>
@@ -67,7 +68,6 @@
 </template>
 
 <script>
-import { store } from '@/store.js'
 
 import router from '@/router'
 import auth from '@/services/auth'
@@ -93,11 +93,19 @@ let words = ['coasters','castles','ride skins','parks','scenarios','blueprints',
 auth.checkAuth()
 
 export default {
-  store,
+  computed: {
+    user() {
+      return this.$store.state.user
+    },
+    isHome() {
+      return this.$route.path === '/'
+    },
+    loginOpen() {
+      return this.$store.state.modals.login
+    }
+  },
   data() {
     return {
-      user: auth.user,
-      isHome: false,
       placeholder: '',
       menuOpen: false,
     }
@@ -105,17 +113,7 @@ export default {
   watch: {
     $route () {
       this.searchPlaceholder()
-      if(this.$route.path === '/') {
-        this.isHome = true
-      } else {
-        this.isHome = false
-      }
     }
-  },
-  computed: {
-    loginOpen() {
-      return this.$store.state.modals.login
-    },
   },
   components: {
     Toolbox,
@@ -143,12 +141,9 @@ export default {
   created() {
     this.searchPlaceholder()
     this.$store.dispatch('fetchTags')
-  },
-  mounted () {
-    if(this.$route.path === '/') {
-      this.isHome = true
-    } else {
-      this.isHome = false
+
+    if(auth.checkAuth() && !this.user._id) {
+      this.$store.dispatch('refreshUser')
     }
   }
 }

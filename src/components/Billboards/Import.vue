@@ -53,11 +53,11 @@
             </div>
           </div>
 
-          <CreateKit :show="creatingKit" @cancel="creatingKit = false"></CreateKit>
+          <CreateKit @created="addToKit" :show="creatingKit" @cancel="creatingKit = false"></CreateKit>
           
 
           <div class="field">
-            <Filters :options="filterOptions" @selected="addTags" ref="tags" ></Filters>
+            <Filters :options="filterOptions" :selected="imported.tags" @selected="addTags" ref="tags" ></Filters>
             <!-- <a class="button" @click="">Add Tags</a><div class="field is-grouped is-grouped-multiline">
               <div class="control" v-for="tag in imported.tags">
                 <div class="tag is-primary is-medium">{{ tag.name }} <button class="delete is-small"></button></div>
@@ -122,6 +122,16 @@ export default {
           min: 1,
           max: 1
         },
+        'orientation': {
+          label: 'Orientation',
+          type: 'toggle',
+          visible: true,
+          force: true,
+          tooltips: true,
+          description: 'Remember, <code>vertical</code> billboards should be rotated 90deg for proper alignment with the screens. We will rotate the video back to preview it properly.',
+          min: 1,
+          max: 1,
+        },
         'billboards-context': {
           label: 'Context',
           type: 'list',
@@ -136,27 +146,33 @@ export default {
         },
         'shops': {
           label: 'Shops',
-          type: 'list'
+          type: 'list',
+          showDescriptionsClosed: true,
         },
         'facilities': {
           label: 'Facilities & Utilities',
-          type: 'list'
+          type: 'list',
+          showDescriptionsClosed: true,
         },
         'coasters': {
           label: 'Coasters',
-          type: 'list'
+          type: 'list',
+          showDescriptionsClosed: true,
         },
         'rides': {
           label: 'Rides',
-          type: 'list'
+          type: 'list',
+          showDescriptionsClosed: true,
         },
         'themes': {
           label: 'Themes',
-          type: 'list'
+          type: 'list',
+          showDescriptionsClosed: true,
         },
         'style': {
           label: 'Styles',
-          type: 'list'
+          type: 'list',
+          showDescriptionsClosed: true,
         },
       }
     }
@@ -190,19 +206,24 @@ export default {
       this.imported.tags = tags
     },
     addBillboard() {
-      let newBillboard = {
+      let data = {
         media: [],
         tags: []
       }
-      newBillboard.name = this.imported.title
-      newBillboard.slug = slug(this.imported.title)
-      newBillboard.description = this.editor.container.firstChild.innerHTML
-      newBillboard.tags = this.$refs.tags.selected
+      data.name = this.imported.title
+      data.slug = slug(this.imported.title)
+      data.description = this.editor.container.firstChild.innerHTML
+      
+      let tags = []
+      this.park.tags.forEach((t) => {
+        tags.push(t._id)
+      })
+      data.tags = tags
 
       // Currently only permits one image per billboard
-      newBillboard.media.push(this.imported.media[0])
+      data.media.push(this.imported.media[0])
 
-      API.post('billboards', newBillboard).then((data) => {
+      API.post('billboards', data).then((data) => {
         this.$notify('notifications', 'Billboard created!', 'success')
 
         let addToKits = []
@@ -225,6 +246,7 @@ export default {
       })[0]
 
       if(!existing) this.kits.push(kit)
+      this.creatingKit = false
     },
     removeFromKit(index) {
       this.kits.splice(index, 1)

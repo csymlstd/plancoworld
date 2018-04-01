@@ -1,6 +1,6 @@
 /*!
- * Font Awesome Pro 5.0.2 by @fontawesome - http://fontawesome.com
- * License - http://fontawesome.com/license (Commercial License)
+ * Font Awesome Pro 5.0.9 by @fontawesome - https://fontawesome.com
+ * License - https://fontawesome.com/license (Commercial License)
  */
 @import 'variables';
 
@@ -18,4 +18,32 @@
 
 .fab {
   font-family: 'Font Awesome 5 Brands';
+}
+
+
+@font-face {
+    font-family: 'Interface';
+    src: url('#{$fa-font-path}/Interface-Regular.woff') format('woff'), /* Modern Browsers */
+         url('#{$fa-font-path}/Interface-Regular.woff2') format('woff2'); /* Modern Browsers */
+    font-style: normal;
+    font-weight: normal;
+    text-rendering: optimizeLegibility;
+}
+
+@font-face {
+    font-family: 'Interface';
+    src: url('#{$fa-font-path}/Interface-Bold.woff') format('woff'), /* Modern Browsers */
+         url('#{$fa-font-path}/Interface-Bold.woff2') format('woff2'); /* Modern Browsers */
+    font-style: normal;
+    font-weight: 700;
+    text-rendering: optimizeLegibility;
+}
+
+@font-face {
+    font-family: 'Interface';
+    src: url('#{$fa-font-path}/Interface-Medium.woff') format('woff'), /* Modern Browsers */
+         url('#{$fa-font-path}/Interface-Medium.woff2') format('woff2'); /* Modern Browsers */
+    font-style: normal;
+    font-weight: 500;
+    text-rendering: optimizeLegibility;
 }

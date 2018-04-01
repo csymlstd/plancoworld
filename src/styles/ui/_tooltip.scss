@@ -26,6 +26,20 @@ $arrow-size: 8px;
     border-top: $arrow-size solid #000;
   }
 
+  &[x-placement^="bottom"] {
+    margin-top: 5px;
+
+    .tooltip-arrow {
+      border-width: 0 $arrow-size $arrow-size $arrow-size;
+      border-top-color: transparent !important;
+      border-bottom: $arrow-size solid #000;
+      top: -5px;
+      left: calc(50% - 5px);
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+  }
+
   &[aria-hidden='true'] {
     visibility: hidden;
     opacity: 0;

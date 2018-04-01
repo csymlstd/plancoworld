@@ -43,12 +43,12 @@
         </div>
       </main>
       <nav class="toolbox--nav">
-        <a @click="tab('parks')"><span class="icon"><i class="fas fa-cubes"></i></span> <span>Parks</span></a>
-        <a @click="tab('blueprints')"><span class="icon"><i class="fas fa-cube"></i></span> <span>Blueprints</span></a>
-        <a @click="tab('billboards')"><span class="icon"><i class="far fa-rectangle-portrait"></i></span> <span>Billboards</span></a>
-        <a @click="tab('kits')"><span class="icon"><i class="fas fa-cubes"></i></span> <span>Kits</span></a>
-        <a @click="tab('videos')"><span class="icon"><i class="fas fa-film"></i></span> <span>Videos</span></a>
-        <a @click="tab('images')"><span class="icon"><i class="fas fa-image"></i></span> <span>Images</span></a>
+        <a @click="tab('parks')" :class="{ 'is-active': active == 'parks' }"><span class="icon"><i class="fab fa-fort-awesome"></i></span> <span>Parks</span></a>
+        <a @click="tab('blueprints')" :class="{ 'is-active': active == 'blueprints' }"><span class="icon"><i class="fas fa-box-open"></i></span> <span>Blueprints</span></a>
+        <a @click="tab('billboards')" :class="{ 'is-active': active == 'billboards' }"><span class="icon"><i class="fas fa-sign"></i></span> <span>Billboards</span></a>
+        <a @click="tab('kits')" :class="{ 'is-active': active == 'kits' }"><span class="icon"><i class="fas fa-box-full"></i></span> <span>Kits</span></a>
+        <a @click="tab('videos')" :class="{ 'is-active': active == 'videos' }"><span class="icon"><i class="fas fa-film-alt"></i></span> <span>Videos</span></a>
+        <a @click="tab('images')" :class="{ 'is-active': active == 'images' }"><span class="icon"><i class="fas fa-images"></i></span> <span>Images</span></a>
       </nav>
     </div>
   </div>

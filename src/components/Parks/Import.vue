@@ -80,24 +80,24 @@
             </div>
 
             <div class="field box filter-list">
-            <h5 class="title is-5">Add to a Kit</h5>
-            <p class="field description">Kits allow you to share a collection of related Parks, Blueprints and Billboards.</p>
-            <div class="field is-grouped">
-              <Autocomplete path="kits" :owned="true" placeholder="Search for your Kits" class="control is-expanded" @selected="addKit"></Autocomplete>
-              <div class="control">
-                <button class="button is-primary is-medium" @click="creatingKit = creatingKit ? false : true">Create New Kit</button>
+              <h5 class="title is-5">Add to a Kit</h5>
+              <p class="field description">Kits allow you to share a collection of related Parks, Blueprints and Billboards.</p>
+              <div class="field is-grouped">
+                <Autocomplete path="kits" :owned="true" placeholder="Search for your Kits" class="control is-expanded" @selected="addKit"></Autocomplete>
+                <div class="control">
+                  <button class="button is-primary is-medium" @click="creatingKit = creatingKit ? false : true">Create New Kit</button>
+                </div>
+              </div>
+              <div class="field" v-if="kits.length > 0">
+                <div class="tag is-primary is-rounded is-large" :key="kit._id" v-for="(kit, index) in kits">{{ kit.name }} &nbsp;<button class="delete is-small" @click="removeKit(index)"></button></div>
               </div>
             </div>
-            <div class="field" v-if="kits.length > 0">
-              <div class="tag is-primary is-rounded is-large" :key="kit._id" v-for="(kit, index) in kits">{{ kit.name }} &nbsp;<button class="delete is-small" @click="removeKit(index)"></button></div>
-            </div>
-          </div>
 
-          <CreateKit :show="creatingKit" @created="addKit" @cancel="creatingKit = false"></CreateKit>
+            <CreateKit :show="creatingKit" @created="addKit" @cancel="creatingKit = false"></CreateKit>
 
             
             <div class="field">
-              <Filters :options="filterOptions" @selected="addTags" ref="tags" ></Filters>
+              <Filters :options="filterOptions" :selected="imported.tags" @selected="addTags" ref="tags" ></Filters>
               <!-- <a class="button" @click="">Add Tags</a><div class="field is-grouped is-grouped-multiline">
                 <div class="control" v-for="tag in imported.tags">
                   <div class="tag is-primary is-medium">{{ tag.name }} <button class="delete is-small"></button></div>
@@ -268,7 +268,6 @@ export default {
           this.errors.import = 'That workshop item is not a Park'
         } else {
           Object.assign(this.imported, data)
-          this.$refs.tags.setPopulated(this.imported.tags)
           this.imported.slug = slug(this.imported.title)
 
           this.editor.clipboard.dangerouslyPasteHTML(this.imported.description)
@@ -322,16 +321,21 @@ export default {
       this.step = 1
     },
     addPark() {
-      let newPark = {
+      let data = {
         media: []
       }
-      newPark.name = this.imported.title
-      newPark.steam_id = this.imported.steam_id
-      newPark.description = this.editor.container.firstChild.innerHTML
-      newPark.tags = this.$refs.tags.selected
+      data.name = this.imported.title
+      data.steam_id = this.imported.steam_id
+      data.description = this.editor.container.firstChild.innerHTML
+      
+      let tags = []
+      this.imported.tags.forEach((t) => {
+        tags.push(t._id)
+      })
+      data.tags = tags
 
       for(let i=0;i<this.imported.media.length;i++) {
-        newPark.media.push(this.imported.media[i]._id)
+        data.media.push(this.imported.media[i]._id)
       }
 
       this.$v.imported.$touch()
@@ -341,7 +345,7 @@ export default {
         return
       }
 
-      API.post('parks', newPark).then((data) => {
+      API.post('parks', data).then((data) => {
         this.$notify('notifications', 'Park created!', 'success')
         this.$router.push({ name: 'Park', params: { slug: data.slug }})
       }).catch((err) => {

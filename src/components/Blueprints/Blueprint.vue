@@ -249,14 +249,17 @@
 
         <div class="level" id="billboards">
           <div class="level-left">
-            <h3 class="ui header level-item">Billboards <a @click="openModal('downloadBillboards')" class="is-text">Download All ({{ blueprint.billboards.length }})</a></h3>
+            <h3 class="ui header level-item">Billboards</h3>
           </div>
           <div class="level-right">
             <!-- <router-link :to="{ name: 'Generator' }" class="button level-item is-white is-medium"><span class="icon"><i class="fas fa-paint-brush has-text-primary"></i></span> <span>Generator</span></router-link> -->
             <a @click="openModal('addBillboard')" class="button level-item is-white is-medium" v-if="editMode"><span class="icon"><i class="fas fa-plus has-text-primary"></i></span> <span>Add Billboard</span></a>
           </div>
         </div>
-        <Billboard :model="billboard" :key="billboard._id" v-for="billboard in blueprint.billboards"></Billboard>
+
+        <div class="columns card is-multiline">
+          <Billboard :model="billboard" :key="billboard._id" v-for="billboard in blueprint.billboards"></Billboard>
+        </div>
 
         <Modal :class="{ 'downloadBillboards': true }" @close="closeModal('downloadBillboards')" :show="modalOpen('downloadBillboards')">
           <p>Be sure to place in Documents\Frontier Developments\Planet Coaster\UserMedia</p>
@@ -281,7 +284,10 @@
             <a @click="openModal('addBlueprint')" class="button is-white is-medium" v-if="editMode"><span class="icon"><i class="fas fa-plus has-text-primary"></i></span> <span>Add Blueprint</span></a>
           </div>
         </div>
-        <Blueprint :model="blueprint" :key="blueprint._id" v-for="blueprint in blueprint.blueprints"></Blueprint>
+
+        <div class="columns card is-multiline">
+          <Blueprint :model="blueprint" :key="blueprint._id" v-for="blueprint in blueprint.blueprints"></Blueprint>
+        </div>
 
         <Modal :class="{ 'addBlueprint': true }" @close="closeModal('addBlueprint')" :show="modalOpen('addBlueprint')">
           <div class="form">

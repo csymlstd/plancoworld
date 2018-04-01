@@ -2,6 +2,7 @@
   <div>
     <section class="hero hero--tall" :style="{ 'background-image': 'url('+(imported.media.length > 0 ? imported.media[0].url : '')+')' }">
       <div class="container">
+        <Loader v-if="loading.importingMedia"></Loader>
         <Upload @uploaded="addPhoto" folder="blueprints" :instant="true" :isDark="true" instructions="Drop your blueprint photos here, or click to browse your computer" v-if="imported.media.length == 0"></Upload>
 
       </div>
@@ -46,7 +47,7 @@
 
           <div class="level">
             <div class="level-left">
-              <button class="button is-medium is-primary level-item" :class="{ 'is-loading': loading.importing }" @click="importItem()"><span class="icon"><i class="fab fa-steam"></i></span> <span>Import Park</span></button>
+              <button class="button is-medium is-primary level-item" :class="{ 'is-loading': loading.importing }" @click="importItem()"><span class="icon"><i class="fab fa-steam"></i></span> <span>Import Blueprint</span></button>
               <button class="button is-light is-medium level-item" @click="importLater()">Connect Later</button>
             </div>
           </div>
@@ -249,8 +250,24 @@
             <ColorPalette v-model="imported.colors" :editMode="true"></ColorPalette>
           </div>
 
+          <div class="field box filter-list">
+            <h5 class="title is-5">Add to a Kit</h5>
+            <p class="field description">Kits allow you to share a collection of related Parks, Blueprints and Billboards.</p>
+            <div class="field is-grouped">
+              <Autocomplete path="kits" :owned="true" placeholder="Search for your Kits" class="control is-expanded" @selected="addKit"></Autocomplete>
+              <div class="control">
+                <button class="button is-primary is-medium" @click="creatingKit = creatingKit ? false : true">Create New Kit</button>
+              </div>
+            </div>
+            <div class="field" v-if="kits.length > 0">
+              <div class="tag is-primary is-rounded is-large" :key="kit._id" v-for="(kit, index) in kits">{{ kit.name }} &nbsp;<button class="delete is-small" @click="removeKit(index)"></button></div>
+            </div>
+          </div>
+
+          <CreateKit :show="creatingKit" @created="addKit" @cancel="creatingKit = false"></CreateKit>
+
           <div class="field">
-            <Filters :options="filterOptions" @selected="addTags" ref="tags"></Filters>
+            <Filters :options="filterOptions" :selected="imported.tags" @selected="addTags" ref="tags"></Filters>
             <!-- <a class="button" @click="">Add Tags</a><div class="field is-grouped is-grouped-multiline">
               <div class="control" v-for="tag in imported.tags">
                 <div class="tag is-primary is-medium">{{ tag.name }} <button class="delete is-small"></button></div>
@@ -273,7 +290,9 @@ import { store } from '@/store.js'
 import slug from 'slug'
 import Filters from '@/components/ui/Filters'
 import API from '@/services/api'
-
+import CreateKit from '@/components/Kits/CreateModal'
+import Autocomplete from '@/components/ui/Autocomplete'
+import Loader from '@/components/ui/Loader'
 import Range from '@/components/ui/Range'
 import Upload from '@/components/ui/Upload'
 import Modal from '@/components/ui/Modal'
@@ -290,7 +309,10 @@ export default {
     Filters,
     Modal,
     Range,
-    ColorPalette
+    ColorPalette,
+    CreateKit,
+    Autocomplete,
+    Loader
   },
   metaInfo: {
     title: 'Import Blueprint'
@@ -305,11 +327,14 @@ export default {
         import: false
       },
       url: '',
+      kits: [],
+      creatingKit: false,
       imported: {
         title: '',
         media: [],
         tags: [],
         colors: [],
+        kits: [],
         stats: {
           excitement: 0,
           fear: 0,
@@ -411,36 +436,36 @@ export default {
     importItem() {
       this.loading.importing = true
       this.errors.import = false
-      API.post('import', { url: this.url }).then((data) => {
-        this.$v.url.$touch()
-        if(!this.$v.url.$valid) {
-          this.$refs.url.focus()
-          return
-        }
 
-        this.loading.importing = true
-        this.errors.import = false
+      this.$v.url.$touch()
+      if(this.$v.url.$invalid) {
+        console.log(this.$v.url)
+        this.loading.importing = false
+        this.errors.import = true
+        this.$refs.url.focus()
+        return
+      }
+
+      API.post('import', { url: this.url }).then((data) => {
+
         if(data.type != 'blueprint') {
           this.errors.import = 'That workshop item is not a Blueprint'
         } else {
-          console.log(this.$refs)
           Object.assign(this.imported, data)
-          this.$refs.tags.setPopulated(this.imported.tags)
           this.imported.slug = slug(this.imported.title)
 
-          let cover = this.imported.cover || this.imported.image || this.imported.images[0]
+          this.editor.clipboard.dangerouslyPasteHTML(this.imported.description)
 
-          if(cover) {
-            API.post('media', {
-              name: `${this.imported.slug}-cover.jpg`,
-              url: cover,
-              external: 'steam',
-              contentType: 'image/jpeg',
-              status: true
-            }).then((c) => {
-              this.imported.media.push(c)
+          if(this.imported.cover) {
+            this.loading.importingMedia = true
+            API.post('media/import', {
+              url: this.imported.cover,
+            }).then((cover) => {
+              this.addPhoto(cover.media)
+              this.loading.importingMedia = false
+            }).catch(err => {
+              this.loading.importingMedia = false
             })
-
           }
 
           this.step = 1
@@ -484,20 +509,25 @@ export default {
       return this.$store.state.measurements == 'imperial'
     },
     addBlueprint() {
-      let newBlueprint = {
+      let data = {
         media: [],
         tags: []
       }
-      newBlueprint.name = this.imported.title
-      newBlueprint.steam_id = this.imported.steam_id
-      newBlueprint.description = this.editor.container.firstChild.innerHTML
-      newBlueprint.tags = this.$refs.tags.selected
+      data.name = this.imported.title
+      data.steam_id = this.imported.steam_id
+      data.description = this.editor.container.firstChild.innerHTML
+      
+      let tags = []
+      this.park.tags.forEach((t) => {
+        tags.push(t._id)
+      })
+      data.tags = tags
 
-      for(let i=0;i<this.imported.media.length;i++) {
-        newBlueprint.media.push(this.imported.media[i]._id)
-      }
-
-      console.log('new blueprint', newBlueprint)
+      let media = []
+      this.imported.media.forEach((m) => {
+        media.push(m._id)
+      })
+      data.media = media
 
       this.$v.imported.$touch()
       let isTagsValid = this.$refs.tags.isValid()
@@ -506,14 +536,26 @@ export default {
         return
       }
 
-      API.post('blueprints', newBlueprint).then((data) => {
+      API.post('blueprints', data).then((data) => {
         console.log(data)
         this.$notify('notifications', 'Blueprint created!', 'success')
+        this.$router.push({ name: 'Blueprint', params: { slug: data.slug }})
       }).catch((err) => {
         console.log(err)
         this.$notify('notifications', 'Error creating Blueprint', 'error')
       })
 
+    },
+    addKit(kit) {
+      this.creatingKit = false
+      let existing = this.kits.filter(k => {
+        return k._id == kit._id
+      })[0]
+
+      if(!existing) this.kits.push(kit)
+    },
+    removeKit(index) {
+      this.kits.splice(index, 1)
     }
   },
   mounted () {

@@ -9,7 +9,7 @@
         <div class="level bottom">
           <div class="level-left"></div>
           <div class="level-right">
-            <a @click.stop="downloadBillboard()" class="level-item subscribe"><span class="tag is-rounded is-primary is-medium" v-tooltip="`Download`"><span class="icon"><i class="far fa-cloud-download"></i></span></span></a>
+            <a @click.stop="downloadBillboard()" class="level-item subscribe"><span class="tag is-rounded is-primary is-medium" v-tooltip="`Download`"><span class="icon"><i class="fas fa-cloud-download"></i></span></span></a>
           </div>
         </div>
       </div>

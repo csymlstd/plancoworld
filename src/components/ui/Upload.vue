@@ -178,9 +178,9 @@ export default {
 
       if(this.items[n].uploaded) {
         API.delete('media/'+this.items[n].media._id).then(() => {
-          this.$notify('notifications', 'Media deleted', 'success')
           this.$emit('deleted', this.items[n])
           this.$delete(this.items, n)
+          this.$notify('notifications', 'Media deleted', 'success')
         })
       } else {
         this.$emit('deleted', this.items[n])

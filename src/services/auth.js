@@ -4,6 +4,7 @@ import moment from 'moment'
 import axios from 'axios'
 
 import api from '@/services/api'
+import { store } from '@/store'
 
 export default {
 
@@ -27,8 +28,7 @@ export default {
       localStorage.setItem('refresh_token', response.refresh_token)
 
       document.body.classList.add('logged-in')
-      this.user.authenticated = true
-      this.user.profile = response.user
+      return response.user
 
       if(redirect) {
         router.push(redirect)
@@ -49,9 +49,8 @@ export default {
       localStorage.setItem('access_token', response.access_token)
       localStorage.setItem('refresh_token', response.refresh_token)
 
-      this.user.authenticated = true
-      this.user.profile = response.user
       document.body.classList.add('logged-in')
+      return response.user
     })
   },
 
@@ -64,11 +63,8 @@ export default {
           localStorage.setItem('access_token', auth.access_token)
           localStorage.setItem('refresh_token', auth.refresh_token)
 
-          this.user.authenticated = true
-          this.user.profile = auth.user
-
           message.source.close()
-          resolve()
+          resolve(auth.user)
           //window.removeEventListener('message', catchToken, false)
         }
       })
@@ -97,13 +93,11 @@ export default {
   },
 
   getUser() {
-    return this.user.profile
+    return store.state.user
   },
 
   refreshUser() {
     return api.fetch('user').then((user) => {
-      this.user.authenticated = true
-      this.user.profile = user
       return user
     })
   },
@@ -175,37 +169,41 @@ export default {
     api.post('auth/logout', { token: localStorage.getItem('refresh_token') })
     localStorage.removeItem('access_token')
     localStorage.removeItem('refresh_token')
-    this.user.authenticated = false
-    this.tokens.access_token = {}
     document.body.classList.remove('logged-in')
+    store.commit('setProfile', {
+      _id: false,
+      name: {},
+      avatar: {
+        url: 'http://placehold.it/150x150'
+      }
+    })
+    store.commit('setAuthState', false)
   },
 
   isLoggedIn() {
-    return this.user.authenticated
+    return this.checkAuth()
   },
 
   checkAuth() {
     let token = localStorage.getItem('access_token')
     if(token) {
       document.body.classList.add('logged-in')
-      this.user.authenticated = true
     } else {
       document.body.classList.remove('logged-in')
-      this.user.authenticated = false
     }
 
-    return this.user.authenticated
+    return token ? true : false
   },
 
-  getScope() {
-    let scope = this.user.scope
-    if(scope.length == 0) {
-      let token = this.decodedAccessToken()
-      if(!token) return false
-      scope = token.scope
-    }
-    return scope
-  },
+  // getScope() {
+  //   let scope = this.user.scope
+  //   if(scope.length == 0) {
+  //     let token = this.decodedAccessToken()
+  //     if(!token) return false
+  //     scope = token.scope
+  //   }
+  //   return scope
+  // },
 
   accessTokenExpired() {
     let token = this.decodedAccessToken()
@@ -228,6 +226,6 @@ export default {
   },
 
   isOwner(model) {
-    return (this.user.authenticated && typeof model.user !== 'undefined' && typeof this.user.profile !== 'undefined') ? (model.user._id == this.user.profile._id) : false
+    return (store.state.user.authenticated && typeof model.user !== 'undefined' && typeof store.state.user.profile !== 'undefined') ? (model.user._id == store.state.user.profile._id) : false
   }
 }

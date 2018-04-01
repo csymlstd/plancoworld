@@ -42,6 +42,38 @@
   }
 }
 
+.park-info {
+  .collaborators {
+    display: flex;
+    justify-content: center;
+
+    .profile {
+      z-index: 40;
+    }
+
+    .profile + .profile {
+      z-index: 30;
+      margin-left: -2rem;
+
+      .avatar {
+        display: flex;
+        align-items: center;
+      }
+
+      .user {
+        opacity: 0;
+      }
+    }
+
+    .profile + .profile:hover, &.edit-mode .profile + .profile {
+      margin-left: 1rem;
+
+      .user {
+        opacity: 1;
+      }
+    }
+  }
+}
 
 .scenario {
   .scenario-objectives {

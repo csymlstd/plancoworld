@@ -20,7 +20,7 @@
           </div>
 
           <div v-if="(typeof options[group.model].description == 'string') && (isVisible(group.model, options[group.model].visible) || readOnly)">
-            <p class="description">{{ options[group.model].description }}</p>
+            <p class="description" v-html="options[group.model].description"></p>
           </div>
           <div v-else-if="options[group.model].description == false"></div>
           <div v-else-if="isVisible(group.model, options[group.model].visible) || readOnly || options[group.model].showDescriptionsClosed == true">
@@ -84,7 +84,7 @@
                 {{ tag.name }}
 
                 <span class="tag is-rounded is-outlined" v-if="['back-to-the-future','knight-rider','the-munsters'].indexOf(tag.slug) > -1">$2.99</span>
-                <span class="tag is-rounded is-outlined" v-if="['spooky-pack','adventure-pack', 'studio-pack'].indexOf(tag.slug) > -1">$10.99</span>
+                <span class="tag is-rounded is-outlined" v-if="['spooky-pack','adventure-pack', 'studios-pack'].indexOf(tag.slug) > -1">$10.99</span>
                 <span class="tag is-rounded is-outlined" v-if="['spooky', 'adventure', 'temple', 'temple-gold', 'crypt'].indexOf(tag.slug) > -1">DLC</span>
 
                 <span class="tag is-rounded is-outlined" v-if="tag.slug == 'scenery' && group.model == 'scenery'">Scenery Category</span>
@@ -211,8 +211,9 @@ export default {
       } else {
         tags.splice(isSelected, 1)
       }
-      this.isValid(model)
+
       this.$emit('selected', tags)
+      this.$nextTick(() => { this.isValid(model) })
       // this.$emit('valid', this.valid)
     },
     isSelected(id, model) {
@@ -245,19 +246,6 @@ export default {
         this.$set(this.visibility, model, true)
       }
     },
-    set(tagIDs = []) {
-      this.$set(this, 'selected', tagIDs)
-    },
-    setPopulated(tags = []) {
-      let ids = []
-
-      tags.forEach((tag) => {
-        //console.log(tag)
-        ids.push(tag._id)
-      })
-      //console.log('as: '+ids)
-      this.$set(this, 'selected', ids)
-    },
     clear() {
       this.$emit('selected', [])
     },
@@ -265,9 +253,9 @@ export default {
       let valid = true
 
       this.groups.forEach(group => {
-        if(model && group.model !== model) return
+        if(model && group.model !== model) return false
         if(this.options[group.model] && this.options[group.model].required) {
-          if(this.getSelected(group.model).length == 0) {
+          if(this.calcSelected(model) == 0) {
             console.log(model, 'is invalid')
             group.valid = false
             valid = false

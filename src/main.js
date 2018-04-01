@@ -4,7 +4,10 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import App from './App'
 import router from './router'
+import { store } from './store'
 import auth from './services/auth'
+
+Vue.use(Vuex)
 
 import Meta from 'vue-meta'
 Vue.use(Meta)
@@ -46,17 +49,13 @@ router.beforeEach((to, from, next) => {
 
   // http://router.vuejs.org/en/advanced/navigation-guards.html
   if(to.meta.auth === true) {
-    if(!auth.user.authenticated) {
+    if(!store.state.user.authenticated) {
       return next('/')
     }
   }
 
-  if(auth.checkAuth() && !auth.user.profile._id) {
-    auth.refreshUser()
-  }
-
   if(to.name !== 'Home' && auth.checkAuth() && auth.accessTokenExpired()) {
-    auth.refreshToken(this).then(() => {
+    auth.refreshToken().then(() => {
       console.log('Token refreshed')
       return next()
     }).catch((err) => {
@@ -92,6 +91,7 @@ Vue.filter('truncate', function (text, length, clamp) {
 new Vue({
   el: '#app',
   router,
+  store,
   metaInfo: {
     title: 'Explore and organize your creations from Planet Coaster',
     titleTemplate: '%s • PlanCo World',

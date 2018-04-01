@@ -1,9 +1,11 @@
-$fonts-primary: 'Futura';
-$fonts-secondary: 'Roboto Slab';
+$fonts-primary: 'Interface', 'Helvetica Neue', 'Helvetica', Arial, sans-serif;
+$fonts-secondary: 'Roboto Slab', 'Rockwell', Georgia, serif;
+
 
 body {
   font-family: $fonts-primary;
   color: color('grey','dark');
+  font-weight: 500;
 }
 
 h1, h2, h3, h4, h5, h6, .ui.header {
@@ -28,5 +30,7 @@ p {
 }
 
 .text-center { text-align: center; }
+
+code { color: color('accent'); }
 
 span.bullet { color: color('accent','dark'); font-size: 1rem; }

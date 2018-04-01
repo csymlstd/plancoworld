@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import API from '@/services/api'
+import Auth from '@/services/auth'
 
 Vue.use(Vuex)
 
@@ -20,6 +21,16 @@ export const store = new Vuex.Store({
         total: 0,
         limit: 25
       },
+    },
+    user: {
+      authenticated: false,
+      profile: {
+        _id: false,
+        name: {},
+        avatar: {
+          url: 'http://placehold.it/150x150'
+        }
+      }
     },
     modals: {
       login: false
@@ -58,6 +69,12 @@ export const store = new Vuex.Store({
     },
     requesting(state, property) {
       state[property] = true
+    },
+    setProfile(state, profile) {
+      state.user.profile = Object.assign({}, state.user.profile, profile)
+    },
+    setAuthState(state, authenticated) {
+      state.user.authenticated = authenticated
     }
   },
   actions: {
@@ -72,6 +89,21 @@ export const store = new Vuex.Store({
         }
 
         resolve()
+      })
+    },
+    refreshUser(context) {
+      return Auth.refreshUser().then(user => {
+        context.commit('setProfile', user)
+        context.commit('setAuthState', true)
+      }).catch(err => {
+        context.commit('setProfile', {
+          _id: false,
+          name: {},
+          avatar: {
+            url: 'http://placehold.it/150x150'
+          }
+        })
+        context.commit('setAuthState', false)
       })
     }
   }

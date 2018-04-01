@@ -27,6 +27,7 @@
 <script>
 import auth from '@/services/auth'
 
+
 export default {
   props: {
     steamOnly: false,
@@ -53,8 +54,10 @@ export default {
         email: this.credentials.email,
       }
 
-      auth.loginLink(credentials).then(() => {
+      auth.loginLink(credentials).then(user => {
         this.loading.login = false
+        this.$store.commit('setProfile', user)
+        this.$store.commit('setAuthState', true)
         this.$store.commit('toggleModal', { modal: 'login', state: false })
       }).catch((err) => {
         console.log(err)
@@ -72,8 +75,10 @@ export default {
         this.loading.steam = false
       }, 3000)
 
-      auth.loginWithSteam().then(() => {
+      auth.loginWithSteam().then(user => {
         this.loading.steam = false
+        this.$store.commit('setProfile', user)
+        this.$store.commit('setAuthState', true)
         this.$store.commit('toggleModal', { modal: 'login', state: false })
         this.$notify('notifications','Welcome back to PlanCo World!')
       }).catch(() => {

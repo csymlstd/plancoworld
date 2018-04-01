@@ -11,7 +11,7 @@
         <!-- <router-link :to="{ name: 'Convert' }" class="level-item">Convert to WebM</router-link> -->
         <router-link :to="{ name: 'GuidePage', params: { slug: 'advertising-and-billboards' }}" class="level-item">Read the Guide</router-link>
         <router-link :to="{ name: 'GuidePage', params: { slug: 'glossary' }}" class="level-item">Glossary</router-link>
-        <router-link :to="{ name: 'ImportBillboard' }" class="button is-primary is-medium">Add a Billboard</router-link>
+        <router-link :to="{ name: 'ImportBillboard' }" class="button is-primary is-medium" v-if="isLoggedIn()">Add a Billboard</router-link>
       </div>
     </div>
   </div>
@@ -60,6 +60,7 @@ import Sort from '@/components/ui/Sort'
 import Loader from '@/components/ui/Loader'
 import Pagination from '@/components/ui/Pagination'
 import API from '@/services/api'
+import Auth from '@/services/auth'
 
 import Billboard from '@/components/Billboards/Card'
 
@@ -145,6 +146,9 @@ export default {
     }
   },
   methods: {
+    isLoggedIn() {
+      return Auth.isLoggedIn()
+    },
     getBillboards (params = {}) {
       this.loading = true
       params = Object.assign(params, this.globalParams)

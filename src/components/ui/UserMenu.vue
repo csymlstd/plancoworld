@@ -12,11 +12,13 @@
 <script>
 import router from '@/router'
 import auth from '@/services/auth'
+import { store } from '@/store'
 
 export default {
-  data() {
-    return {
-      user: auth.getUser()
+  store,
+  computed: {
+    user() {
+      return this.$store.state.user.profile
     }
   },
   methods: {
@@ -30,9 +32,7 @@ export default {
     }
   },
   mounted () {
-    auth.refreshUser().then(() => {
-      this.user = auth.getUser()
-    })
+    this.$store.dispatch('refreshUser')
   }
 }
 </script>

@@ -66,6 +66,7 @@ export default {
             api.post('kits', {
                 name: this.name
             }).then(kit => {
+                this.loading = false
                 this.$emit('created', kit)
             }).catch(err => {
                 this.loading = false

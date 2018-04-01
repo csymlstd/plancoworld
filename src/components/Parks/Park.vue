@@ -68,7 +68,13 @@
     <div class="columns">
       <div class="column is-one-quarter">
         <div class="box park-info">
-          <Creator :user="park.user"></Creator>
+          <div class="collaborators" :class="{ 'edit-mode': editMode }">
+            <Creator :user="park.user"></Creator>
+            <a class="profile profile--mini" v-if="editMode" v-tooltip="'Add a Collaborator'">
+              <div class="avatar is-new"><i class="fas fa-plus"></i></div>
+              <div class="user">Collaborator</div>
+            </a>
+          </div>
           <hr />
           <ReactionMeter />
         </div>
@@ -373,7 +379,7 @@ export default {
       this.$notify('notifications', 'Your Park has been saved', '')
     },
     isOwner() {
-      return auth.isOwner(this.park)
+      return auth.isOwner(this.park, this.$store.state.user)
     },
     closeModal(modal) {
       this.modals[modal].show = false

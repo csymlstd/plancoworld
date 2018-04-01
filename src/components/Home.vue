@@ -23,15 +23,17 @@
 import '@/styles/components/_home.scss'
 import auth from '@/services/auth'
 import Login from '@/components/Login'
+import {store} from '@/store'
 
 export default {
   name: 'Home',
+  store,
   components: {
     Login
   },
   data () {
     return {
-      user: auth.user,
+      user: this.$store.state.user,
       cycle: 3
     }
   },
