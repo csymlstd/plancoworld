@@ -1,6 +1,6 @@
 main.home-page {
   display: flex;
-  height: 100vh;
+  min-height: 100vh;
   align-items: stretch;
   position: relative;
   overflow: hidden;
@@ -19,9 +19,9 @@ main.home-page {
     h1 {
       font-family: $fonts-primary;
       text-indent: -9999px;
-      width: 500px;
-      height: 250px;
-      margin: 0 auto 1.5rem;
+      max-width: 100%;
+      height: 225px;
+      margin: 0 auto 1rem;
       background: url('/assets/images/logo.svg') no-repeat center;
       background-size: contain;
     }
@@ -29,6 +29,8 @@ main.home-page {
     h2 {
       font-family: $fonts-secondary;
       font-weight: 600;
+      margin-top: 0!important;
+      margin-bottom: 2rem!important;
     }
 
     > div {
@@ -39,6 +41,7 @@ main.home-page {
     &::before {
       display: block;
       position: absolute;
+      top: 0; left: 0;
       content: ' ';
       height: 100%;
       width: 100%;

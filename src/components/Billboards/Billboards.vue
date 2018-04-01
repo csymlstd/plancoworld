@@ -19,13 +19,14 @@
 <main class="container billboards">
   <div class="columns">
     <div class="column is-one-quarter content">
-      <Filters :options="filterOptions" @selected="filterBillboards" @sort="sortBillboards" @order="orderBillboards"></Filters>
+      <Filters ref="filters" :options="filterOptions" :selected="selectedTags" @selected="filterBillboards" @sort="sortBillboards" @order="orderBillboards"></Filters>
     </div>
     <div class="column">
 
       <div class="level">
         <div class="level-left">
           <div class="level-item"><Sort @sort="sortBillboards" @order="orderBillboards"></Sort></div>
+          <div class="level-item"><a @click="$refs.filters.clear()" class="button">Reset</a></div>
         </div>
         <div class="level-right">
           <a class="delete level-item" @click="globalParams.name = ''; getBillboards()" v-if="globalParams.name"></a>
@@ -85,11 +86,13 @@ export default {
         total: 0,
         limit: 25
       },
+      selectedTags: [],
       filterOptions: {
         'billboards': {
           label: null,
           type: 'toggle',
           visible: true,
+          max: 1,
         },
         'orientation': {
           label: 'Orientation',
@@ -97,6 +100,7 @@ export default {
           visible: true,
           force: true,
           tooltips: true,
+          max: 1,
         },
         'billboards-context': {
           label: 'Context',
@@ -151,7 +155,7 @@ export default {
         this.pagination.pages = data.pages
         this.pagination.limit = data.limit
         this.pagination.current = data.page
-        return data
+        
       }).catch((err) => {
 
       })
@@ -170,8 +174,17 @@ export default {
     },
     filterBillboards(tags) {
       this.loading = true
-      tags = tags.join(',')
-      this.getBillboards({ tags: tags }).then(() => {
+      this.selectedTags = tags
+
+      let params = []
+      tags.forEach(tag => {
+        params.push(tag._id)
+      })
+
+      params = params.join(',')
+      this.globalParams.tags = params
+
+      this.getBillboards().then(() => {
         this.loading = false
       })
     },

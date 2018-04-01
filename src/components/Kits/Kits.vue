@@ -19,7 +19,7 @@
   <main class="container">
     <div class="columns">
       <div class="column is-one-quarter content">
-        <Filters :options="filterOptions" @selected="filterKits"></Filters>
+        <Filters :options="filterOptions" :selected="selectedTags" @selected="filterKits"></Filters>
       </div>
       <div class="column">
         <div class="level">
@@ -105,6 +105,7 @@ export default {
         total: 0,
         limit: 25
       },
+      selectedTags: [],
       filterOptions: {
         'coasters': {
           label: 'Coasters',
@@ -192,8 +193,15 @@ export default {
     },
     filterKits(tags) {
       this.loading = true
-      tags = tags.join(',')
-      this.globalParams.tags = tags
+      this.selectedTags = tags
+
+      let params = []
+      tags.forEach(tag => {
+        params.push(tag._id)
+      })
+
+      params = params.join(',')
+      this.globalParams.tags = params
 
       this.getKits().then(() => {
         this.loading = false

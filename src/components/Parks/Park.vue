@@ -1,17 +1,18 @@
 <template>
   <div>
-  <section class="hero hero--tall" :style="{ backgroundImage: `url('${park.media.length > 0 ? park.media[0].url : '' }')` }">
+  <section class="hero hero--tall">
+    <Carousel class="hero-carousel" :media="park.media"></Carousel>
     <div class="hero-meta">
       <div class="container">
         <div class="level">
           <div class="level-left">
-            <Filters :options="heroFilterOptions" :inline="true" :readOnly="true" :large="true" ref="heroTags" class="level-item"></Filters>
+            <Filters :options="heroFilterOptions" :selected="park.tags" :inline="true" :readOnly="true" :large="true" ref="heroTags" class="level-item"></Filters>
             <div class="tags selected-tags level-item">
               <a v-if="park.billboards.length > 0" href="#billboards" class="tag is-rounded is-white is-large" data-scroll v-tooltip="'Download the custom Billboards for the best experience'"><span class="icon"><i class="fas fa-exclamation"></i></span> <span>Billboards</span></a>
             </div>
           </div>
           <div class="level-right">
-            <a class="button level-item is-medium is-primary is-inverted"><span class="icon"><i class="far fa-map"></i></span> <span>Park Map</span></a>
+            <a @click="openModal('parkMap')" v-if="park.map.media || editMode" class="button level-item is-medium is-primary is-inverted"><span class="icon"><i class="far fa-map"></i></span> <span>Park Map</span></a>
             <a @click="openModal('uploadPhotos')" class="button level-item is-white is-medium" v-if="editMode"><span>Manage Photos</span></a>
           </div>
         </div>
@@ -34,7 +35,7 @@
 
           <div class="field level-item has-addons" v-if="isOwner()">
             <div class="control"><a @click="toggleEditMode" class="button is-warning is-medium construction">Edit</a></div>
-            <div class="control"><a @click="updatePark()" class="button is-primary is-medium" v-if="editMode">Save</a></div>
+            <div class="control"><a @click="updatePark()" class="button is-light is-medium" v-if="editMode">Save</a></div>
             <div class="control">
               <div class="button is-white is-medium" @click="toggleStatus()" v-tooltip="{ content: statusTooltip }">
                 <div class="switch" :class="{ 'is-active': park.status && park.steam_id, 'is-warning': !park.steam_id }">
@@ -76,11 +77,18 @@
           <ColorPalette v-model="park.colors" :editMode="editMode"></ColorPalette>
         </div>
 
-        <Filters class="field" :options="filterOptions" :readOnly="!editMode" ref="tags"></Filters>
+        <Filters class="field" :selected="park.tags" @selected="park.tags = $event" :options="filterOptions" :readOnly="!editMode" ref="tags"></Filters>
 
-        <a href="#" class="button is-white is-fluid field">Report Park</a>
+        <!-- <a href="#" class="button is-white is-fluid field">Report Park</a> -->
 
-        <a href="#" class="button is-warning is-fluid" v-if="editMode">Delete Park</a>
+        <a @click="openModal('delete')" class="button is-warning is-fluid" v-if="editMode">Delete Park</a>
+
+        <Modal :class="['deletePark']" :show="modalOpen('delete')">
+          <p><strong>Are you sure you want to delete {{ park.name }}?</strong> This cannot be undone. Your media will still be available in the toolbox.</p>
+
+          <a @click="deletePark()" class="button is-warning">Delete</a>
+          <a @click="closeModal('delete')" class="button is-light">Cancel</a>
+        </Modal>
 
       </div>
 
@@ -91,16 +99,9 @@
           <div class="park-description-content" v-show="!editMode" v-html="park.description"></div>
         </section>
 
-        <div class="level">
-          <div class="level-left">
-            <h3 class="level-item">Scenario Specs</h3>
-          </div>
-          <div class="level-right">
-          </div>
-        </div>
-        <section class="box park-scenario">
+        <!-- <section class="box park-scenario">
           <Scenario :model="park.scenario" @update="updateScenario" :editMode="editMode"></Scenario>
-        </section>
+        </section> -->
 
         <div class="level" id="billboards" v-if="park.billboards.length > 0 || editMode">
           <div class="level-left">
@@ -112,7 +113,10 @@
             <a @click="openModal('addBillboard')" class="button level-item is-white is-medium" v-if="editMode"><span class="icon"><i class="fas fa-plus has-text-primary"></i></span> <span>Add Billboard</span></a>
           </div>
         </div>
-        <Billboard :model="billboard" :key="billboard._id" v-for="billboard in park.billboards"></Billboard>
+
+        <div class="columns cards is-multiline">
+          <Billboard :model="billboard" :key="billboard._id" v-for="billboard in park.billboards"></Billboard>
+        </div>
 
         <Modal :class="{ 'downloadBillboards': true }" @close="closeModal('downloadBillboards')" :show="modalOpen('downloadBillboards')">
           <p>Be sure to place in Documents\Frontier Developments\Planet Coaster\UserMedia</p>
@@ -156,6 +160,24 @@
       </div>
     </div>
 
+    <Modal :class="['park-map', 'is-skinny', 'is-wide']" @close="closeModal('parkMap')" :show="modalOpen('parkMap')">
+        <img :src="park.map.media.url" v-if="park.map.media && !editMode" />
+        
+        <div class="box" v-if="park && isOwner() && editMode">
+        <h3>Upload a Park Map</h3>
+        <div class="park-photo level" v-if="park.map.media">
+          <div class="level-left">
+            <img :src="park.map.media.url" class="is-64h level-item" />
+          </div>
+          <div class="level-right">
+            <a class="icon level-item" v-tooltip="'Remove from Park'" @click="removeMap()"><i class="fas fa-trash"></i></a>
+          </div>
+        </div>
+
+        <Upload @uploaded="addMap" folder="parks" :instant="true" :maxItems="1" instructions="Drop your map here, or click to browse your computer"></Upload>
+        </div>
+    </Modal>
+
     <Modal :class="{ 'uploadPhotos': true }" @close="closeModal('uploadPhotos')" :show="modalOpen('uploadPhotos')">
       <div class="park-media">
         <div class="park-photo level" :key="media._id" v-for="(media, key) in park.media">
@@ -184,6 +206,7 @@ import Upload from '@/components/ui/Upload'
 import SaveToToolbox from '@/components/ui/SaveToToolbox'
 import ColorPalette from '@/components/ui/ColorPalette'
 import ReactionMeter from '@/components/ui/ReactionMeter'
+import Carousel from '@/components/ui/Carousel'
 import Modal from '@/components/ui/Modal'
 import Dropdown from '@/components/ui/Dropdown'
 import Creator from '@/components/ui/ProfileMini'
@@ -204,6 +227,7 @@ export default {
     Search,
     Filters,
     Upload,
+    Carousel,
     SaveToToolbox,
     ColorPalette,
     ReactionMeter,
@@ -246,10 +270,19 @@ export default {
         downloadBillboards: {
           show: false,
           loading: false
+        },
+        parkMap: {
+          show: false,
+          loading: false
+        },
+        delete: {
+          show: false,
+          loading: false
         }
       },
       editor: false,
       park: {
+        map: { media: false },
         media: [],
         blueprints: [],
         billboards: [],
@@ -390,7 +423,6 @@ export default {
       })
     },
     addPhoto(newMedia) {
-      console.log('adding', media)
       this.park.media.push(newMedia)
 
       let media = []
@@ -402,7 +434,17 @@ export default {
         this.park.status = park.status
         this.$notify('notifications', 'Photo added', 'success')
       }).catch(() => {
-        this.park.status = status
+        
+      })
+    },
+    addMap(newMedia) {
+      this.park.map.media = newMedia
+
+      API.put(this.apiURL(), { map: { media: newMedia._id }}).then((park) => {
+        this.park.status = park.status
+        this.$notify('notifications', 'Map added', 'success')
+      }).catch(() => {
+        
       })
     },
     removePhoto(key) {
@@ -417,9 +459,18 @@ export default {
         this.park.status = park.status
         this.$notify('notifications', 'Photo removed', 'success')
       }).catch(() => {
-        this.park.status = status
+        
       })
+    },
+    removeMap() {
+      this.park.map.media = ''
 
+      API.put(this.apiURL(), { map: { media: null }}).then((park) => {
+        this.park.status = park.status
+        this.$notify('notifications', 'Map removed', 'success')
+      }).catch(() => {
+        
+      })
     },
     toggleStatus() {
       let status = this.park.status
@@ -460,8 +511,6 @@ export default {
         this.shareURL = `http://planco.world/parks/${this.park.slug}`
         this.loading = false
         this.editMode = false
-        this.$refs.heroTags.setPopulated(this.park.tags)
-        this.$refs.tags.setPopulated(this.park.tags)
 
       }).catch((err) => {
         API.handleError(err, 'parks')
@@ -479,11 +528,26 @@ export default {
       data.media = media
       data.user = data.user._id
       data.description = this.editor.container.firstChild.innerHTML
-      data.tags = this.$refs.tags.selected
+      
+      delete data.map.media
+
+      let tags = []
+      this.park.tags.forEach((t) => {
+        tags.push(t._id)
+      })
+      data.tags = tags
 
       return API.put(this.apiURL(), data).then((park) => {
-        this.$notify('notifications', 'Your Park has been saved', 'success')
+        this.$notify('notifications', 'Your park has been saved', 'success')
         return this.getPark()
+      })
+    },
+    deletePark() {
+      API.delete(this.apiURL(true)).then(response => {
+        this.$notify('notifications', `${this.park.name} has been deleted.`, 'success')
+        this.$router.push({ name: 'Parks' })
+      }).catch(err => {
+        this.$notify('notifications', 'There was a problem deleting your park.', 'error')
       })
     },
     apiURL(force = true) {

@@ -7,13 +7,13 @@
       <a class="reaction fun" @click="react('exciting')">Exciting!</a>
       <a class="reaction love" @click="react('love')">Love It!</a>
     </div>
-    <i class="far fa-plus-circle has-text-grey-light" @mouseover="open = true" @click="open ? open = false : open = true"></i>
-    <a class="reaction nauseating" v-if="hasReacted('nauseating')" v-tooltip="model.reactions['nauseating'].length">Nauseating!</a>
-    <a class="reaction boring" v-if="hasReacted('boring')" v-tooltip="model.reactions['boring'].length">Boring..</a>
+    <i class="far fa-plus-circle has-text-grey-light" @mouseover="open = true" @click="open ? open = false : open = true" v-if="isLoggedIn()"></i>
+    <a class="reaction nauseating" v-if="hasReacted('nauseating')" v-tooltip="{ content: total('nauseating') }">Nauseating!</a>
+    <a class="reaction boring" v-if="hasReacted('boring')" v-tooltip="{ content: total('boring') }">Boring..</a>
     
-    <a class="reaction scary" v-if="hasReacted('scary')" v-tooltip="model.reactions['scary'].length">Scary!</a>
-    <a class="reaction fun" v-if="hasReacted('exciting')" v-tooltip="model.reactions['exciting'].length">Exciting!</a>
-    <a class="reaction love" v-if="hasReacted('love')" v-tooltip="model.reactions['love'].length">Love It!</a>
+    <a class="reaction scary" v-if="hasReacted('scary')" v-tooltip="{ content: total('scary') }">Scary!</a>
+    <a class="reaction fun" v-if="hasReacted('exciting')" v-tooltip="{ content: total('exciting') }">Exciting!</a>
+    <a class="reaction love" v-if="hasReacted('love')" v-tooltip="{ content: total('love') }">Love It!</a>
   </div>
 </template>
 
@@ -38,7 +38,7 @@ export default {
     }
   },
   computed: {
-
+    
   },
   data () {
     return {
@@ -46,6 +46,12 @@ export default {
     }
   },
   methods: {
+    total(reaction) {
+      return this.model.reactions[reaction] ? this.model.reactions[reaction].length : 0
+    },
+    isLoggedIn() {
+      return auth.isLoggedIn()
+    },
     react(reaction) {
       console.log('reacting with '+reaction)
       this.open = false

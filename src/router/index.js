@@ -83,20 +83,20 @@ export default new Router({
       name: 'VerifyLink',
       component: require('@/components/Account/VerifyLink')
     },
-    {
-      path: '/admin',
-      name: 'Admin',
-      component: require('@/components/Admin/Admin'),
-      meta: { auth: true },
-      children: [
-        {
-          path: 'permissions',
-          name: 'Permissions',
-          meta: { auth: true },
-          component: require('@/components/Admin/Permissions')
-        }
-      ]
-    },
+    // {
+    //   path: '/admin',
+    //   name: 'Admin',
+    //   component: require('@/components/Admin/Admin'),
+    //   meta: { auth: true },
+    //   children: [
+    //     {
+    //       path: 'permissions',
+    //       name: 'Permissions',
+    //       meta: { auth: true },
+    //       component: require('@/components/Admin/Permissions')
+    //     }
+    //   ]
+    // },
     {
       path: '/creator/:username',
       name: 'Profile',
@@ -126,13 +126,13 @@ export default new Router({
       meta: { auth: true },
       component: require('@/components/Billboards/Import')
     },
-    {
-      path: '/billboards/convert-to-webm',
-      name: 'Convert',
-      meta: { auth: true },
-      component: require('@/components/Billboards/Convert'),
+    // {
+    //   path: '/billboards/convert-to-webm',
+    //   name: 'Convert',
+    //   meta: { auth: true },
+    //   component: require('@/components/Billboards/Convert'),
 
-    },
+    // },
     // {
     //   path: '/billboards/generator',
     //   name: 'Generator',
@@ -152,12 +152,12 @@ export default new Router({
     {
       path: '/guides',
       name: 'Guides',
-      component: require('@/components/Wiki/Wiki'),
+      component: require('@/components/Guides/Guides'),
       children: [
         {
           path: ':slug',
           name: 'GuidePage',
-          component: require('@/components/Wiki/Page')
+          component: require('@/components/Guides/Page')
         }
       ]
     },

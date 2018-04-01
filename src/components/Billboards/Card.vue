@@ -6,6 +6,12 @@
         <video autoplay loop muted>
           <source :src="model.media[0].url" v-if="model.media[0] && model.media[0].type == 'video'">
         </video>
+        <div class="level bottom">
+          <div class="level-left"></div>
+          <div class="level-right">
+            <a @click.stop="downloadBillboard()" class="level-item subscribe"><span class="tag is-rounded is-primary is-medium" v-tooltip="`Download`"><span class="icon"><i class="far fa-cloud-download"></i></span></span></a>
+          </div>
+        </div>
       </div>
       <div class="card-content">
         <div class="content">
@@ -26,7 +32,7 @@
 </template>
 
 <script>
-
+import API from '@/services/api'
 import router from '@/router'
 import Creator from '@/components/ui/ProfileMicro'
 import Reaction from '@/components/ui/Reaction'
@@ -43,13 +49,24 @@ export default {
   data () {
     return {
       selected: [],
-      groups: []
+      groups: [],
+      downloading: false
     }
   },
   methods: {
     viewBillboard () {
       router.push({ name: 'Billboard', params: { slug: this.model.slug, id: this.model._id }})
-    }
+    },
+    downloadBillboard () {
+      this.downloading = true
+      let mediaID = this.model.media[0]._id
+      API.fetch(`media/${mediaID}/download`).then((billboard) => {
+        let url = billboard.signedRequest
+        console.log(url)
+        window.open(url)
+        this.downloading = false
+      })
+    },
   },
   mounted () {
 

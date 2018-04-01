@@ -17,12 +17,13 @@
   <main class="container">
     <div class="columns">
       <div class="column is-one-quarter content">
-        <Filters :options="filterOptions" @selected="filterBlueprints" ></Filters>
+        <Filters ref="filters" :options="filterOptions" :selected="selectedTags" @selected="filterBlueprints"></Filters>
       </div>
       <div class="column">
         <div class="level">
           <div class="level-left">
             <div class="level-item"><Sort @sort="sortBlueprints" @order="orderBlueprints"></Sort></div>
+            <div class="level-item"><a @click="$refs.filters.clear()" class="button">Reset</a></div>
           </div>
           <div class="level-right">
             <a class="delete level-item" @click="globalParams.name = ''; getBlueprints()" v-if="globalParams.name"></a>
@@ -35,6 +36,13 @@
           </div>
         </div>
 
+        <!-- <section class="box studios-promo" v-if="pagination.current == 1 && !globalParams.tags">
+          <div>
+            <h1 class="title">Watch the stunts and animatronics <br /> built with the new <img alt="Studios Pack" src="/assets/images/studios-pack-logo.png" style="width: 250px;transform:translateY(5px);" />!</h1>
+            <br />
+            <a class="button is-warning is-medium" @click="$refs.filters.checkTagById('5ab6ba772e6cec647de35538','content-packs')"><span>Search for Studios Blueprints</span> <span class="icon"><i class="far fa-arrow-down"></i></span></a>
+          </div>
+        </section> -->
 
         <div class="columns cards is-multiline loader--parent">
           <Loader v-if="loading"></Loader>
@@ -88,6 +96,7 @@ export default {
         total: 0,
         limit: 25
       },
+      selectedTags: [],
       filterOptions: {
         'buildings': {
           label: 'Buildings',
@@ -187,8 +196,15 @@ export default {
     },
     filterBlueprints(tags) {
       this.loading = true
-      tags = tags.join(',')
-      this.globalParams.tags = tags
+      this.selectedTags = tags
+
+      let params = []
+      tags.forEach(tag => {
+        params.push(tag._id)
+      })
+
+      params = params.join(',')
+      this.globalParams.tags = params
 
       this.getBlueprints().then(() => {
         this.loading = false
@@ -213,6 +229,20 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" scoped>
+
+  .studios-promo {
+    padding: 4rem 1rem;
+    background-image: linear-gradient(90deg, rgba(0, 145, 215,0.6) 0%, rgba(0,0,0,0.6) 100%), url('/assets/images/studios-pack.jpg');
+    background-size: cover!important;
+    background-repeat: no-repeat!important;
+    background-position: center!important;
+    text-align: center;
+
+    h1 {
+      color: #fff;
+    }
+  }
+
   .hero .title {
     margin: 0;
   }

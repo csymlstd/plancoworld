@@ -23,6 +23,12 @@
           <div class="toolbox--list-parks" v-if="active == 'parks'">
             <Park :model="park" :key="park._id" v-for="park in panes[active].data.parks"></Park>
           </div>
+          <div class="toolbox--list-kits" v-if="active == 'kits'">
+            <Kit :model="kit" :key="kit._id" v-for="kit in panes[active].data.kits"></Kit>
+          </div>
+          <div class="toolbox--list-billboards" v-if="active == 'billboards'">
+            <Billboard :model="billboard" :key="billboard._id" v-for="billboard in panes[active].data.billboards" v-tooltip="{ content: selectMode ? 'Select this Billboard' : null }"></Billboard>
+          </div>
           <div class="toolbox--list-blueprints" v-if="active == 'blueprints'">
             <Blueprint :model="blueprint" :key="blueprint._id" v-for="blueprint in panes[active].data.blueprints" v-tooltip="{ content: selectMode ? 'Select this Blueprint' : null }"></Blueprint>
           </div>
@@ -56,7 +62,9 @@ import API from '@/services/api'
 import { ToolBus } from './Toolbus.js'
 
 import Park from '@/components/Parks/List'
+import Billboard from '@/components/Billboards/List'
 import Blueprint from '@/components/Blueprints/List'
+import Kit from '@/components/Kits/List'
 import ImageThumbnail from '@/components/Media/ImageThumbnail'
 import VideoThumbnail from '@/components/Media/VideoThumbnail'
 
@@ -64,6 +72,8 @@ export default {
   name: 'toolbox',
   components: {
     Park,
+    Kit,
+    Billboard,
     Blueprint,
     Loader,
     Pagination,
@@ -78,6 +88,7 @@ export default {
       restricted: [],
       active: 'parks',
       context: 'user',
+      uid: false,
       pagination: {
         current: 1,
         pages: 1,
@@ -148,7 +159,7 @@ export default {
     select(model) {
       if(this.selectMode) {
         console.log('emitting select')
-        ToolBus.$emit('select', model)
+        ToolBus.$emit('select', { uid: this.uid, media: model })
         this.toggle()
       }
     },
@@ -156,6 +167,7 @@ export default {
       if(this.open) {
         this.selectMode = false
         this.restricted = []
+        this.uid = false
         return this.open = false
       } else {
         this.getToolbox(this.active)
@@ -190,6 +202,7 @@ export default {
   },
   mounted () {
     ToolBus.$on('toggle', (options) => {
+      if(options.uid) this.uid = options.uid
       let opts = Object.assign({ tab: 'parks', context: 'user', selectMode: false }, options)
       this.tab(opts.tab, opts.context, opts.selectMode)
       this.toggle()

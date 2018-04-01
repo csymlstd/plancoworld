@@ -17,7 +17,7 @@
   <main class="container">
     <div class="columns">
       <div class="column is-one-quarter content">
-        <Filters ref="filters" :options="filterOptions" @selected="filterParks"></Filters>
+        <Filters ref="filters" :selected="selectedTags" @selected="filterParks" :options="filterOptions"></Filters>
       </div>
       <div class="column">
         <div class="level">
@@ -36,13 +36,13 @@
           </div>
         </div>
 
-        <section class="box adventure-promo" v-if="pagination.current == 1 && !globalParams.tags">
+        <!-- <section class="box adventure-promo" v-if="pagination.current == 1 && !globalParams.tags">
           <div>
             <h1 class="title">Explore the temples and traps <br /> built with the new <img alt="Adventure Pack" src="/assets/images/adventure-pack-logo.svg" style="width: 250px;transform:translateY(5px);" />!</h1>
             <br />
-            <a class="button is-warning is-medium" @click="$refs.filters.checkTag('5a2deba8c22ae923f29cc220')"><span>Search for Adventure Parks</span> <span class="icon"><i class="far fa-arrow-down"></i></span></a>
+            <a class="button is-warning is-medium" @click="$refs.filters.checkTagById('5a2deba8c22ae923f29cc220', 'content-packs')"><span>Search for Adventure Parks</span> <span class="icon"><i class="far fa-arrow-down"></i></span></a>
           </div>
-        </section>
+        </section> -->
 
 
         <div class="columns cards is-multiline loader--parent">
@@ -64,7 +64,7 @@
           <Park :model="park" :key="park._id" v-for="(park, index) in parks" v-if="index > 3"></Park>
 
           <div class="column" v-if="parks.length == 0 && loading == false" v-cloak>
-            <div class="notification is-warning">There aren't any Parks that match what you're looking for. You should build it!</div>
+            <div class="notification is-warning text-center">There aren't any Parks that match what you're looking for. <br /><br /> <router-link :to="{ name: 'ImportPark' }" class="button is-dark is-medium" v-if="isLoggedIn()">Add a Park</router-link></div>
           </div>
         </div>
         <Pagination :total="pagination.total" :current="pagination.current" :pages="pagination.pages" @goTo="goToPage"></Pagination>
@@ -112,6 +112,7 @@ export default {
         total: 0,
         limit: 25
       },
+      selectedTags: [],
       filterOptions: {
         'parks': {
           label: 'Park Type',
@@ -194,8 +195,15 @@ export default {
     },
     filterParks(tags = []) {
       this.loading = true
-      tags = tags.join(',')
-      this.globalParams.tags = tags
+      this.selectedTags = tags
+
+      let params = []
+      tags.forEach(tag => {
+        params.push(tag._id)
+      })
+
+      params = params.join(',')
+      this.globalParams.tags = params
 
       this.getParks().then(() => {
         this.loading = false

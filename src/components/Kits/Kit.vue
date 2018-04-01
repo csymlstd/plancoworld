@@ -60,7 +60,7 @@
           </table>
         </div>
 
-        <Filters class="field" :options="filterOptions" :readOnly="!editMode" ref="tags"></Filters>
+        <Filters class="field" :selected="kit.tags" @selected="kit.tags = $event" :options="filterOptions" :readOnly="!editMode" ref="tags"></Filters>
 
         <a href="#" class="button is-white is-fluid field">Report Kit</a>
 
@@ -76,17 +76,22 @@
         </section>
 
 
-        <div class="level" id="billboards">
-          <div class="level-left">
-            <h3 class="level-item">Billboards</h3>
-            <div class="level-item"><a @click="openModal('downloadBillboards')" class="is-text">Download All ({{ kit.billboards.length }})</a></div>
+        <div v-if="kit.billboards.length > 0 || editMode">
+          <div class="level" id="billboards">
+            <div class="level-left">
+              <h3 class="level-item">Billboards</h3>
+              <!-- <div class="level-item"><a @click="openModal('downloadBillboards')" class="is-text">Download All ({{ kit.billboards.length }})</a></div> -->
+            </div>
+            <div class="level-right">
+              <!-- <router-link :to="{ name: 'Generator' }" class="button level-item is-white is-medium"><span class="icon"><i class="fas fa-paint-brush has-text-primary"></i></span> <span>Generator</span></router-link> -->
+              <a @click="openModal('addBillboard')" class="button level-item is-white is-medium" v-if="editMode"><span class="icon"><i class="fas fa-plus has-text-primary"></i></span> <span>Add Billboard</span></a>
+            </div>
           </div>
-          <div class="level-right">
-            <!-- <router-link :to="{ name: 'Generator' }" class="button level-item is-white is-medium"><span class="icon"><i class="fas fa-paint-brush has-text-primary"></i></span> <span>Generator</span></router-link> -->
-            <a @click="openModal('addBillboard')" class="button level-item is-white is-medium" v-if="editMode"><span class="icon"><i class="fas fa-plus has-text-primary"></i></span> <span>Add Billboard</span></a>
+
+          <div class="columns cards is-multiline loader--parent">
+            <Billboard :model="billboard" :key="billboard._id" v-for="billboard in kit.billboards"></Billboard>
           </div>
         </div>
-        <Billboard :model="billboard" :key="billboard._id" v-for="billboard in kit.billboards"></Billboard>
 
         <Modal :class="{ 'downloadBillboards': true }" @close="closeModal('downloadBillboards')" :show="modalOpen('downloadBillboards')">
           <p>Be sure to place in Documents\Frontier Developments\Planet Coaster\UserMedia</p>
@@ -103,17 +108,19 @@
           </div>
         </Modal>
 
-        <div class="level">
-          <div class="level-left">
-            <h3 class="ui header level-item">Blueprints</h3>
+        <div v-if="kit.blueprints.length > 0 || editMode">
+          <div class="level">
+            <div class="level-left">
+              <h3 class="ui header level-item">Blueprints</h3>
+            </div>
+            <div class="level-right">
+              <a @click="openModal('addBlueprint')" class="button is-white is-medium" v-if="editMode"><span class="icon"><i class="fas fa-plus has-text-primary"></i></span> <span>Add Blueprint</span></a>
+            </div>
           </div>
-          <div class="level-right">
-            <a @click="openModal('addBlueprint')" class="button is-white is-medium" v-if="editMode"><span class="icon"><i class="fas fa-plus has-text-primary"></i></span> <span>Add Blueprint</span></a>
-          </div>
-        </div>
 
-        <div class="columns cards is-multiline loader--parent">
-          <Blueprint :model="blueprint" :key="blueprint._id" v-for="blueprint in kit.blueprints"></Blueprint>
+          <div class="columns cards is-multiline loader--parent">
+            <Blueprint :model="blueprint" :key="blueprint._id" v-for="blueprint in kit.blueprints"></Blueprint>
+          </div>
         </div>
 
         <Modal :class="{ 'addBlueprint': true }" @close="closeModal('addBlueprint')" :show="modalOpen('addBlueprint')">
@@ -127,17 +134,19 @@
           </div>
         </Modal>
 
-        <div class="level">
-          <div class="level-left">
-            <h3 class="ui header level-item">Parks</h3>
+        <div v-if="kit.parks.length > 0 || editMode">
+          <div class="level">
+            <div class="level-left">
+              <h3 class="ui header level-item">Parks</h3>
+            </div>
+            <div class="level-right">
+              <a @click="openModal('addPark')" class="button is-white is-medium" v-if="editMode"><span class="icon"><i class="fas fa-plus has-text-primary"></i></span> <span>Add Park</span></a>
+            </div>
           </div>
-          <div class="level-right">
-            <a @click="openModal('addPark')" class="button is-white is-medium" v-if="editMode"><span class="icon"><i class="fas fa-plus has-text-primary"></i></span> <span>Add Park</span></a>
-          </div>
-        </div>
 
-        <div class="columns cards is-multiline loader--parent">
-          <Park :model="park" :key="park._id" v-for="park in kit.parks"></Park>
+          <div class="columns cards is-multiline loader--parent">
+            <Park :model="park" :key="park._id" v-for="park in kit.parks"></Park>
+          </div>
         </div>
 
       </div>
@@ -232,7 +241,55 @@ export default {
         parks: [],
       },
       filterOptions: {
-        
+        'coasters': {
+          label: 'Coasters',
+          type: 'list'
+        },
+        'rides': {
+          label: 'Rides',
+          type: 'list'
+        },
+        'shops': {
+          label: 'Shops',
+          type: 'list'
+        },
+        'facilities': {
+          label: 'Facilities & Utilities',
+          type: 'list'
+        },
+        'buildings': {
+          label: 'Buildings',
+          type: 'list',
+          visible: true
+        },
+        'scenery': {
+          label: 'Scenery',
+          type: 'list',
+          visible: true
+        },
+        'age-groups': {
+          label: 'Age Groups',
+          type: 'toggle',
+        },
+        'materials': {
+          label: 'Materials',
+          type: 'list'
+        },
+        'themes': {
+          label: 'Themes',
+          type: 'list'
+        },
+        'style': {
+          label: 'Styles',
+          type: 'list'
+        },
+        'content-packs': {
+          label: 'Content Packs',
+          type: 'list',
+          dlc: true,
+          visible: true,
+          force: true
+        },
       }
     }
   },
@@ -264,9 +321,10 @@ export default {
       return this.modals[modal].show
     },
     addToKit(match, modal) {
+      console.log(match, modal)
       this.modals[modal].loading = true
 
-      let plural = match._type+'s'
+      let plural = match._source.type+'s'
       let model = this.kit[plural]
       let data = {}
 
@@ -279,7 +337,8 @@ export default {
       API.put(this.apiURL(), data).then(() => {
         return this.getKit()
       }).then(() => {
-        
+        this.closeModal(modal)
+        this.modals[modal].loading = false
       }).catch(() => {
 
       })

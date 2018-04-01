@@ -1,7 +1,7 @@
 <template>
   <div class="column is-one-third-desktop is-half-tablet">
     <div class="card has-level-bottom">
-      <a class="card-image" :style="{ 'backgroundImage': `url('${thumbnail}')` }" @click="viewPark">
+      <a class="card-image" :style="{ 'backgroundImage': `url('${thumbnail}')` }" @click="viewKit">
         <div class="level bottom">
           <div class="level-left"><div class="level-item"><Filters :options="tagOptions" :inline="true" :readOnly="true" ref="tags"></Filters></div></div>
           <div class="level-right"><div class="level-item" v-if="isSaved()"><span class="tag is-rounded is-warning is-medium" v-tooltip="'Saved to Toolbox'"><span class="icon"><i class="fas fa-archive"></i></span></span></div></div>

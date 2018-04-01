@@ -1,15 +1,18 @@
 <template>
   <div class="column is-one-third-desktop is-half-tablet">
     <div class="card has-level-bottom">
-      <a class="card-image" :style="{ 'backgroundImage': `url('${thumbnail}')` }" @click="viewPark">
+      <div class="card-image" :style="{ 'backgroundImage': `url('${thumbnail}')` }" @click="viewPark">
         <div class="level bottom">
           <div class="level-left"><div class="level-item"><Filters :options="tagOptions" :inline="true" :readOnly="true" ref="tags"></Filters></div></div>
-          <div class="level-right"><div class="level-item" v-if="isSaved()"><span class="tag is-rounded is-warning is-medium" v-tooltip="'Saved to Toolbox'"><span class="icon"><i class="fas fa-archive"></i></span></span></div></div>
+          <div class="level-right">
+            <a :href="'http://steamcommunity.com/sharedfiles/filedetails/?id='+model.steam_id" @click.stop target="_blank" class="level-item subscribe"><span class="tag is-rounded is-primary is-medium" v-tooltip="'Subscribe on Steam'"><span class="icon"><i class="fab fa-steam"></i></span></span></a>
+            <div class="level-item" v-if="isSaved()"><span class="tag is-rounded is-warning is-medium" v-tooltip="'Saved to Toolbox'"><span class="icon"><i class="fas fa-archive"></i></span></span></div>
+          </div>
         </div>
-      </a>
+      </div>
       <div class="card-content">
         <div class="content">
-          <h3 class="title"><a @click="viewPark">{{ model.name | truncate(70) }}</a></h3>
+          <h3 class="title"><a :href="'/parks/'+model.slug" @click="viewPark">{{ model.name | truncate(70) }}</a></h3>
           <div class="level bottom">
             <div class="level-left">
               <Creator :user="model.user" class="level-item"></Creator>
@@ -80,6 +83,6 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style>
+<style scoped>
 
 </style>

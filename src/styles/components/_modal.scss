@@ -3,10 +3,22 @@
 }
 
 .modal {
+  padding-top: 65px;
+
   &.is-active {
     z-index: 9060;
   }
 
+  &.is-skinny {
+    .modal-content > .box {
+      padding: 0;
+      overflow: hidden;
+
+      > img {
+        margin-bottom: -10px;
+      }
+    }
+  }
 
   &.is-wide {
     .modal-card, .modal-content {

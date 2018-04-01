@@ -78,11 +78,18 @@
           <ColorPalette v-model="blueprint.colors" :editMode="editMode"></ColorPalette>
         </div>
 
-        <Filters class="field" :options="filterOptions" :readOnly="!editMode" ref="tags"></Filters>
+        <Filters class="field" :selected="blueprint.tags" @selected="blueprint.tags = $event" :options="filterOptions" :readOnly="!editMode" ref="tags"></Filters>
 
-        <a href="#" class="button is-white is-fluid field">Report Blueprint</a>
+        <!-- <a href="#" class="button is-white is-fluid field">Report Blueprint</a> -->
 
-        <a href="#" class="button is-warning is-fluid" v-if="editMode">Delete Blueprint</a>
+        <a @click="openModal('delete')" class="button is-warning is-fluid" v-if="editMode">Delete Blueprint</a>
+
+        <Modal :class="['deleteBlueprint']" :show="modalOpen('delete')">
+          <p><strong>Are you sure you want to delete {{ blueprint.name }}?</strong> This cannot be undone. Your media will still be available in the toolbox.</p>
+
+          <a @click="deleteBlueprint()" class="button is-warning">Delete</a>
+          <a @click="closeModal('delete')" class="button is-light">Cancel</a>
+        </Modal>
 
       </div>
 
@@ -91,6 +98,152 @@
         <section class="box blueprint-description">
           <div class="blueprint-description-editor editor" v-if="editMode" v-html="blueprint.description"></div>
           <div class="blueprint-description-content" v-show="!editMode" v-html="blueprint.description"></div>
+        </section>
+
+        <section class="box blueprint-stats">
+            <div class="level">
+                <div class="level-left">
+                  <h5 class="title is-5">Ride Stats</h5>
+                </div>
+                <div class="level-right">
+                  
+                </div>
+              </div>
+              <div class="columns blueprint-stats">
+                <div class="column">
+                  <label class="label">Duration</label>
+                  <div class="field has-addons">
+                    <div class="control">
+                      <input type="number" class="input" v-model="blueprint.stats.duration" />
+                    </div>
+                    <div class="control">
+                      <div class="button is-static">seconds</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="column">
+                  <label class="label">Length</label>
+                  <div class="field has-addons">
+                    <div class="control">
+                      <input type="number" class="input" v-model="blueprint.stats.length" />
+                    </div>
+                    <div class="control">
+                      <div class="button is-static" v-if="isImperial()">feet</div>
+                      <div class="button is-static" v-else>meters</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="column">
+                  <label class="label">Max Speed</label>
+                  <div class="field has-addons">
+                    <div class="control">
+                      <input type="number" max="149" class="input" v-model="blueprint.stats.maxSpeed" />
+                    </div>
+                    <div class="control">
+                      <div class="button is-static" v-if="isImperial()">mph</div>
+                      <div class="button is-static" v-else>kmh</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="column">
+                  <label class="label">Average Speed</label>
+                  <div class="field has-addons">
+                    <div class="control">
+                      <input type="number" max="149" class="input" v-model="blueprint.stats.avgSpeed" />
+                    </div>
+                    <div class="control">
+                      <div class="button is-static" v-if="isImperial()">mph</div>
+                      <div class="button is-static" v-else>kmh</div>
+                    </div>
+                  </div>
+                </div>
+                
+              </div>
+              <div class="columns blueprint-stats">
+                <div class="column">
+                  <label class="label">Biggest Drop</label>
+                  <div class="field has-addons">
+                    <div class="blueprints-stats-value" v-html="blueprint.stats.biggestDrop || 'N/A'" v-if="!editMode"></div>
+                    <div class="control" v-if="editMode">
+                      <input type="number" class="input" v-model="blueprint.stats.biggestDrop" />
+                    </div>
+                    <div class="control" v-if="editMode">
+                      <div class="button is-static" v-if="isImperial()">feet</div>
+                      <div class="button is-static" v-else>meters</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="column">
+                  <label class="label">Number of Inversions</label>
+                  <div class="field">
+                    <div class="blueprints-stats-value" v-html="blueprint.stats.inversions || 0" v-if="!editMode"></div>
+                    <div class="control" v-if="editMode">
+                      <input type="number" class="input" v-model="blueprint.stats.inversions" />
+                    </div>
+                  </div>
+                </div>
+                <div class="column">
+                  <label class="label">Airtime Count</label>
+                  <div class="field">
+                    <div class="control">
+                      <input type="number" class="input" v-model="blueprint.stats.airtimeCount" />
+                    </div>
+                  </div>
+                </div>
+                <div class="column">
+                  <label class="label">Total Airtime Duration</label>
+                  <div class="field has-addons">
+                    <div class="control">
+                      <input type="number" class="input" v-model="blueprint.stats.airtimeDuration " />
+                    </div>
+                    <div class="control">
+                      <div class="button is-static">seconds</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="columns blueprint-stats">
+                <div class="column">
+                  <label class="label">Max Lateral G</label>
+                  <div class="field">
+                    <div class="control">
+                      <input type="number" max="5" min="-5" step="0.01" class="input" v-model="blueprint.stats.maxLateralG" />
+                    </div>
+                  </div>
+                </div>
+                <div class="column">
+                  <label class="label">Max Vertical G</label>
+                  <div class="field">
+                    <div class="control">
+                      <input type="number" max="5" min="-5" step="0.01" class="input" v-model="blueprint.stats.maxVerticalG" />
+                    </div>
+                  </div>
+                </div>
+                <div class="column">
+                  <label class="label">Min Vertical G</label>
+                  <div class="field">
+                    <div class="control">
+                      <input type="number" max="5" min="-5" step="0.01" class="input" v-model="blueprint.stats.minVerticalG" />
+                    </div>
+                  </div>
+                </div>
+                <div class="column">
+                  <label class="label">Max Foward G</label>
+                  <div class="field">
+                    <div class="control">
+                      <input type="number" max="5" min="-5" step="0.01" class="input" v-model="blueprint.stats.maxForwardG" />
+                    </div>
+                  </div>
+                </div>
+                <div class="column">
+                  <label class="label">Min Forward G</label>
+                  <div class="field">
+                    <div class="control">
+                      <input type="number" max="5" min="-5" step="0.01" class="input" v-model="blueprint.stats.minForwardG" />
+                    </div>
+                  </div>
+                </div>
+              </div> 
         </section>
 
 
@@ -219,6 +372,10 @@ export default {
         downloadBillboards: {
           show: false,
           loading: false
+        },
+        delete: {
+          show: false,
+          loading: false
         }
       },
       editor: false,
@@ -229,6 +386,7 @@ export default {
         attractions: [],
         tags: [],
         colors: [],
+        stats: {},
       },
       filterOptions: {
         'buildings': {
@@ -407,7 +565,6 @@ export default {
         })
       } else {
         let toolbar = this.editor.container.parentNode.querySelector('.ql-toolbar')
-        console.log(toolbar)
         if(toolbar) toolbar.remove()
         this.$nextTick(() => {
           this.editor = null
@@ -420,11 +577,10 @@ export default {
       this.loading = true
 
       API.fetch(this.apiURL(false)).then((blueprint) => {
-        this.blueprint = blueprint
+        this.blueprint = Object.assign({}, this.blueprint, blueprint)
         this.shareURL = `http://planco.world/blueprints/${this.blueprint.slug}`
         this.loading = false
         this.editMode = false
-        this.$refs.tags.setPopulated(this.blueprint.tags)
 
       }).catch((err) => {
         API.handleError(err, 'blueprints')
@@ -442,11 +598,26 @@ export default {
       data.media = media
       data.user = data.user._id
       data.description = this.editor.container.firstChild.innerHTML
-      data.tags = this.$refs.tags.selected
+      
+      let tags = []
+      this.blueprint.tags.forEach((t) => {
+        tags.push(t._id)
+      })
+      data.tags = tags
 
       return API.put(this.apiURL(), data).then((blueprint) => {
         this.$notify('notifications', 'Your Blueprint has been saved', 'success')
         return this.getBlueprint()
+      })
+    },
+    deleteBlueprint() {
+      API.delete(this.apiURL(true)).then(response => {
+        console.log(response)
+        this.$notify('notifications', `${this.blueprint.name} has been deleted.`, 'success')
+        this.$router.push({ name: 'Blueprints' })
+      }).catch(err => {
+        console.log(err)
+        this.$notify('notifications', 'There was a problem deleting your blueprint.', 'error')
       })
     },
     apiURL(force = true) {
@@ -478,6 +649,9 @@ export default {
         },
         theme: 'snow'
       })
+    },
+    isImperial() {
+      return this.$store.state.measurements == 'imperial'
     },
     copy() {
       this.$clipboard(this.shareURL)

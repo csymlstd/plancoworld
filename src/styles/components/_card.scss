@@ -42,6 +42,17 @@
     
   }
 
+  .subscribe {
+    display: none;
+    cursor: pointer!important;
+  }
+  
+  &:hover {
+    .subscribe {
+      display: inline-block;
+    }
+  }
+
   &.has-level-bottom {
     padding-bottom: 3rem;
   }

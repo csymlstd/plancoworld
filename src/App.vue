@@ -1,11 +1,13 @@
 <template>
   <div id="app">
-    <nav class="navbar" :class="{ 'transparent': isHome }">
+    <nav class="navbar" :class="{ 'transparent': isHome }" @click="menuOpen = false">
         <div class="navbar-brand">
           <router-link class="navbar-item logo" to="/">PlanCo World</router-link>
+          
+          <a class="navbar-link is-hidden-desktop" @click.stop="toggleMenu()"><span class="icon"><i class="far fa-lg" :class="{ 'fa-ellipsis-h': !menuOpen, 'fa-times': menuOpen }"></i></span></a>
         </div>
-
-        <div class="navbar-menu">
+        
+        <div :class="['navbar-menu', { 'is-active': menuOpen }]">
           <div class="navbar-start">
             <router-link :to="{ name: 'Parks' }" class="navbar-item">Parks</router-link>
             <router-link :to="{ name: 'Blueprints' }" class="navbar-item">Blueprints</router-link>
@@ -13,7 +15,7 @@
             <router-link :to="{ name: 'Kits' }" class="navbar-item">Kits</router-link>
             <router-link :to="{ name: 'Guides' }" class="navbar-item">Guides</router-link>
             <!-- <router-link :to="{ name: 'Audio' }" class="navbar-item">Audio</router-link> -->
-            <div class="navbar-item has-dropdown is-hoverable">
+            <div class="navbar-item has-dropdown is-hoverable is-hidden-touch">
               <a class="navbar-link"><span class="icon"><i class="far fa-lg fa-ellipsis-h"></i></span></a>
               <div class="navbar-dropdown is-right">
                 <a href="http://steamcommunity.com/app/493340/workshop/" target="_blank" class="navbar-item">Workshop</a>
@@ -24,10 +26,10 @@
             </div>
           </div>
           <div class="navbar-end">
-          <div class="navbar-item">
+          <div class="navbar-item" @click.stop>
             <Search @selected="go" :placeholder="placeholder"></Search>
           </div>
-          <div class="navbar-item has-dropdown is-hoverable" v-if="user.authenticated">
+          <div class="navbar-item has-dropdown is-hoverable is-hidden-touch" v-if="user.authenticated">
             <a class="navbar-link"><span class="icon"><i class="fas fa-plus-circle"></i></span></a>
             <div class="navbar-dropdown is-right">
               <router-link :to="{ name: 'ImportPark' }" class="navbar-item">Park</router-link>
@@ -58,7 +60,7 @@
 
     <footer class="main">
       <div class="container">
-        <p class="description">PlanCo World &copy; 2017. <br /> We are not affiliated with Planet Coaster, Frontier Developments or its licensors. <span class="planco" title="Buldcrefs">Trademarks</span> are the property of their respective owners.</p>
+        <p class="description">PlanCo World &copy; 2018. <br /> We are not affiliated with Planet Coaster, Frontier Developments or its licensors. <span class="planco" title="Buldcrefs">Trademarks</span> are the property of their respective owners.</p>
       </div>
     </footer>
   </div>
@@ -85,8 +87,8 @@ import '@/styles/vendors/fa/fa-solid.scss'
 import 'quill/dist/quill.core.css'
 import 'quill/dist/quill.snow.css'
 
-let words = ['coaster','castle','ride skin','park','scenario','blueprint','billboard','sci-fi toilet','Chief Beef','fireworks show','statue','custom lamp',
-      'gift shop', 'building', 'starter land', 'western scene', 'tropical park', 'spooky ride','ferris wheel','ufo','billboard kit', 'park you visit']
+let words = ['coasters','castles','ride skins','parks','scenarios','blueprints','billboards','sci-fi toilets','Chief Beef','fireworks shows','statues','lamps',
+      'gift shops', 'buildings', 'starter land', 'western scenes', 'tropical parks', 'spooky rides','ferris wheels','ufos','billboard kits', 'parks you\'ve visited']
 
 auth.checkAuth()
 
@@ -96,7 +98,8 @@ export default {
     return {
       user: auth.user,
       isHome: false,
-      placeholder: ''
+      placeholder: '',
+      menuOpen: false,
     }
   },
   watch: {
@@ -131,7 +134,10 @@ export default {
       this.$store.commit('toggleModal',{ modal: 'login' })
     },
     searchPlaceholder() {
-      this.placeholder = 'Search for a ' + words[Math.floor(Math.random()*words.length)]
+      this.placeholder = 'Search for ' + words[Math.floor(Math.random()*words.length)]
+    },
+    toggleMenu() {
+      this.menuOpen = this.menuOpen ? false : true
     }
   },
   created() {

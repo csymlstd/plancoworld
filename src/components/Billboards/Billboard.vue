@@ -1,5 +1,5 @@
 <template>
-  <article class="billboard">
+  <article :class="['billboard', {'is-vertical': isVertical }]">
     <section class="hero hero--tall">
       <img :src="billboard.media[0].url" v-if="billboard.media && billboard.media[0].type == 'image'" class="cover-photo" />
       <video class="cover-photo" muted autoplay loop>
@@ -50,7 +50,7 @@
             <ColorPalette v-model="billboard.colors" :editMode="editMode"></ColorPalette>
           </div>
 
-          <Filters :options="filterOptions" :readOnly="!editMode" ref="tags"></Filters>
+          <Filters :options="filterOptions" :selected="billboard.tags" @selected="billboard.tags = $event" :readOnly="!editMode" ref="tags"></Filters>
         </div>
 
         <div class="column">
@@ -101,7 +101,7 @@ export default {
   data () {
     return {
       loading: false,
-      billboard: {},
+      billboard: { tags: [] },
       shareURL: '',
       editMode: false,
       downloading: false,
@@ -123,6 +123,8 @@ export default {
           inline: true,
           force: true,
           tooltips: true,
+          min: 1,
+          max: 1
         },
         'billboards-context': {
           label: 'Context',
@@ -177,7 +179,10 @@ export default {
     },
     downloads () {
       return this.billboard.media.length > 0 ? this.billboard.media[0].downloads : 'N/A'
-    }
+    },
+    isVertical() {
+      return this.billboard.tags.filter(t => { return t.slug == 'vertical' }).length > 0
+    },
   },
   methods: {
     downloadBillboard () {
@@ -194,13 +199,10 @@ export default {
       this.loading = true
 
       API.fetch(this.apiURL(false)).then((billboard) => {
-        this.billboard = billboard
+        this.billboard = Object.assign({}, billboard)
         this.shareURL = `http://planco.world/billboards/${this.billboard.slug}`
         this.loading = false
         this.editMode = false
-        this.$nextTick(() => {
-          this.$refs.tags.setPopulated(this.billboard.tags)
-        })
 
       }).catch((err) => {
         API.handleError(err, 'billboards')

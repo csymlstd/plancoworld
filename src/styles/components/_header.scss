@@ -18,6 +18,22 @@ nav.navbar {
     background: transparent;
   }
 
+  @media(max-width: 1024px) {
+    background: color('accent');
+
+    .navbar-menu {
+      background: color('accent');
+
+      .navbar-start > a, .navbar-end > a, .navbar-dropdown > a, .navbar-link {
+        color: rgba(255,255,255,0.75);
+        &:hover, &.is-active  {
+          color: #fff;
+          background: transparent;
+        }
+      }
+    }
+  }
+
   .logo {
     font-weight: 600;
   }
@@ -54,6 +70,10 @@ nav.navbar {
 
       }
     }
+  }
+
+  .navbar-brand {
+    justify-content: space-between;
   }
 
   .navbar-brand, .navbar-start, .navbar-end {

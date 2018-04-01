@@ -93,7 +93,7 @@ export default {
   methods: {
     toggleToolbox(e) {
       e.preventDefault()
-      ToolBus.$emit('toggle', { tab: 'images', selectMode: ['images', 'videos'] })
+      ToolBus.$emit('toggle', { tab: 'images', selectMode: ['images', 'videos'], uid: this._uid })
     },
     // http://scratch99.com/web-development/javascript/convert-bytes-to-mb-kb/
     bytesToSize(bytes) {
@@ -358,7 +358,9 @@ export default {
     }
 
     // When a user selects an item from the toolbox while in select mode
-    ToolBus.$on('select', (media) => {
+    ToolBus.$on('select', (data) => {
+      if(this._uid !== data.uid) return
+      let media = data.media
       console.log(media)
       let allowed = Media.isAllowedType(media.contentType)
       if(allowed) {
