@@ -1,13 +1,15 @@
 <template>
   <div class="column is-one-third-desktop is-half-tablet">
     <div class="card has-level-bottom">
-      <div class="card-image" @click="viewBillboard">
-        <img :src="model.media[0].url" v-if="model.media[0] && model.media[0].type == 'image'" />
+      <div class="card-image" @click="viewBillboard" :style="{ 'background': getBackground(model.media[0]) }">
         <video autoplay loop muted>
           <source :src="model.media[0].url" v-if="model.media[0] && model.media[0].type == 'video'">
         </video>
         <div class="level bottom">
-          <div class="level-left"></div>
+          <div class="level-left">
+            <span v-if="model.media[0].type == 'image'" class="tag is-rounded is-light is-medium"><span class="icon"><i class="fas fa-image"></i></span></span>
+            <span v-if="model.media[0].type == 'video'" class="tag is-rounded is-light is-medium"><span class="icon"><i class="fas fa-film-alt"></i></span></span>
+          </div>
           <div class="level-right">
             <a @click.stop="downloadBillboard()" class="level-item subscribe"><span class="tag is-rounded is-primary is-medium" v-tooltip="`Download`"><span class="icon"><i class="fas fa-cloud-download"></i></span></span></a>
           </div>
@@ -56,6 +58,9 @@ export default {
   methods: {
     viewBillboard () {
       router.push({ name: 'Billboard', params: { slug: this.model.slug, id: this.model._id }})
+    },
+    getBackground(item) {
+        return `url('${item.url}')`
     },
     downloadBillboard () {
       this.downloading = true

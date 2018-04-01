@@ -1,7 +1,8 @@
 <template>
     <div class="carousel">
         <div class="carousel-item" :key="item._id" v-for="item in media">
-            <div class="carousel-image" v-if="item.type == 'image'" :style="getBackground(item)"></div>
+            <div class="carousel-video" v-if="item.type == 'video'"></div>
+            <div class="carousel-image" v-else :style="getBackground(item)"></div>
         </div>
     </div>
 </template>

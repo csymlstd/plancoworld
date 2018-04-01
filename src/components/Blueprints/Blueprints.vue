@@ -4,7 +4,7 @@
     <div class="container">
       <div class="level">
         <div class="level-left">
-          <h1 class="title level-item">Blueprints</h1>
+          <h1 class="title"><i class="fas fa-box-open"></i> Blueprints</h1>
         </div>
         <div class="level-right">
           <router-link :to="{ name: 'GuidePage', params: { slug: 'blueprints' }}" class="level-item">Read the Guide</router-link>

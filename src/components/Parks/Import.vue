@@ -26,8 +26,8 @@
 
         <Modal :class="['importFromSteam', 'is-wide']" :show="step == 0">
             <header>
-              <i class="fab fa-steam fa-3x"></i>
-              <h2 class="title">Import and Connect to Steam Workshop</h2>
+              
+              <h1 class="title"><i class="fab fa-steam fa-3x"></i> Import and Connect to Steam Workshop</h1>
               <p>Enter the URL to your Park in the Workshop to import your descriptions, tags, and photos.</p>
             </header>
             <main>
@@ -146,6 +146,7 @@ export default {
   data () {
     return {
       step: 0,
+      later: false,
       loading: {
         importing: false,
         importingMedia: false,
@@ -250,6 +251,7 @@ export default {
       this.$nextTick(() => { this.$refs.url.focus() })
     },
     importItem() {
+      if(this.later) return this.linkToWorkshop()
       this.loading.importing = true
       this.errors.import = false
 
@@ -295,6 +297,27 @@ export default {
         this.loading.importing = false
       })
     },
+    linkToWorkshop() {
+      this.loading.importing = true
+      this.errors.import = false
+
+      this.$v.url.$touch()
+      if(this.$v.url.$invalid) {
+        this.loading.importing = false
+        this.errors.import = true
+        this.$refs.url.focus()
+        return
+      }
+
+      API.post(this.apiURL()+'/link', { url: this.url }).then((park) => {
+        this.$notify('notifications', 'Park linked to workshop', 'success')
+        this.modals.linkToWorkshop.show = false
+        this.park.steam_id = park.steam_id
+      }).catch((err) => {
+        this.$notify('notifications', 'Could not link to Workshop', 'error')
+        console.log(err)
+      })
+    },
     attachEditor() {
       let wrapper = this.$el.querySelector('.editor')
       this.editor = new Quill(wrapper, {
@@ -317,6 +340,7 @@ export default {
       this.imported.tags = tags
     },
     importLater() {
+      this.later = true
       this.$v.url.$reset()
       this.step = 1
     },

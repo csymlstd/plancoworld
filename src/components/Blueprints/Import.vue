@@ -513,6 +513,14 @@ export default {
         media: [],
         tags: []
       }
+
+      this.$v.imported.$touch()
+      let isTagsValid = this.$refs.tags.isValid()
+      if(this.$v.imported.$invalid || !isTagsValid) {
+        new SmoothScroll().animateScroll(this.$el.querySelector('#form'), false, { offset: 100 })
+        return
+      }
+
       data.name = this.imported.title
       data.steam_id = this.imported.steam_id
       data.description = this.editor.container.firstChild.innerHTML
@@ -528,13 +536,6 @@ export default {
         media.push(m._id)
       })
       data.media = media
-
-      this.$v.imported.$touch()
-      let isTagsValid = this.$refs.tags.isValid()
-      if(!this.$v.imported.$valid || !isTagsValid) {
-        new SmoothScroll().animateScroll(this.$el.querySelector('#form'), false, { offset: 100 })
-        return
-      }
 
       API.post('blueprints', data).then((data) => {
         console.log(data)

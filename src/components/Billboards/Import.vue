@@ -24,13 +24,13 @@
     </section>
     <section class="section">
       <div class="columns is-centered">
-        <div class="form content for-billboard column is-three-quarters is-centered">
+        <div class="form content for-billboard column is-three-quarters is-centered" id="form">
 
          
           <div class="box">
             <h5 class="title is-5">Billboard Title</h5>
             <div class="control">
-              <input type="text" name="title" v-model="imported.title" class="input is-medium" placeholder="" />
+              <input type="text" name="title" v-model="imported.title" @input="$v.imported.title.$touch()" class="input is-medium" :class="{ 'is-danger': $v.imported.title.$error }" placeholder="" />
             </div>
           </div>
 
@@ -67,7 +67,7 @@
 
           <div class="field is-grouped">
             <div class="control"><a class="button is-medium is-primary" @click="addBillboard()">Save Billboard</a></div>
-            <div class="control"><a class="button is-medium is-white" @click="addBillboard()">Save &amp; Add Another</a></div>
+            <div class="control"><a class="button is-medium is-white" @click="addBillboard(true)">Save &amp; Add Another</a></div>
           </div>
 
 
@@ -78,6 +78,7 @@
 </template>
 
 <script>
+import SmoothScroll from 'smooth-scroll'
 import CreateKit from '@/components/Kits/CreateModal'
 import Modal from '@/components/ui/Modal'
 import Filters from '@/components/ui/Filters'
@@ -90,6 +91,8 @@ import Upload from '@/components/ui/Upload'
 import Quill from 'quill'
 import slug from 'slug'
 
+import { required } from 'vuelidate/lib/validators'
+
 export default {
   name: 'Import',
   components: {
@@ -98,6 +101,16 @@ export default {
     Autocomplete,
     Modal,
     CreateKit,
+  },
+  validations: {
+    url: {
+      required
+    },
+    imported: {
+      title: {
+        required,
+      }
+    }
   },
   data () {
     return {
@@ -120,7 +133,8 @@ export default {
           visible: true,
           force: true,
           min: 1,
-          max: 1
+          max: 1,
+          required: true,
         },
         'orientation': {
           label: 'Orientation',
@@ -128,6 +142,7 @@ export default {
           visible: true,
           force: true,
           tooltips: true,
+          required: true,
           description: 'Remember, <code>vertical</code> billboards should be rotated 90deg for proper alignment with the screens. We will rotate the video back to preview it properly.',
           min: 1,
           max: 1,
@@ -138,6 +153,7 @@ export default {
           visible: true,
           force: true,
           min: 1,
+          required: true,
         },
         'language': {
           label: 'Language',
@@ -197,25 +213,33 @@ export default {
       this.imported.media.push(media)
 
       if(Media.isImage(media.contentType)) {
-        this.$refs.tags.checkTag('59654fd912341326996d3358','billboards')
+        this.$refs.tags.checkTagById('59654fd912341326996d3358','billboards')
       } else if(Media.isVideo(media.contentType)) {
-        this.$refs.tags.checkTag('59654fdf12341326996d3359','billboards')
+        this.$refs.tags.checkTagById('59654fdf12341326996d3359','billboards')
       }
     },
     addTags(tags) {
       this.imported.tags = tags
     },
-    addBillboard() {
+    addBillboard(addAnother = false) {
       let data = {
         media: [],
         tags: []
       }
+
+      this.$v.imported.$touch()
+      let isTagsValid = this.$refs.tags.isValid()
+      if(this.$v.imported.$invalid || !isTagsValid) {
+        new SmoothScroll().animateScroll(this.$el.querySelector('#form'), false, { offset: 100 })
+        return
+      }
+
       data.name = this.imported.title
       data.slug = slug(this.imported.title)
       data.description = this.editor.container.firstChild.innerHTML
       
       let tags = []
-      this.park.tags.forEach((t) => {
+      this.imported.tags.forEach((t) => {
         tags.push(t._id)
       })
       data.tags = tags
@@ -224,16 +248,23 @@ export default {
       data.media.push(this.imported.media[0])
 
       API.post('billboards', data).then((data) => {
+        data = data
         this.$notify('notifications', 'Billboard created!', 'success')
 
         let addToKits = []
-        kits.forEach(kit => {
+        this.kits.forEach(kit => {
           kit.billboards.push(data._id)
           addToKits.push(API.put('kits/'+kit._id, { billboards: kit.billboards }))
         })
         return Promise.all(addToKits)
       }).then((addedToKits) => {
-        this.$notify('notifications', 'Billboard added to your Kits', 'success')
+        if(addedToKits.length > 0) this.$notify('notifications', 'Billboard added to your Kits', 'success')
+        if(addAnother) {
+          this.$router.push({ name: 'ImportBillboard' })
+          new SmoothScroll().animateScroll(document.body)
+        } else {
+          this.$router.push({ name: 'Billboard', params: { slug: data.slug }})
+        } 
       }).catch((err) => {
         console.log(err)
         this.$notify('notifications', 'Error creating Billboard', 'error')

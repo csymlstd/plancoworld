@@ -39,6 +39,7 @@ section.filters {
     position: relative;
     max-height: 275px;
     overflow: scroll;
+    overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
   }
 }

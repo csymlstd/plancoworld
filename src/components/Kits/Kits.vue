@@ -5,8 +5,8 @@
     <div class="container">
       <div class="level">
         <div class="level-left">
-          <h1 class="title level-item">Kits</h1>
-          <div class="level-item">&bull; Collections of Parks, Blueprints and Billboards</div>
+          <h1 class="title"><i class="fas fa-box-full"></i> Kits</h1>
+          <div class="">&nbsp; Collections of Parks, Blueprints and Billboards</div>
         </div>
         <div class="level-right">
           <router-link :to="{ name: 'GuidePage', params: { slug: 'kits' }}" class="level-item">Read the Guide</router-link>
