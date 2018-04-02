@@ -48,7 +48,7 @@
           <Loader v-if="loading"></Loader>
           <Blueprint :model="blueprint" :key="blueprint._id" v-for="blueprint in blueprints"></Blueprint>
           <div class="column" v-if="blueprints.length == 0 && loading == false" v-cloak>
-            <div class="notification is-warning">There aren't any Blueprints that match what you're looking for. You should build it!</div>
+            <div class="notification is-warning text-center">There aren't any Blueprints that match what you're looking for. You should build it! <br /><br /> <router-link :to="{ name: 'ImportBlueprint' }" class="button is-dark is-medium" v-if="isLoggedIn()">Add a Blueprint</router-link></div>
           </div>
         </div>
         <Pagination :total="pagination.total" :current="pagination.current" :pages="pagination.pages" @goTo="goToPage"></Pagination>

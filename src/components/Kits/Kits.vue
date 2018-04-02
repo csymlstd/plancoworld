@@ -6,7 +6,7 @@
       <div class="level">
         <div class="level-left">
           <h1 class="title"><i class="fas fa-box-full"></i> Kits</h1>
-          <div class="">&nbsp; Collections of Parks, Blueprints and Billboards</div>
+          <div class="sub-title">Kickstart a park with a collection of scenery, buildings, and billboards</div>
         </div>
         <div class="level-right">
           <router-link :to="{ name: 'GuidePage', params: { slug: 'kits' }}" class="level-item">Read the Guide</router-link>
@@ -57,7 +57,7 @@
           <Kit :model="kit" :key="kit._id" v-for="(kit, index) in kits" v-if="index > 3"></Kit>
 
           <div class="column" v-if="kits.length == 0 && loading == false" v-cloak>
-            <div class="notification is-warning">There aren't any Kits that match what you're looking for. You should build it!</div>
+            <div class="notification is-warning text-center">There aren't any Kits that match what you're looking for. You should create it! <br /> Go to a park, billboard, or blueprint and create a kit.</div>
           </div>
         </div>
         <Pagination :total="pagination.total" :current="pagination.current" :pages="pagination.pages" @goTo="goToPage"></Pagination>
@@ -231,6 +231,11 @@ export default {
     background-size: auto 100%!important;
     background-repeat: no-repeat!important;
     background-position: 150px center!important;
+  }
+
+  .sub-title {
+    transform: translateY(4px) translateX(15px);
+    opacity: 0.75;
   }
 
   .hero .title {

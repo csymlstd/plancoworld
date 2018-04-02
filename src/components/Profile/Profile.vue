@@ -23,7 +23,7 @@
                 </div>
                 <div class="level-right">
                     <button class="button level-item is-medium is-dark" @click="copy" v-tooltip="{ content: 'Copy Profile URL'  }"><span class="icon"><i class="fas fa-link"></i></span></button>
-                    <a :href="''" target="_blank" class="button level-item is-medium is-primary"><span class="icon"><i class="fab fa-steam"></i></span> <span>Follow on Steam</span></a>
+                    <a :href="profileUrl" target="_blank" class="button level-item is-medium is-primary"><span class="icon"><i class="fab fa-steam"></i></span> <span>Follow on Steam</span></a>
 
                     <div class="field level-item has-addons" v-if="isOwner()">
                         <div class="control"><a @click="toggleEditMode" class="button is-warning is-medium construction">Edit</a></div>
@@ -72,12 +72,15 @@ export default {
         },
         username() {
             return this.$route.params.username
+        },
+        profileUrl() {
+            return this.profile.oauth.steam.profileUrl
         }
     },
     data() {
         return {
             editMode: false,
-            profile: {},
+            profile: { oauth: { steam: {}}},
             active: 'parks',
             selectedTags: [],
             filterOptions: {

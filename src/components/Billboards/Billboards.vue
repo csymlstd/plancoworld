@@ -43,7 +43,7 @@
         <Loader v-if="loading"></Loader>
         <Billboard :model="billboard" :key="billboard._id" v-for="billboard in billboards"></Billboard>
         <div class="column" v-if="billboards.length == 0 && loading == false" v-cloak>
-          <div class="notification is-warning">There aren't any Billboards that match what you're looking for. You should create it!</div>
+          <div class="notification is-warning text-center">There aren't any Billboards that match what you're looking for. You should create it! <br /><br /> <router-link :to="{ name: 'ImportBillboard' }" class="button is-dark is-medium" v-if="isLoggedIn()">Add a Billboard</router-link></div>
         </div>
       </div>
       <Pagination :total="pagination.total" :current="pagination.current" :pages="pagination.pages" @goTo="goToPage"></Pagination>

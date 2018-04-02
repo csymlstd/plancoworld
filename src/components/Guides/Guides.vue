@@ -30,6 +30,13 @@
         <router-view>
             <!-- Wiki page will be displayed here -->
         </router-view>
+
+        <div class="box">
+          <h2 class="title">Hayo!</h2>
+          <p>We are looking for PlanCo fans to write guides. If you would like to write, provide source data, or have suggestions of other guides send us an email at <a href="mailto:guides@planco.world">guides@planco.world</a></p>
+          <br />
+          <p>Our goal is to create a single source for everything Planet Coaster, for you, by you.</p>
+        </div>
       </div>
 
     </div>
