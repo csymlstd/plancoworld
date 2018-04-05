@@ -135,8 +135,10 @@ export default {
               let allowed = Media.isAllowedType(file.type)
               if(!allowed) return this.$notify('notifications',`File type ${file.type} is not permitted.`, 'error')
               
-              allowed = Media.isFileExtension(Media.getExtension(file.name)) && this.allowFiles
-              if(!allowed) return this.$notify('notifications',`File type ${Media.getExtension(file.name)} is not permitted.`, 'error')
+              if(this.allowFiles) {
+                allowed = Media.isFileExtension(Media.getExtension(file.name))
+                if(!allowed) return this.$notify('notifications',`File type ${Media.getExtension(file.name)} is not permitted.`, 'error')
+              }
 
               if(this.transcode) {
                 console.log('checking if can transcode '+file.type)

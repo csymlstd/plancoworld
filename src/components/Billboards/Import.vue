@@ -156,6 +156,12 @@ export default {
           min: 1,
           max: 1,
         },
+        'screen-sizes': {
+          label: 'Screen Sizes',
+          type: 'list',
+          visible: true,
+          description: 'Recommended screens for this billboard'
+        },
         'billboards-context': {
           label: 'Context',
           type: 'list',

@@ -5,13 +5,13 @@ const fileTypes = ['application/pdf','application/octet-stream','application/pos
 const audioTypes = ['audio/webm','audio/ogg','audio/mpeg3','audio/x-mpeg-3','audio/wav','audio/x-wav','audio/x-ms-wma','audio/aac','audio/mp4','audio/flac']
 const videoTypes = ['video/webm']
 const transcoderTypes = ['video/mp4']
-const allowedTypes = imageTypes.concat(fileTypes, audioTypes, videoTypes, transcoderTypes)
+const allowedTypes = imageTypes.concat(fileTypes, audioTypes, videoTypes)
 
 const imageExtensions = ['png','jpg','jpeg','gif','tiff']
 const fileExtensions = ['pdf','sketch','psd','ai']
 const audioExtensions = ['webm','ogg','mp3','wav','wma','aac','m4a','flac']
-const videoExtensions = ['webm','mp4']
-const allowedExtensions = imageExtensions.concat(fileExtensions, audioExtensions, videoExtensions)
+const videoExtensions = ['webm']
+const allowedExtensions = imageExtensions.concat(fileExtensions, videoExtensions)
 
 const allowedFolders = ['billboards', 'parks', 'blueprints', 'users', 'audio']
 
