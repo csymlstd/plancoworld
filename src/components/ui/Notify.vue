@@ -22,7 +22,7 @@ Vue.component('vs-notify', {
 		'<div :class="[\'vs-notify\', group]" :style="styles"><transition-group :name="trans" mode="out-in">'+
 			'<div :class="it.type" v-for="it in list" :key="it.id">'+
 				'<slot name="body" :class="it.type" :item="it" :close="function(){ end(it) }">'+
-					'<span @click.stop="end(it)" class="icon"><i class="fas fa-check"></i></span>'+
+					'<span @click.stop="end(it)" class="icon"><i :class="{ \'fas\': true, \'fa-exclamation-triangle\': it.type == \'ntf error\', \'fa-check\': it.type == \'ntf success\', \'fa-info-circle\': it.type == \'ntf\' }"></i></span>'+
 					'<span @click.stop="end(it)" v-html="it.text"></span>'+
 				'</slot>'+
 			'</div>'+

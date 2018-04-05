@@ -14,7 +14,27 @@
         <router-link :to="{ name: 'Guides' }" class="button is-primary is-medium" data-cycle>Explore Guides</router-link>
         </div>
 
+        <div class="box home-promos">
+          <div>
+            <strong class="has-text-grey">New DLC &amp; v1.6!</strong>
+            <br />
+            <router-link :to="{ name: 'GuidePage', params: { slug: 'studios-pack-v1-6' } }">See what's new in the<br /> Studios Pack and 1.6 update.</router-link>
+          </div>
+          <div>
+            <strong class="has-text-grey">Welcome to PlanCo World Beta!</strong>
+            <br />
+            <a href="http://reddit.com/planetcoaster">Read our debut on Reddit<br /> to learn what you can do!</a>
+          </div>
+        </div>
+
       </div>
+    </div>
+    <div class="home-gallery">
+      <div class="carousel-cell" style="background: url('/assets/images/home-studios-1.jpg');" ></div>
+      <div class="carousel-cell" style="background: url('/assets/images/home-adventure-1.jpg');" ></div>
+      <div class="carousel-cell" style="background: url('/assets/images/home-spooky-3.jpg');" ></div>
+      <div class="carousel-cell" style="background: url('/assets/images/home-adventure-2.jpg');" ></div>
+      <div class="carousel-cell" style="background: url('/assets/images/home-spooky-2.jpg');" ></div>
     </div>
   </main>
 </template>
@@ -24,6 +44,7 @@ import '@/styles/components/_home.scss'
 import auth from '@/services/auth'
 import Login from '@/components/Login'
 import {store} from '@/store'
+import Flickity from 'flickity'
 
 export default {
   name: 'Home',
@@ -34,7 +55,8 @@ export default {
   data () {
     return {
       user: this.$store.state.user,
-      cycle: 3
+      cycle: 3,
+      gallery: false,
     }
   },
   mounted() {
@@ -61,6 +83,12 @@ export default {
       }, 1200 );
     }
 
+    this.gallery = new Flickity('.home-gallery', {
+      pageDots: false,
+      prevNextButtons: false,
+      pauseAutoPlayOnHover: false,
+      autoPlay: 6000,
+    })
 
   }
 }

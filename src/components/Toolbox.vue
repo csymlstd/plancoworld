@@ -33,10 +33,10 @@
             <Blueprint :model="blueprint" :key="blueprint._id" v-for="blueprint in panes[active].data.blueprints" v-tooltip="{ content: selectMode ? 'Select this Blueprint' : null }"></Blueprint>
           </div>
           <div class="toolbox--list-images columns is-multiline" v-if="active == 'images'">
-            <ImageThumbnail :key="image._id" :media="image" v-for="image in panes[active].data.media" @select="select(image)"></ImageThumbnail>
+            <ImageThumbnail @remove="removeMedia($event, key, 'images')" :key="image._id" :media="image" v-for="(image, key) in panes[active].data.media" @select="select(image)"></ImageThumbnail>
           </div>
           <div class="toolbox--list-videos columns is-multiline" v-if="active == 'videos'">
-            <VideoThumbnail :key="video._id" :media="video" v-for="video in panes[active].data.media" @select="select(video)"></VideoThumbnail>
+            <VideoThumbnail @remove="removeMedia($event, key, 'videos')" :key="video._id" :media="video" v-for="(video, key) in panes[active].data.media" @select="select(video)"></VideoThumbnail>
           </div>
 
           <Pagination :total="pagination.total" :current="pagination.current" :pages="pagination.pages" @goTo="goToPage" v-if="pagination.pages > 1"></Pagination>
@@ -194,6 +194,16 @@ export default {
       this.pagination.current = page
       this.getParks().then(() => {
         this.loading = false
+      })
+    },
+    removeMedia(media, key, type) {
+      console.log(media._id, key, type, this.panes[type])
+      this.$delete(this.panes[type].data.media, key)
+
+      API.delete('media/'+media._id).then(response => {
+        this.$notify('notifications', 'Media removed', 'success')
+      }).catch(() => {
+        this.$notify('notifications', 'Could not remove media', 'error')
       })
     },
     canSave(model) {

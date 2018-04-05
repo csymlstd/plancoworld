@@ -6,3 +6,13 @@
   display: flex;
   padding: 0 1rem;
 }
+
+.push-down-none { margin-bottom: 0rem!important; }
+.push-down-single { margin-bottom: 1rem!important; }
+.push-down-double { margin-bottom: 2rem!important; }
+.push-down-triple { margin-bottom: 3rem!important; }
+
+.push-up-none { margin-top: 0rem!important; }
+.push-up-single { margin-top: 1rem!important; }
+.push-up-double { margin-top: 2rem!important; }
+.push-up-triple { margin-top: 3rem!important; }

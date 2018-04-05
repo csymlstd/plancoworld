@@ -20,8 +20,8 @@
               <div class="navbar-dropdown is-right">
                 <a href="http://steamcommunity.com/app/493340/workshop/" target="_blank" class="navbar-item">Workshop</a>
                 <a href="https://reddit.com/r/PlanetCoaster/" target="_blank" class="navbar-item">r/PlanetCoaster</a>
+                <a href="http://forums.planetcoaster.com" target="_blank" class="navbar-item">Forums</a>
                 <hr class="dropdown-divider" />
-                <a href="https://patreon.com/plancoworld" target="_blank" class="navbar-item">Give Support</a>
                 <a href="https://reddit.com/r/PlanCoWorld/" target="_blank" class="navbar-item">r/PlanCoWorld</a>
               </div>
             </div>

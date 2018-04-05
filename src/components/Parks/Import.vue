@@ -190,6 +190,8 @@ export default {
           label: 'Starting Points',
           type: 'toggle',
           visible: true,
+          required: true,
+          min: 1,
           max: 1,
           showDescriptionsClosed: true,
         },
@@ -346,21 +348,19 @@ export default {
     },
     addPark() {
       let data = {
-        media: []
+        media: [],
+        tags: [],
       }
       data.name = this.imported.title
       data.steam_id = this.imported.steam_id
       data.description = this.editor.container.firstChild.innerHTML
       
-      let tags = []
       this.imported.tags.forEach((t) => {
-        tags.push(t._id)
+        data.tags.push(t._id)
       })
-      data.tags = tags
-
-      for(let i=0;i<this.imported.media.length;i++) {
-        data.media.push(this.imported.media[i]._id)
-      }
+      this.imported.media.forEach((t) => {
+        data.media.push(t._id)
+      })
 
       this.$v.imported.$touch()
       let isTagsValid = this.$refs.tags.isValid()

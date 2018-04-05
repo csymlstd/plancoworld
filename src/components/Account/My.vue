@@ -34,14 +34,18 @@
       <div class="notification is-warning" v-if="this.errors.email">{{ this.errors.email }}</div>
     </div>
 
+    <div class="box">
+      You can request a <a href="#">one-time login link</a> sent to the email address above at any time. This will let you log back in to PlanCo World if you lose access to your Steam account.
+    </div>
+
     <div class="field">
     <div class="field-body">
       <div class="field">
         <label class="label">Distance Unit</label>
         <div class="control">
           <select v-model="user.settings.distanceUnit" class="input is-medium">
-            <option value="ft">Feet (ft)</option>
             <option value="m">Meters (m)</option>
+            <option value="ft">Feet (ft)</option>
             <option value="yd">Yards (yd)</option>
           </select>
         </div>
@@ -57,14 +61,13 @@
           </select>
         </div>
       </div>
+
+
     </div>
     </div>
 
+    <div class="notification is-warning"><p>The unit conversion feature is not quite ready yet. Save your preferred settings and you'll be ready once it is! For the time being, you'll need to use meters and miles per hour on your creations.</p></div>
 
-
-    <div class="box">
-      You can request a <a href="#">one-time login link</a> sent to the email address above at any time. This will let you log back in to PlanCo World if you lose access to your Steam account.
-    </div>
 
     <div class="ui divider"></div>
 
@@ -133,6 +136,7 @@ export default {
         console.log(updatedUser)
         this.updating = false
         this.$notify('notifications', 'Profile saved', 'success')
+        this.$store.dispatch('refreshUser')
       }).catch((err) => {
         console.log(err)
         this.updating = false
@@ -149,11 +153,12 @@ export default {
       API.put('user', { avatar: media._id }).then(() => {
         this.updating = false
         this.uploadAvatar = false
-        this.$notify('notifications', 'Avatar saved', 'success');
+        this.$notify('notifications', 'Avatar saved', 'success')
+        this.$store.dispatch('refreshUser')
       }).catch((err) => {
         console.log(err)
         this.updating = false
-        this.$notify('notifications', 'Error saving avatar', 'error');
+        this.$notify('notifications', 'Error saving avatar', 'error')
       })
     }
   },

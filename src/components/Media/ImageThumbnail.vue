@@ -1,14 +1,14 @@
 <template>
   <div class="column is-half thumbnail">
     <div class="image is-16by9" @click="select()">
-      <img :src="media.url" />
+      <img :src="getThumbnail()" />
     </div>
     <div class="level">
       <div class="level-left">
         <div class="tag level-item" v-if="media.external">External</div>
       </div>
       <div class="level-right">
-        <a class="icon level-item" v-tooltip="'Delete Image'"><i class="fas fa-trash"></i></a>
+        <a @click="$emit('remove', media)" class="icon level-item" v-tooltip="'Delete Image'"><i class="fas fa-trash"></i></a>
       </div>
     </div>
 
@@ -34,6 +34,9 @@ export default {
   methods: {
     select () {
       this.$emit('select')
+    },
+    getThumbnail() {
+      return this.media.alternates.indexOf('600w') > -1 ? Media.getAlternateUrl('600w', this.media.url) : this.media.url
     }
   },
   watch: {

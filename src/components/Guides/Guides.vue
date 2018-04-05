@@ -21,7 +21,7 @@
 
             <aside class="menu">
             <ul class="menu-list">
-                <li :key="page._id" v-for="page in getPagesByCategory(category._id)"><router-link :to="{ name: 'GuidePage', params: { slug: page.slug }}">{{ page.name }}</router-link></li>
+                <li :key="page._id" v-for="page in getPagesByCategory(category._id)"><router-link :to="{ name: 'GuidePage', params: { slug: page.slug }}"><span v-html="page.name"></span></router-link></li>
             </ul>
             </aside>
         </div>
@@ -33,9 +33,9 @@
 
         <div class="box">
           <h2 class="title">Hayo!</h2>
-          <p>We are looking for PlanCo fans to write guides. If you would like to write, provide source data, or have suggestions of other guides send us an email at <a href="mailto:guides@planco.world">guides@planco.world</a></p>
+          <p>We are looking for PlanCo fans to write guides. If you would like to write, provide source data, or have suggestions of other guides send an email to <a href="mailto:guides@planco.world">guides@planco.world</a></p>
           <br />
-          <p>Our goal is to create a single source for everything Planet Coaster, for you, by you.</p>
+          <p>Our goal is to create a single organized source for everything Planet Coaster!</p>
         </div>
       </div>
 

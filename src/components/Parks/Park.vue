@@ -8,7 +8,7 @@
           <div class="level-left">
             <Filters :options="heroFilterOptions" :selected="park.tags" :inline="true" :readOnly="true" :large="true" ref="heroTags" class="level-item"></Filters>
             <div class="tags selected-tags level-item">
-              <a v-if="park.billboards.length > 0" href="#billboards" class="tag is-rounded is-white is-large" data-scroll v-tooltip="'Download the custom Billboards for the best experience'"><span class="icon"><i class="fas fa-exclamation"></i></span> <span>Billboards</span></a>
+              <a v-if="park.billboards.length > 0" href="#billboards" class="tag is-rounded is-white is-large" data-scroll v-tooltip="'Download the custom Billboards for the best experience'"><span class="icon"><i class="fas fa-sign"></i></span> <span>Billboards</span></a>
             </div>
           </div>
           <div class="level-right">
@@ -25,7 +25,7 @@
       <div class="level is-mobile">
         <div class="level-left">
           <h1 class="title level-item"><router-link :to="{ name: 'Parks' }">Parks</router-link></h1>
-          <h2 class="title level-item"> / {{ park.name ? park.name : '' | truncate(45) }}</h2>
+          <h2 class="title level-item" :title="park.name"> / {{ park.name ? park.name : '' | truncate(45) }}</h2>
         </div>
         <div class="level-right">
           <button class="button level-item is-medium is-dark" @click="copy" v-tooltip="{ content: 'Copy Park URL'  }"><span class="icon"><i class="fas fa-link"></i></span></button>
@@ -70,16 +70,17 @@
         <div class="box park-info">
           <div class="collaborators" :class="{ 'edit-mode': editMode }">
             <Creator :user="park.user"></Creator>
-            <a class="profile profile--mini" v-if="editMode" v-tooltip="'Add a Collaborator'">
+            <!-- <a class="profile profile--mini" v-if="editMode" v-tooltip="'Add a Collaborator'">
               <div class="avatar is-new"><i class="fas fa-plus"></i></div>
               <div class="user">Collaborator</div>
-            </a>
+            </a> -->
           </div>
           <hr />
-          <ReactionMeter />
+          <ReactionMeter :reactions="park.reactions" :reactOnly="true" />
         </div>
 
         <div class="box" v-if="park.colors.length > 0 || editMode">
+          <h4 v-if="editMode">Color Palette</h4>
           <ColorPalette v-model="park.colors" :editMode="editMode"></ColorPalette>
         </div>
 
@@ -111,7 +112,7 @@
 
         <div class="level" id="billboards" v-if="park.billboards.length > 0 || editMode">
           <div class="level-left">
-            <h3 class="level-item">Billboards</h3>
+            <h3 class="level-item"><i class="fas fa-sign"></i>&nbsp; Billboards</h3>
             <!-- <div class="level-item"><a @click="openModal('downloadBillboards')" class="is-text">Download All ({{ park.billboards.length }})</a></div> -->
           </div>
           <div class="level-right">
@@ -121,7 +122,7 @@
         </div>
 
         <div class="columns cards is-multiline">
-          <Billboard :model="billboard" :key="billboard._id" v-for="billboard in park.billboards"></Billboard>
+          <Billboard :model="billboard" @remove="removeFromPark" :editMode="editMode" :key="billboard._id" v-for="billboard in park.billboards"></Billboard>
         </div>
 
         <Modal :class="{ 'downloadBillboards': true }" @close="closeModal('downloadBillboards')" :show="modalOpen('downloadBillboards')">
@@ -133,15 +134,12 @@
             <div class="field">
               <Search @selected="addToPark($event, 'addBillboard')" placeholder="Search for Billboards" :models="['billboards']"></Search>
             </div>
-            <div class="field">
-              <a class="button is-primary is-medium">Add to Park</a>
-            </div>
           </div>
         </Modal>
 
         <div class="level" v-if="park.blueprints.length > 0 || editMode">
           <div class="level-left">
-            <h3 class="ui header level-item">Blueprints</h3>
+            <h3 class="ui header level-item"><i class="fas fa-box-open"></i>&nbsp; Blueprints</h3>
           </div>
           <div class="level-right">
             <a @click="openModal('addBlueprint')" class="button is-white is-medium" v-if="editMode"><span class="icon"><i class="fas fa-plus has-text-primary"></i></span> <span>Add Blueprint</span></a>
@@ -149,16 +147,13 @@
         </div>
 
         <div class="columns cards is-multiline loader--parent">
-          <Blueprint :model="blueprint" :key="blueprint._id" v-for="blueprint in park.blueprints"></Blueprint>
+          <Blueprint :model="blueprint" @remove="removeFromPark" :editMode="editMode" :key="blueprint._id" v-for="blueprint in park.blueprints"></Blueprint>
         </div>
 
         <Modal :class="{ 'addBlueprint': true }" @close="closeModal('addBlueprint')" :show="modalOpen('addBlueprint')">
           <div class="form">
             <div class="field">
               <Search @selected="addToPark($event, 'addBlueprint')" placeholder="Search for Blueprints" :models="['blueprints']"></Search>
-            </div>
-            <div class="field">
-              <a class="button is-primary is-medium">Add to Park</a>
             </div>
           </div>
         </Modal>
@@ -394,7 +389,7 @@ export default {
     addToPark(match, modal) {
       this.modals[modal].loading = true
 
-      let plural = match._type+'s'
+      let plural = match._source.type+'s'
       let model = this.park[plural]
       let data = {}
 
@@ -412,6 +407,28 @@ export default {
 
       })
     },
+    removeFromPark(options) {
+      let title
+      for(let i=0;i<this.park[options.model].length;i++) {
+        if(this.park[options.model][i]._id == options.id) {
+          title = this.park[options.model][i].name
+          this.park[options.model].splice(i, 1)
+          break
+        }
+      }
+
+      let update = []
+      this.park[options.model].forEach(m => {
+        update.push(m._id)
+      })
+
+      API.put(this.apiURL(), { [options.model]: update }).then((park) => {
+        this.park.status = park.status
+        this.$notify('notifications', `${title} removed from park`, 'success')
+      }).catch(() => {
+        this.$notify('notifications', 'There was a problem removing that from the park', 'error')
+      })
+    },
     getTagGroup(model) {
       return this.$store.getters.getTagGroup(model)
     },
@@ -424,8 +441,7 @@ export default {
         this.modals.linkToWorkshop.show = false
         this.park.steam_id = park.steam_id
       }).catch((err) => {
-        this.$notify('notifications', 'Could not link to Workshop', 'error')
-        console.log(err)
+        this.$notify('notifications', err.response.data.message || 'Could not link to Workshop', 'error')
       })
     },
     addPhoto(newMedia) {
@@ -465,7 +481,7 @@ export default {
         this.park.status = park.status
         this.$notify('notifications', 'Photo removed', 'success')
       }).catch(() => {
-        
+        this.$notify('notifications', 'There was a problem removing that photo', 'error')
       })
     },
     removeMap() {
@@ -475,7 +491,7 @@ export default {
         this.park.status = park.status
         this.$notify('notifications', 'Map removed', 'success')
       }).catch(() => {
-        
+        this.$notify('notifications', 'There was a problem removing that map', 'error')
       })
     },
     toggleStatus() {
@@ -516,7 +532,6 @@ export default {
         this.park = park
         this.shareURL = `http://planco.world/parks/${this.park.slug}`
         this.loading = false
-        this.editMode = false
 
       }).catch((err) => {
         API.handleError(err, 'parks')

@@ -3,7 +3,7 @@
     <section class="hero hero--tall" :style="{ 'background-image': 'url('+(imported.media.length > 0 ? imported.media[0].url : '')+')' }">
       <div class="container">
         <Loader v-if="loading.importingMedia"></Loader>
-        <Upload @uploaded="addPhoto" folder="blueprints" :instant="true" :isDark="true" instructions="Drop your blueprint photos here, or click to browse your computer" v-if="imported.media.length == 0"></Upload>
+        <Upload @uploaded="addPhoto" folder="blueprints" :allowFiles="false" :instant="true" :isDark="true" instructions="Drop your blueprint photos here, or click to browse your computer" v-if="imported.media.length == 0"></Upload>
 
       </div>
       <!-- <img :src="imported.media ? imported.media[0].url : ''" v-if="imported.media.length > 0" class="cover-photo" @load="$event.target.classList.toggle('is-active')" /> -->
@@ -89,11 +89,11 @@
                 </div>
                 <div class="column" v-tooltip="'Fear'">
                   <div class="reaction is-large scary"></div>
-                  <div class="control"><input type="number" class="input" :value="value" min="0" max="10" step="0.01" v-model="imported.stats.fear" /></div>
+                  <div class="control"><input type="number" class="input" min="0" max="10" step="0.01" v-model="imported.stats.fear" /></div>
                 </div>
                 <div class="column" v-tooltip="'Nausea'">
                   <div class="reaction is-large nauseating"></div>
-                  <div class="control"><input type="number" class="input" :value="value" min="0" max="10" step="0.01" v-model="imported.stats.nausea" /></div>
+                  <div class="control"><input type="number" class="input" min="0" max="10" step="0.01" v-model="imported.stats.nausea" /></div>
                 </div>
               </div>
             </div>
@@ -124,11 +124,10 @@
                   <label class="label">Length</label>
                   <div class="field has-addons">
                     <div class="control">
-                      <input type="number" class="input" v-model="imported.stats.length" />
+                      <input type="number" class="input" v-model="imported.stats.trackLength" />
                     </div>
                     <div class="control">
-                      <div class="button is-static" v-if="isImperial()">feet</div>
-                      <div class="button is-static" v-else>meters</div>
+                      <div class="button is-static">meters</div>
                     </div>
                   </div>
                 </div>
@@ -139,8 +138,7 @@
                       <input type="number" max="149" class="input" v-model="imported.stats.maxSpeed" />
                     </div>
                     <div class="control">
-                      <div class="button is-static" v-if="isImperial()">mph</div>
-                      <div class="button is-static" v-else>kmh</div>
+                      <div class="button is-static">mph</div>
                     </div>
                   </div>
                 </div>
@@ -151,8 +149,7 @@
                       <input type="number" max="149" class="input" v-model="imported.stats.avgSpeed" />
                     </div>
                     <div class="control">
-                      <div class="button is-static" v-if="isImperial()">mph</div>
-                      <div class="button is-static" v-else>kmh</div>
+                      <div class="button is-static">mph</div>
                     </div>
                   </div>
                 </div>
@@ -166,8 +163,7 @@
                       <input type="number" class="input" v-model="imported.stats.biggestDrop" />
                     </div>
                     <div class="control">
-                      <div class="button is-static" v-if="isImperial()">feet</div>
-                      <div class="button is-static" v-else>meters</div>
+                      <div class="button is-static">meters</div>
                     </div>
                   </div>
                 </div>
@@ -339,6 +335,19 @@ export default {
           excitement: 0,
           fear: 0,
           nausea: 0,
+          duration: '',
+          trackLength: '',
+          maxSpeed: '',
+          avgSpeed: '',
+          biggestDrop: '',
+          inversions: '',
+          airtimeCount: '',
+          airtimeDuration: '',
+          maxLateralG: '',
+          maxVerticalG: '',
+          minVerticalG: '',
+          maxForwardG: '',
+          minForwardG: '',
         }
       },
       wasImported: false,
@@ -475,9 +484,9 @@ export default {
         this.loading.importing = false
       }).catch((err) => {
         console.log(err)
+        this.errors.import = 'There was an error importing'
         if(err.response && err.response.data.message) this.errors.import = err.response.data.message
         this.loading.importing = false
-        this.errors.import = true
       })
     },
     attachEditor() {
@@ -511,7 +520,7 @@ export default {
     addBlueprint() {
       let data = {
         media: [],
-        tags: []
+        tags: [],
       }
 
       this.$v.imported.$touch()
@@ -523,19 +532,17 @@ export default {
 
       data.name = this.imported.title
       data.steam_id = this.imported.steam_id
+      data.colors = this.imported.colors
+      data.stats = this.imported.stats
       data.description = this.editor.container.firstChild.innerHTML
       
-      let tags = []
-      this.park.tags.forEach((t) => {
-        tags.push(t._id)
+      this.imported.tags.forEach((t) => {
+        data.tags.push(t._id)
       })
-      data.tags = tags
 
-      let media = []
       this.imported.media.forEach((m) => {
-        media.push(m._id)
+        data.media.push(m._id)
       })
-      data.media = media
 
       API.post('blueprints', data).then((data) => {
         console.log(data)

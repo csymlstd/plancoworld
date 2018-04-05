@@ -3,8 +3,13 @@
     <div class="card has-level-bottom">
       <a class="card-image" :style="{ 'backgroundImage': `url('${thumbnail}')` }" @click="viewKit">
         <div class="level bottom">
-          <div class="level-left"><div class="level-item"><Filters :options="tagOptions" :selected="model.tags" :inline="true" :readOnly="true" ref="tags"></Filters></div></div>
-          <div class="level-right"><div class="level-item" v-if="isSaved()"><span class="tag is-rounded is-warning is-medium" v-tooltip="'Saved to Toolbox'"><span class="icon"><i class="fas fa-archive"></i></span></span></div></div>
+          <div class="level-left">
+            <a @click.stop="$emit('remove', { id: model._id, model: 'kits' })" v-if="editMode" class="level-item"><span class="tag is-rounded is-warning is-medium"><i class="fas fa-times"></i>&nbsp; Remove</span></a>
+            <div class="level-item"><Filters :options="tagOptions" :selected="model.tags" :inline="true" :readOnly="true" ref="tags"></Filters></div>
+          </div>
+          <div class="level-right">
+            <div class="level-item" v-if="isSaved()"><span class="tag is-rounded is-warning is-medium" v-tooltip="'Saved to Toolbox'"><span class="icon"><i class="fas fa-archive"></i></span></span></div>
+          </div>
         </div>
       </a>
       <div class="card-content">
@@ -15,7 +20,7 @@
               <Creator :user="model.user" class="level-item"></Creator>
             </div>
             <div class="level-right">
-              <Reaction :model="model"></Reaction>
+              <Reaction :model="model" :type="'kits'"></Reaction>
               <!-- <div class="vote level-item"><span class="icon"><i class="fas fa-heart"></i></span><span class="count">{{ model.votes.upTotal || 0 }}</span></div> -->
             </div>
           </div>
@@ -43,6 +48,7 @@ export default {
   },
   props: {
     model: {},
+    editMode: false,
   },
   data () {
     return {

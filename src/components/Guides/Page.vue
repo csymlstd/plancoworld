@@ -7,9 +7,7 @@
         <h1 v-html="page.name"></h1>
         
     </header>
-    <div class="content">
-    {{ page.content }}
-    </div>
+    <div class="content" v-html="page.content"></div>
 </article>
 </div>
 </template>

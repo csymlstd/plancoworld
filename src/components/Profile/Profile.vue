@@ -8,7 +8,7 @@
                     
                 </div>
                 <div class="level-right">
-                    <a @click="" class="button level-item is-white is-medium" v-if="editMode"><span>Manage Photos</span></a>
+                    <a @click="openModal('managePhotos')" class="button level-item is-white is-medium" v-if="editMode"><span>Manage Photos</span></a>
                 </div>
                 </div>
             </div>
@@ -141,6 +141,12 @@ export default {
             API.fetch('profile/'+this.username).then(profile => {
                 this.profile = Object.assign({}, this.profile, profile)
             })
+        }, 
+        getOwned(model) {
+
+        },
+        getPublic(model) {
+
         },
         tab(t) {
             this.active = t

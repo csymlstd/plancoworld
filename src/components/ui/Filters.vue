@@ -85,7 +85,7 @@
 
                 <span class="tag is-rounded is-outlined" v-if="['back-to-the-future','knight-rider','the-munsters'].indexOf(tag.slug) > -1">$2.99</span>
                 <span class="tag is-rounded is-outlined" v-if="['spooky-pack','adventure-pack', 'studios-pack'].indexOf(tag.slug) > -1">$10.99</span>
-                <span class="tag is-rounded is-outlined" v-if="['spooky', 'adventure', 'temple', 'temple-gold', 'crypt'].indexOf(tag.slug) > -1">DLC</span>
+                <span class="tag is-rounded is-outlined" v-if="['spooky', 'adventure', 'temple', 'temple-gold', 'crypt','parabolic-screen'].indexOf(tag.slug) > -1">DLC</span>
 
                 <span class="tag is-rounded is-outlined" v-if="tag.slug == 'scenery' && group.model == 'scenery'">Scenery Category</span>
                 <span class="tag is-rounded is-outlined" v-if="tag.slug == 'building' && group.model == 'buildings'">Building Category</span>
@@ -255,18 +255,18 @@ export default {
       this.groups.forEach(group => {
         if(model && group.model !== model) return false
         if(this.options[group.model] && this.options[group.model].required) {
-          if(this.calcSelected(model) == 0) {
-            console.log(model, 'is invalid')
+          if(this.calcSelected(group.model) == 0) {
+            // console.log(group.model, 'is invalid', this.calcSelected(model))
             group.valid = false
             valid = false
           } else {
-            console.log(model, 'is valid')
+            // console.log(group.model, 'is valid')
             group.valid = true
           }
         }
       })
 
-      console.log('is valid', valid)
+      // console.log('is valid', valid)
       return valid
     }
   },

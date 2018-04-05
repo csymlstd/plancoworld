@@ -8,7 +8,7 @@
             <div class="tag is-primary is-rounded is-large level-item" v-if="isBuilding()">Building</div>
             <div class="tag is-primary is-rounded is-large level-item" v-if="isScenery()">Scenery</div>
             <div class="tags selected-tags level-item">
-              <a v-if="blueprint.billboards.length > 0" href="#billboards" class="tag is-rounded is-white is-large" data-scroll v-tooltip="'Download the custom Billboards for the best experience'"><span class="icon"><i class="fas fa-exclamation"></i></span> <span>Billboards</span></a>
+              <a v-if="blueprint.billboards.length > 0" href="#billboards" class="tag is-rounded is-white is-large" data-scroll v-tooltip="'Download the custom Billboards for the best experience'"><span class="icon"><i class="fas fa-sign"></i></span> <span>Billboards</span></a>
             </div>
           </div>
           <div class="level-right">
@@ -24,7 +24,7 @@
       <div class="level is-mobile">
         <div class="level-left">
           <h1 class="title level-item"><router-link :to="{ name: 'Blueprints' }">Blueprints</router-link></h1>
-          <h2 class="title level-item"> / {{ blueprint.name ? blueprint.name : '' | truncate(45) }}</h2>
+          <h2 class="title level-item" :title="blueprint.name"> / {{ blueprint.name ? blueprint.name : '' | truncate(45) }}</h2>
         </div>
         <div class="level-right">
           <button class="button level-item is-medium is-dark" @click="copy" v-tooltip="{ content: 'Copy Blueprint URL'  }"><span class="icon"><i class="fas fa-link"></i></span></button>
@@ -71,7 +71,7 @@
 
           <hr />
 
-          <ReactionMeter />
+          <ReactionMeter :reactions="blueprint.reactions" />
         </div>
 
         <div class="box" v-if="blueprint.colors.length > 0 || editMode">
@@ -100,19 +100,48 @@
           <div class="blueprint-description-content" v-show="!editMode" v-html="blueprint.description"></div>
         </section>
 
+        <section class="box blueprint-ratings">
+          <div class="level">
+            <div class="level-left">
+              <h5 class="title is-5">Ratings</h5>
+            </div>
+            <div class="level-right">
+              
+            </div>
+          </div>
+          <div class="columns blueprint-ratings">
+            <div class="column" v-tooltip="'Excitement'">
+              <div class="reaction is-large fun"></div>
+              <div class="stats-value text-center" v-if="!editMode">{{ blueprint.stats.excitement || 'N/A' }}</div>
+              <div class="control" v-if="editMode"><input type="number" class="input" min="0" max="10" step="0.01" v-model="blueprint.stats.excitement" /></div>
+            </div>
+            <div class="column" v-tooltip="'Fear'">
+              <div class="reaction is-large scary"></div>
+              <div class="stats-value text-center" v-if="!editMode">{{ blueprint.stats.fear || 'N/A' }}</div>
+              <div class="control" v-if="editMode"><input type="number" class="input" min="0" max="10" step="0.01" v-model="blueprint.stats.fear" /></div>
+            </div>
+            <div class="column" v-tooltip="'Nausea'">
+              <div class="reaction is-large nauseating"></div>
+              <div class="stats-value text-center" v-if="!editMode">{{ blueprint.stats.nausea || 'N/A' }}</div>
+              <div class="control" v-if="editMode"><input type="number" class="input" min="0" max="10" step="0.01" v-model="blueprint.stats.nausea" /></div>
+            </div>
+          </div>
+        </section>
+
         <section class="box blueprint-stats">
             <div class="level">
-                <div class="level-left">
-                  <h5 class="title is-5">Ride Stats</h5>
-                </div>
-                <div class="level-right">
-                  
-                </div>
+              <div class="level-left">
+                <h5 class="title is-5">Ride Stats</h5>
               </div>
+              <div class="level-right">
+                
+              </div>
+            </div>
               <div class="columns blueprint-stats">
                 <div class="column">
                   <label class="label">Duration</label>
-                  <div class="field has-addons">
+                  <div class="stats-value" v-if="!editMode">{{ blueprint.stats.duration || 'N/A' }} seconds</div>
+                  <div class="field has-addons" v-if="editMode">
                     <div class="control">
                       <input type="number" class="input" v-model="blueprint.stats.duration" />
                     </div>
@@ -123,37 +152,37 @@
                 </div>
                 <div class="column">
                   <label class="label">Length</label>
-                  <div class="field has-addons">
+                  <div class="stats-value" v-if="!editMode">{{ blueprint.stats.length || 'N/A' }} meters</div>
+                  <div class="field has-addons" v-if="editMode">
                     <div class="control">
                       <input type="number" class="input" v-model="blueprint.stats.length" />
                     </div>
                     <div class="control">
-                      <div class="button is-static" v-if="isImperial()">feet</div>
-                      <div class="button is-static" v-else>meters</div>
+                      <div class="button is-static">meters</div>
                     </div>
                   </div>
                 </div>
                 <div class="column">
                   <label class="label">Max Speed</label>
-                  <div class="field has-addons">
+                  <div class="stats-value" v-if="!editMode">{{ blueprint.stats.maxSpeed || 'N/A' }} mph</div>
+                  <div class="field has-addons" v-if="editMode">
                     <div class="control">
                       <input type="number" max="149" class="input" v-model="blueprint.stats.maxSpeed" />
                     </div>
                     <div class="control">
-                      <div class="button is-static" v-if="isImperial()">mph</div>
-                      <div class="button is-static" v-else>kmh</div>
+                      <div class="button is-static">mph</div>
                     </div>
                   </div>
                 </div>
                 <div class="column">
                   <label class="label">Average Speed</label>
-                  <div class="field has-addons">
+                  <div class="stats-value" v-if="!editMode">{{ blueprint.stats.avgSpeed || 'N/A' }} mph</div>
+                  <div class="field has-addons" v-if="editMode">
                     <div class="control">
                       <input type="number" max="149" class="input" v-model="blueprint.stats.avgSpeed" />
                     </div>
                     <div class="control">
-                      <div class="button is-static" v-if="isImperial()">mph</div>
-                      <div class="button is-static" v-else>kmh</div>
+                      <div class="button is-static">mph</div>
                     </div>
                   </div>
                 </div>
@@ -163,20 +192,19 @@
                 <div class="column">
                   <label class="label">Biggest Drop</label>
                   <div class="field has-addons">
-                    <div class="blueprints-stats-value" v-html="blueprint.stats.biggestDrop || 'N/A'" v-if="!editMode"></div>
+                    <div class="stats-value" v-if="!editMode">{{ blueprint.stats.biggestDrop || 'N/A' }}</div>
                     <div class="control" v-if="editMode">
                       <input type="number" class="input" v-model="blueprint.stats.biggestDrop" />
                     </div>
                     <div class="control" v-if="editMode">
-                      <div class="button is-static" v-if="isImperial()">feet</div>
-                      <div class="button is-static" v-else>meters</div>
+                      <div class="button is-static">meters</div>
                     </div>
                   </div>
                 </div>
                 <div class="column">
                   <label class="label">Number of Inversions</label>
                   <div class="field">
-                    <div class="blueprints-stats-value" v-html="blueprint.stats.inversions || 0" v-if="!editMode"></div>
+                    <div class="stats-value" v-if="!editMode">{{ blueprint.stats.inversions || 'N/A' }}</div>
                     <div class="control" v-if="editMode">
                       <input type="number" class="input" v-model="blueprint.stats.inversions" />
                     </div>
@@ -184,7 +212,8 @@
                 </div>
                 <div class="column">
                   <label class="label">Airtime Count</label>
-                  <div class="field">
+                  <div class="stats-value" v-if="!editMode">{{ blueprint.stats.airtimeCount || 'N/A' }}</div>
+                  <div class="field" v-if="editMode">
                     <div class="control">
                       <input type="number" class="input" v-model="blueprint.stats.airtimeCount" />
                     </div>
@@ -192,7 +221,8 @@
                 </div>
                 <div class="column">
                   <label class="label">Total Airtime Duration</label>
-                  <div class="field has-addons">
+                  <div class="stats-value" v-if="!editMode">{{ blueprint.stats.airtimeDuration || 'N/A' }}</div>
+                  <div class="field has-addons" v-if="editMode">
                     <div class="control">
                       <input type="number" class="input" v-model="blueprint.stats.airtimeDuration " />
                     </div>
@@ -205,7 +235,8 @@
               <div class="columns blueprint-stats">
                 <div class="column">
                   <label class="label">Max Lateral G</label>
-                  <div class="field">
+                  <div class="stats-value" v-if="!editMode">{{ blueprint.stats.maxLateralG || 'N/A' }}</div>
+                  <div class="field" v-if="editMode">
                     <div class="control">
                       <input type="number" max="5" min="-5" step="0.01" class="input" v-model="blueprint.stats.maxLateralG" />
                     </div>
@@ -213,7 +244,8 @@
                 </div>
                 <div class="column">
                   <label class="label">Max Vertical G</label>
-                  <div class="field">
+                  <div class="stats-value" v-if="!editMode">{{ blueprint.stats.maxVerticalG || 'N/A' }}</div>
+                  <div class="field" v-if="editMode">
                     <div class="control">
                       <input type="number" max="5" min="-5" step="0.01" class="input" v-model="blueprint.stats.maxVerticalG" />
                     </div>
@@ -221,7 +253,8 @@
                 </div>
                 <div class="column">
                   <label class="label">Min Vertical G</label>
-                  <div class="field">
+                  <div class="stats-value" v-if="!editMode">{{ blueprint.stats.minVerticalG || 'N/A' }}</div>
+                  <div class="field" v-if="editMode">
                     <div class="control">
                       <input type="number" max="5" min="-5" step="0.01" class="input" v-model="blueprint.stats.minVerticalG" />
                     </div>
@@ -229,7 +262,8 @@
                 </div>
                 <div class="column">
                   <label class="label">Max Foward G</label>
-                  <div class="field">
+                  <div class="stats-value" v-if="!editMode">{{ blueprint.stats.maxForwardG || 'N/A' }}</div>
+                  <div class="field" v-if="editMode">
                     <div class="control">
                       <input type="number" max="5" min="-5" step="0.01" class="input" v-model="blueprint.stats.maxForwardG" />
                     </div>
@@ -237,7 +271,8 @@
                 </div>
                 <div class="column">
                   <label class="label">Min Forward G</label>
-                  <div class="field">
+                  <div class="stats-value" v-if="!editMode">{{ blueprint.stats.minForwardG || 'N/A' }}</div>
+                  <div class="field" v-if="editMode">
                     <div class="control">
                       <input type="number" max="5" min="-5" step="0.01" class="input" v-model="blueprint.stats.minForwardG" />
                     </div>
@@ -247,9 +282,9 @@
         </section>
 
 
-        <div class="level" id="billboards">
+        <div class="level" id="billboards" v-if="blueprint.billboards.length > 0 || editMode">
           <div class="level-left">
-            <h3 class="ui header level-item">Billboards</h3>
+            <h3 class="ui header level-item"><i class="fas fa-sign"></i>&nbsp; Billboards</h3>
           </div>
           <div class="level-right">
             <!-- <router-link :to="{ name: 'Generator' }" class="button level-item is-white is-medium"><span class="icon"><i class="fas fa-paint-brush has-text-primary"></i></span> <span>Generator</span></router-link> -->
@@ -257,8 +292,8 @@
           </div>
         </div>
 
-        <div class="columns card is-multiline">
-          <Billboard :model="billboard" :key="billboard._id" v-for="billboard in blueprint.billboards"></Billboard>
+        <div class="columns cards is-multiline push-down-single" v-if="blueprint.billboards.length > 0">
+          <Billboard :model="billboard" @remove="removeFromBlueprint" :editMode="editMode" :key="billboard._id" v-for="billboard in blueprint.billboards"></Billboard>
         </div>
 
         <Modal :class="{ 'downloadBillboards': true }" @close="closeModal('downloadBillboards')" :show="modalOpen('downloadBillboards')">
@@ -270,32 +305,26 @@
             <div class="field">
               <Search @selected="addToBlueprint($event, 'addBillboard')" placeholder="Search for Billboards" :models="['billboards']"></Search>
             </div>
-            <div class="field">
-              <a class="button is-primary is-medium">Add to Blueprint</a>
-            </div>
           </div>
         </Modal>
 
-        <div class="level">
+        <div class="level" v-if="blueprint.blueprints.length > 0 || editMode">
           <div class="level-left">
-            <h3 class="ui header level-item">Blueprints</h3>
+            <h3 class="ui header level-item"><i class="fas fa-box-open"></i>&nbsp; Blueprints</h3>
           </div>
           <div class="level-right">
             <a @click="openModal('addBlueprint')" class="button is-white is-medium" v-if="editMode"><span class="icon"><i class="fas fa-plus has-text-primary"></i></span> <span>Add Blueprint</span></a>
           </div>
         </div>
 
-        <div class="columns card is-multiline">
-          <Blueprint :model="blueprint" :key="blueprint._id" v-for="blueprint in blueprint.blueprints"></Blueprint>
+        <div class="columns cards is-multiline" v-if="blueprint.blueprints.length > 0">
+          <Blueprint :model="blueprint" @remove="removeFromBlueprint" :editMode="editMode" :key="blueprint._id" v-for="blueprint in blueprint.blueprints"></Blueprint>
         </div>
 
         <Modal :class="{ 'addBlueprint': true }" @close="closeModal('addBlueprint')" :show="modalOpen('addBlueprint')">
           <div class="form">
             <div class="field">
               <Search @selected="addToBlueprint($event, 'addBlueprint')" placeholder="Search for Blueprints" :models="['blueprints']"></Search>
-            </div>
-            <div class="field">
-              <a class="button is-primary is-medium">Add to Blueprint</a>
             </div>
           </div>
         </Modal>
@@ -304,6 +333,17 @@
     </div>
 
     <Modal :class="{ 'uploadPhotos': true }" @close="closeModal('uploadPhotos')" :show="modalOpen('uploadPhotos')">
+      <div class="blueprint-media">
+        <div class="blueprint-photo level" :key="media._id" v-for="(media, key) in blueprint.media">
+          <div class="level-left">
+            <img :src="media.url" class="is-64h level-item" />
+          </div>
+          <div class="level-right">
+            <div class="tag is-rounded level-item" v-if="key == 0">Cover Photo</div>
+            <a class="icon level-item" v-tooltip="'Remove from Blueprint'" @click="removePhoto(key)"><i class="fas fa-trash"></i></a>
+          </div>
+        </div>
+      </div>
       <Upload @uploaded="addPhoto" folder="blueprints" instructions="Drop your blueprint photos here, or click to browse your computer" v-if="blueprint && isOwner() && editMode"></Upload>
     </Modal>
 
@@ -388,6 +428,7 @@ export default {
       blueprint: {
         media: [ { url: '' } ],
         billboards: [],
+        blueprints: [],
         shops: [],
         attractions: [],
         tags: [],
@@ -470,9 +511,6 @@ export default {
     }
   },
   methods: {
-    notify() {
-      this.$notify('notifications', 'Your Blueprint has been saved', '')
-    },
     isBuilding() {
       return this.blueprint.tags.filter(t => {
         return t._id == '597cfc8c23e62646b0c8f7a7'
@@ -499,7 +537,7 @@ export default {
     addToBlueprint(match, modal) {
       this.modals[modal].loading = true
 
-      let plural = match._type+'s'
+      let plural = match._source.type+'s'
       let model = this.blueprint[plural]
       let data = {}
 
@@ -507,6 +545,8 @@ export default {
       model.forEach((m) => {
         data[plural].push(m._id)
       })
+
+      console.log(plural, model, data[plural])
 
       console.log('putting', data)
       API.put(this.apiURL(), data).then(() => {
@@ -522,6 +562,28 @@ export default {
     },
     setModalData(modal, field, data) {
       this.$set(this.modals[modal].data, field, data)
+    },
+    removeFromBlueprint(options) {
+      let title
+      for(let i=0;i<this.blueprint[options.model].length;i++) {
+        if(this.blueprint[options.model][i]._id == options.id) {
+          title = this.blueprint[options.model][i].name
+          this.blueprint[options.model].splice(i, 1)
+          break
+        }
+      }
+
+      let update = []
+      this.blueprint[options.model].forEach(m => {
+        update.push(m._id)
+      })
+
+      API.put(this.apiURL(), { [options.model]: update }).then((blueprint) => {
+        this.blueprint.status = blueprint.status
+        this.$notify('notifications', `${title} removed from blueprint`, 'success')
+      }).catch(() => {
+        this.$notify('notifications', 'There was a problem removing that from the blueprint', 'error')
+      })
     },
     linkToWorkshop() {
       API.post(this.apiURL()+'/link', { url: this.modals.linkToWorkshop.url }).then((blueprint) => {
@@ -545,7 +607,19 @@ export default {
       API.put(this.apiURL(), { media }).then((blueprint) => {
         this.blueprint.status = blueprint.status
       }).catch(() => {
-        this.blueprint.status = status
+        
+      })
+    },
+    removePhoto(key) {
+      this.blueprint.media.splice(key, 1)
+
+      let media = this.blueprint.media
+
+      API.put(this.apiURL(), { media }).then((blueprint) => {
+        this.blueprint.status = blueprint.status
+        this.$notify('notifications', 'Photo removed', 'success')
+      }).catch(() => {
+        this.$notify('notifications', 'There was a problem removing that photo', 'error')
       })
     },
     toggleStatus() {
@@ -586,7 +660,6 @@ export default {
         this.blueprint = Object.assign({}, this.blueprint, blueprint)
         this.shareURL = `http://planco.world/blueprints/${this.blueprint.slug}`
         this.loading = false
-        this.editMode = false
 
       }).catch((err) => {
         API.handleError(err, 'blueprints')
@@ -612,7 +685,7 @@ export default {
       data.tags = tags
 
       return API.put(this.apiURL(), data).then((blueprint) => {
-        this.$notify('notifications', 'Your Blueprint has been saved', 'success')
+        this.$notify('notifications', `${this.blueprint.name} has been saved`, 'success')
         return this.getBlueprint()
       })
     },
@@ -624,6 +697,28 @@ export default {
       }).catch(err => {
         console.log(err)
         this.$notify('notifications', 'There was a problem deleting your blueprint.', 'error')
+      })
+    },
+    removeFromBlueprint(options) {
+      let title
+      for(let i=0;i<this.blueprint[options.model].length;i++) {
+        if(this.blueprint[options.model][i]._id == options.id) {
+          title = this.blueprint[options.model][i].name
+          this.blueprint[options.model].splice(i, 1)
+          break
+        }
+      }
+
+      let update = []
+      this.blueprint[options.model].forEach(m => {
+        update.push(m._id)
+      })
+
+      API.put(this.apiURL(), { [options.model]: update }).then((blueprint) => {
+        this.blueprint.status = blueprint.status
+        this.$notify('notifications', `${title} removed from blueprint`, 'success')
+      }).catch(() => {
+        this.$notify('notifications', 'There was a problem removing that from the blueprint', 'error')
       })
     },
     apiURL(force = true) {

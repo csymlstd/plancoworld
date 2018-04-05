@@ -48,23 +48,24 @@
       <div class="column is-one-quarter">
         <div class="box kit-info">
           <Creator :user="kit.user"></Creator>
-          <br />
-          <table class="table is-not-hoverable">
-            <tbody>
-            <tr>
-              <td colspan="2">
-                <ReactionMeter />
-              </td>
-            </tr>
-            </tbody>
-          </table>
+          <hr />
+          <ReactionMeter :reactions="kit.reactions" />
+          <Reaction :model="kit" :reactOnly="true" @reacted="kit.reactions = $event" />
         </div>
 
         <Filters class="field" :selected="kit.tags" @selected="kit.tags = $event" :options="filterOptions" :readOnly="!editMode" ref="tags"></Filters>
 
-        <a href="#" class="button is-white is-fluid field">Report Kit</a>
+        <!-- <a href="#" class="button is-white is-fluid field">Report Kit</a> -->
 
-        <a href="#" class="button is-warning is-fluid" v-if="editMode">Delete Kit</a>
+
+        <a @click="openModal('deleteKit')" class="button is-warning is-fluid" v-if="editMode">Delete Kit</a>
+
+        <Modal :class="['deleteKit']" @close="closeModal('deleteKit')" :show="modalOpen('deleteKit')">
+          <p><strong>Are you sure you want to delete {{ kit.name }}?</strong> This cannot be undone. Your media will still be available in the toolbox.</p>
+
+          <a @click="deleteKit()" class="button is-warning">Delete</a>
+          <a @click="closeModal('deleteKit')" class="button is-light">Cancel</a>
+        </Modal>
 
       </div>
 
@@ -79,7 +80,7 @@
         <div v-if="kit.billboards.length > 0 || editMode">
           <div class="level" id="billboards">
             <div class="level-left">
-              <h3 class="level-item">Billboards</h3>
+              <h3 class="level-item"><i class="fas fa-sign"></i>&nbsp; Billboards</h3>
               <!-- <div class="level-item"><a @click="openModal('downloadBillboards')" class="is-text">Download All ({{ kit.billboards.length }})</a></div> -->
             </div>
             <div class="level-right">
@@ -88,8 +89,8 @@
             </div>
           </div>
 
-          <div class="columns cards is-multiline loader--parent">
-            <Billboard :model="billboard" :key="billboard._id" v-for="billboard in kit.billboards"></Billboard>
+          <div class="columns cards is-multiline loader--parent push-down-single">
+            <Billboard :model="billboard" @remove="removeFromKit" :editMode="editMode" :key="billboard._id" v-for="billboard in kit.billboards"></Billboard>
           </div>
         </div>
 
@@ -111,15 +112,15 @@
         <div v-if="kit.blueprints.length > 0 || editMode">
           <div class="level">
             <div class="level-left">
-              <h3 class="ui header level-item">Blueprints</h3>
+              <h3 class="ui header level-item"><i class="fas fa-box-open"></i>&nbsp; Blueprints</h3>
             </div>
             <div class="level-right">
               <a @click="openModal('addBlueprint')" class="button is-white is-medium" v-if="editMode"><span class="icon"><i class="fas fa-plus has-text-primary"></i></span> <span>Add Blueprint</span></a>
             </div>
           </div>
 
-          <div class="columns cards is-multiline loader--parent">
-            <Blueprint :model="blueprint" :key="blueprint._id" v-for="blueprint in kit.blueprints"></Blueprint>
+          <div class="columns cards is-multiline loader--parent push-down-single">
+            <Blueprint :model="blueprint" @remove="removeFromKit" :editMode="editMode" :key="blueprint._id" v-for="blueprint in kit.blueprints"></Blueprint>
           </div>
         </div>
 
@@ -137,7 +138,7 @@
         <div v-if="kit.parks.length > 0 || editMode">
           <div class="level">
             <div class="level-left">
-              <h3 class="ui header level-item">Parks</h3>
+              <h3 class="ui header level-item"><i class="fab fa-fort-awesome"></i>&nbsp; Parks</h3>
             </div>
             <div class="level-right">
               <a @click="openModal('addPark')" class="button is-white is-medium" v-if="editMode"><span class="icon"><i class="fas fa-plus has-text-primary"></i></span> <span>Add Park</span></a>
@@ -149,6 +150,17 @@
           </div>
         </div>
 
+        <Modal :class="{ 'addPark': true }" @close="closeModal('addPark')" :show="modalOpen('addPark')">
+          <div class="form">
+            <div class="field">
+              <Search @selected="addToKit($event, 'addPark')" placeholder="Search for Parks" :models="['parks']"></Search>
+            </div>
+            <div class="field">
+              <a class="button is-primary is-medium">Add to Kit</a>
+            </div>
+          </div>
+        </Modal>
+
       </div>
     </div>
 
@@ -157,7 +169,7 @@
         <div class="kit-photo level" :key="media._id" v-for="(media, key) in kit.media">
           <div class="level-item">
             <img :src="media.url" class="is-64h" />
-            <div class="tag is-rounded" v-if="key == 0">Primary</div>
+            <div class="tag is-rounded" v-if="key == 0">Cover Photo</div>
           </div>
         </div>
       </div>
@@ -173,6 +185,7 @@ import Search from '@/components/ui/Search'
 import Filters from '@/components/ui/Filters'
 import Upload from '@/components/ui/Upload'
 import SaveToToolbox from '@/components/ui/SaveToToolbox'
+import Reaction from '@/components/ui/Reaction'
 import ReactionMeter from '@/components/ui/ReactionMeter'
 import Modal from '@/components/ui/Modal'
 import Dropdown from '@/components/ui/Dropdown'
@@ -196,6 +209,7 @@ export default {
     Upload,
     SaveToToolbox,
     ReactionMeter,
+    Reaction,
     Dropdown,
     Creator,
     Blueprint,
@@ -224,11 +238,19 @@ export default {
           show: false,
           loading: false
         },
+        addPark: {
+          show: false,
+          loading: false
+        },
         addBlueprint: {
           show: false,
           loading: false
         },
         downloadBillboards: {
+          show: false,
+          loading: false
+        },
+        deleteKit: {
           show: false,
           loading: false
         }
@@ -298,8 +320,7 @@ export default {
   },
   computed: {
     statusTooltip () {
-      if(this.kit.status && this.kit.steam_id) return 'Open to the Public'
-      if(!this.kit.steam_id) return 'Link to Workshop to Open'
+      if(this.kit.status) return 'Open to the Public'
       return 'Closed to the Public'
     }
   },
@@ -440,6 +461,14 @@ export default {
         return this.getKit()
       })
     },
+    deleteKit() {
+      API.delete(this.apiURL(true)).then(response => {
+        this.$notify('notifications', `${this.kit.name} has been deleted.`, 'success')
+        this.$router.push({ name: 'Kits' })
+      }).catch(err => {
+        this.$notify('notifications', 'There was a problem deleting your kit.', 'error')
+      })
+    },
     apiURL(force = true) {
       if(this.kit._id && force) {
         return `kits/${this.kit._id}`
@@ -455,6 +484,28 @@ export default {
         url = `kits/slug/${SLUG}`
       }
       return url
+    },
+    removeFromKit(options) {
+      let title
+      for(let i=0;i<this.kit[options.model].length;i++) {
+        if(this.kit[options.model][i]._id == options.id) {
+          title = this.kit[options.model][i].name
+          this.kit[options.model].splice(i, 1)
+          break
+        }
+      }
+
+      let update = []
+      this.kit[options.model].forEach(m => {
+        update.push(m._id)
+      })
+
+      API.put(this.apiURL(), { [options.model]: update }).then((kit) => {
+        this.kit.status = kit.status
+        this.$notify('notifications', `${title} removed from kit`, 'success')
+      }).catch(() => {
+        this.$notify('notifications', 'There was a problem removing that from the kit', 'error')
+      })
     },
     attachEditor() {
       let wrapper = this.$el.querySelector('.kit-description-editor')

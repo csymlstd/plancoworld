@@ -23,7 +23,6 @@ export default {
     },
     watch: {
         media() {
-            console.log('media updated')
             if(this.flickity) this.flickity.destroy()
             this.$nextTick(() => {
                 this.init()

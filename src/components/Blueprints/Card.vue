@@ -4,6 +4,7 @@
       <div class="card-image" :style="{ 'backgroundImage': `url('${thumbnail}')` }" @click="viewBlueprint">
         <div class="level bottom">
           <div class="level-left">
+            <a @click.stop="$emit('remove', { id: model._id, model: 'blueprints' })" v-if="editMode" class="level-item"><span class="tag is-rounded is-warning is-medium"><i class="fas fa-times"></i>&nbsp; Remove</span></a>
             <div class="tag is-primary is-rounded is-medium level-item" v-if="isBuilding()">Building</div>
             <div class="tag is-primary is-rounded is-medium level-item" v-if="isScenery()">Scenery</div>
           </div>
@@ -47,6 +48,7 @@ export default {
   },
   props: {
     model: {},
+    editMode: false,
   },
   data () {
     return {

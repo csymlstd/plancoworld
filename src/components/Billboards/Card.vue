@@ -7,6 +7,7 @@
         </video>
         <div class="level bottom">
           <div class="level-left">
+            <a @click.stop="$emit('remove', { id: model._id, model: 'billboards' })" v-if="editMode" class="level-item"><span class="tag is-rounded is-warning is-medium"><i class="fas fa-times"></i>&nbsp; Remove</span></a>
             <span v-if="model.media[0].type == 'image'" class="tag is-rounded is-light is-medium"><span class="icon"><i class="fas fa-image"></i></span></span>
             <span v-if="model.media[0].type == 'video'" class="tag is-rounded is-light is-medium"><span class="icon"><i class="fas fa-film-alt"></i></span></span>
           </div>
@@ -47,6 +48,7 @@ export default {
   },
   props: {
     model: {},
+    editMode: false,
   },
   data () {
     return {

@@ -6,26 +6,28 @@
             <input type="file" name="items[]" multiple @change="onChange">
         </div>
         <div class="upload--files">
-          <div :class="{ 'upload--file': true, 'box': isDark, 'is-uploaded': file.uploaded }" v-for="(file, key) in items">
+          <div :class="{ 'upload--file': true, 'box': isDark, 'is-uploaded': file.uploaded }" :key="key" v-for="(file, key) in items">
             <div class="level">
               <div class="level-left">
                 <figure class="level-item image is-128x128" v-if="file.imageData" >
                     <img :src="file.imageData" />
                 </figure>
                 <span class="level-item">{{ file.name }}</span>
-                <span class="tag level-item is-outlined">{{ file.duration }} Seconds</span>
+                <span class="tag level-item is-outlined" v-if="file.duration">{{ file.duration }} Seconds</span>
               </div>
               <div class="level-right">
-                <progress class="progress is-primary is-small level-item" v-if="file.progress > 0 && file.progress < 100" :value="file.progress" max="100"> </progress>
-                <div class="tag is-primary is-medium level-item" v-if="file.ready">Ready to Upload</div>
-                <div class="tag is-warning is-medium level-item" v-if="file.failed"><span class="icon"><i class="fas fa-exclamation-triangle"></i></span> <span>Failed</span></div>
+                <progress class="progress is-primary is-small level-item" v-if="file.progress > 0 && file.progress < 100" :value="file.progress" max="100"></progress>
+                <div class="tag is-primary is-medium level-item is-rounded" v-if="file.ready">Ready to Upload</div>
+                <div class="tag is-warning is-medium level-item is-rounded" v-if="file.failed"><span class="icon"><i class="fas fa-exclamation-triangle"></i></span> <span>Failed</span></div>
 
-                <div class="tag is-success is-medium level-item" v-if="file.uploaded && !file.transcoding && !file.transcoded">Uploaded</div>
-                <div class="tag is-primary is-medium level-item" v-if="file.uploaded && file.isTranscodePending && !file.transcoding && !file.transcoded">Preparing Transcode  <span class="icon"><i class="fas fa-cog fa-spin"></i></span></div>
-                <div class="tag is-success is-medium level-item" v-if="file.transcoded">Transcoded  <span class="icon"><i class="fas fa-check"></i></span></div>
-                <div class="tag is-primary is-medium level-item" v-if="file.transcoding">Transcoding <span class="icon"><i class="fas fa-cog fa-spin"></i></span></div>
+                <!-- <div class="tag is-success is-medium level-item" v-if="file.uploaded && !file.transcoding && !file.transcoded">Uploaded</div> -->
+                <div class="tag is-primary is-medium level-item is-rounded" v-if="file.uploaded && file.isTranscodePending && !file.transcoding && !file.transcoded">Preparing Transcode  <span class="icon"><i class="fas fa-cog fa-spin"></i></span></div>
+                <div class="tag is-primary is-medium level-item is-rounded" v-if="file.generating">Generating Thumbnails  &nbsp;<span class="icon"><i class="fas fa-cog fa-spin"></i></span></div>
+                <div class="tag is-success is-medium level-item is-rounded" v-if="file.transcoded">Transcoded  <span class="icon"><i class="fas fa-check"></i></span></div>
+                <div class="tag is-primary is-medium level-item is-rounded" v-if="file.transcoding">Transcoding <span class="icon"><i class="fas fa-cog fa-spin"></i></span></div>
 
-                <a @click="removeItem(key)" class="upload--delete level-item button is-link"><span class="icon"><i class="fas fa-trash"></i></span></a>
+                <a @click="removeItem(key)" v-if="!allowClear || !file.uploaded" class="upload--delete level-item button is-link"><span class="icon"><i class="fas fa-trash"></i></span></a>
+                <a @click="clearItem(key)" v-if="file.uploaded && allowClear" class="upload--delete level-item button is-success"><span class="icon"><i class="fas fa-check"></i></span></a>
               </div>
             </div>
 
@@ -49,6 +51,14 @@ import Toolbox from '@/components/Toolbox'
 
 export default {
   props: {
+    allowFiles: {
+        type: Boolean,
+        default: true,
+    },
+    allowClear: {
+      type: Boolean,
+      default: false,
+    },
     maxItems: {
         type: Number,
         default: 3
@@ -88,6 +98,7 @@ export default {
       completed: [],
       loading: false,
       transcodeQueue: [],
+      sizeLimit: 100 * 1048576, // 100MB
     }
   },
   methods: {
@@ -95,13 +106,8 @@ export default {
       e.preventDefault()
       ToolBus.$emit('toggle', { tab: 'images', selectMode: ['images', 'videos'], uid: this._uid })
     },
-    // http://scratch99.com/web-development/javascript/convert-bytes-to-mb-kb/
-    bytesToSize(bytes) {
-        const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-        if (bytes === 0) return 'n/a';
-        let i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
-        if (i === 0) return bytes + ' ' + sizes[i];
-        return (bytes / Math.pow(1024, i)).toFixed(2) + ' ' + sizes[i];
+    sizeAllowed(size) {
+      return size <= (this.sizeLimit)
     },
     onChange(e) {
         //this.formData = new FormData();
@@ -111,56 +117,67 @@ export default {
               let file = {
                 file: e.target.files[x] || e.dataTransfer.files[x],
                 name: files[x].name,
-                type: files[x].type,
+                type: files[x].type || 'application/octet-stream',
                 size: files[x].size,
-                sizeFormatted: this.bytesToSize(files[x].size),
+                sizeFormatted: Media.bytesToSize(files[x].size),
                 ready: false,
                 duration: false,
                 uploaded: false,
                 isTranscodePending: false,
                 transcoding: false,
                 transcoded: false,
+                generating: false,
                 failed: false,
                 progress: 0
               }
 
+
               let allowed = Media.isAllowedType(file.type)
+              if(!allowed) return this.$notify('notifications',`File type ${file.type} is not permitted.`, 'error')
+              
+              allowed = Media.isFileExtension(Media.getExtension(file.name)) && this.allowFiles
+              if(!allowed) return this.$notify('notifications',`File type ${Media.getExtension(file.name)} is not permitted.`, 'error')
 
               if(this.transcode) {
                 console.log('checking if can transcode '+file.type)
                 allowed = Media.canTranscode(file.type)
+                if(!allowed) return this.$notify('notifications',`${file.name} cannot be transcoded`, 'error')
               }
 
-              if(allowed) {
-                console.log('file is allowed')
-                // If allowed, add to upload queue
-                this.items.push(file)
-                let n = this.items.length - 1
+              
 
-                if(Media.isImage(file.type)) {
-                  // Set file as ready to upload
-                  file.ready = true
-                  // Add preview of image
-                  let reader = new FileReader()
-                  reader.addEventListener('load', () => {
-                    this.$set(this.items[n], 'imageData', reader.result)
-                  })
-                  reader.readAsDataURL(this.items[n].file)
-                } else if(Media.canTranscode(file.type) || Media.isVideo(file.type)) {
-                  console.log('checking duration')
-                  // Check duration of the video
-                  let v = document.createElement('video')
-                  v.preload = 'metadata'
-                  v.onloadedmetadata = () => {
-                    this.items[n].duration = v.duration.toFixed(1)
-                    this.items[n].ready = true
+              if(!this.sizeAllowed(file.size)) return this.$notify('notifications',`${file.name} is larger than ${Media.bytesToSize(this.sizeLimit)}.`, 'error')
 
-                    if(this.instant === true) {
-                      this.onSubmit()
-                    }
+              console.log('file is allowed')
+              // If allowed, add to upload queue
+              this.items.push(file)
+              let n = this.items.length - 1
+
+              if(Media.isImage(file.type)) {
+                // Set file as ready to upload
+                file.ready = true
+                // Add preview of image
+                let reader = new FileReader()
+                reader.addEventListener('load', () => {
+                  this.$set(this.items[n], 'imageData', reader.result)
+                })
+                reader.readAsDataURL(this.items[n].file)
+              } else if(Media.canTranscode(file.type) || Media.isVideo(file.type)) {
+                console.log('checking duration')
+                // Check duration of the video
+                let v = document.createElement('video')
+                v.preload = 'metadata'
+                v.onloadedmetadata = () => {
+                  this.items[n].duration = v.duration.toFixed(1)
+                  this.items[n].ready = true
+
+                  if(this.instant === true) {
+                    this.onSubmit()
                   }
-                  v.src = URL.createObjectURL(file.file)
                 }
+                v.src = URL.createObjectURL(file.file)
+              } else {
+                this.items[n].ready = true
               }
 
 
@@ -171,6 +188,9 @@ export default {
         if(this.instant === true) {
           this.onSubmit()
         }
+    },
+    clearItem(n) {
+      this.$delete(this.items, n)
     },
     removeItem(n) {
       // @todo remove from DB
@@ -224,10 +244,16 @@ export default {
         console.log('uploaded', media)
         file.media = media
         file.uploaded = true
-        return media
+        if(media.type == 'image') {
+          file.generating = true
+          return API.post(`media/${media._id}/alternate`)
+        }
+      }).then(alternate => {
+        file.generating = false
       }).catch((err) => {
         console.log('error uploading', err)
         file.failed = true
+        file.generating = false
         this.loading = false
         this.$notify('notifications', 'Error uploading', 'error')
       })
@@ -327,7 +353,7 @@ export default {
               console.log('error signing', err)
               file.failed = true
               this.loading = false
-              this.$notify('notifications', 'Error signing', 'error')
+              this.$notify('notifications', 'Error generating upload url', 'error')
             })
           }
         }
@@ -374,7 +400,7 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style>
+<style scoped>
 
 </style>
 

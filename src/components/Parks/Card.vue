@@ -3,7 +3,10 @@
     <div class="card has-level-bottom">
       <div class="card-image" :style="{ 'backgroundImage': `url('${thumbnail}')` }" @click="viewPark">
         <div class="level bottom">
-          <div class="level-left"><div class="level-item"><Filters :options="tagOptions" :selected="model.tags" :inline="true" :readOnly="true" ref="tags"></Filters></div></div>
+          <div class="level-left">
+            <a @click.stop="$emit('remove', { id: model._id, model: 'parks' })" v-if="editMode" class="level-item"><span class="tag is-rounded is-warning is-medium"><i class="fas fa-times"></i>&nbsp; Remove</span></a>
+            <div class="level-item"><Filters :options="tagOptions" :selected="model.tags" :inline="true" :readOnly="true" ref="tags"></Filters></div>
+          </div>
           <div class="level-right">
             <a :href="'http://steamcommunity.com/sharedfiles/filedetails/?id='+model.steam_id" @click.stop target="_blank" class="level-item subscribe"><span class="tag is-rounded is-primary is-medium" v-tooltip="'Subscribe on Steam'"><span class="icon"><i class="fab fa-steam"></i></span></span></a>
             <div class="level-item" v-if="isSaved()"><span class="tag is-rounded is-warning is-medium" v-tooltip="'Saved to Toolbox'"><span class="icon"><i class="fas fa-archive"></i></span></span></div>
@@ -46,6 +49,7 @@ export default {
   },
   props: {
     model: {},
+    editMode: false,
   },
   data () {
     return {

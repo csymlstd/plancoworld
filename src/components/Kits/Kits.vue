@@ -11,7 +11,7 @@
         <div class="level-right">
           <router-link :to="{ name: 'GuidePage', params: { slug: 'kits' }}" class="level-item">Read the Guide</router-link>
           <router-link :to="{ name: 'GuidePage', params: { slug: 'glossary' }}" class="level-item">Glossary</router-link>
-          <!-- <router-link :to="{ name: 'ImportKit' }" class="button is-primary is-medium level-item" v-if="isLoggedIn()">Add a Kit</router-link> -->
+          <router-link :to="{ name: 'CreateKit' }" class="button is-primary is-medium level-item" v-if="isLoggedIn()">Create a Kit</router-link>
         </div>
       </div>
     </div>

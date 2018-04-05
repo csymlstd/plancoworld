@@ -10,7 +10,7 @@
         <div class="tag is-success level-item" v-if="media.transcoder.status == 'Complete'">Transcoded</div>
       </div>
       <div class="level-right">
-        <a class="icon level-item" v-tooltip="'Delete Video'"><i class="fas fa-trash"></i></a>
+        <a @click="$emit('remove', media)" class="icon level-item" v-tooltip="'Delete Video'"><i class="fas fa-trash"></i></a>
       </div>
     </div>
 

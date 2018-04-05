@@ -16,7 +16,7 @@
       </div>
     </section>
     <section class="hero hero--tall">
-        <Upload @uploaded="addMedia" :maxItems="1" folder="billboards" :isDark="true" :instant="true" instructions="Drop your billboard image or webm here, or click to browse your computer" v-if="imported.media.length == 0"></Upload>
+        <Upload @uploaded="addMedia" :maxItems="1" :allowFiles="false" folder="billboards" :isDark="true" :instant="true" instructions="Drop your billboard image or webm here, or click to browse your computer" v-if="imported.media.length == 0"></Upload>
         <img :src="imported.media[0].url" v-if="imported.media[0] && imported.media[0].type == 'image'" class="cover-photo" />
         <video class="cover-photo" v-if="imported.media[0] && imported.media[0].type == 'video'" autoplay loop>
           <source :src="imported.media[0].url" v-if="imported.media[0] && imported.media[0].type == 'video'">
@@ -37,6 +37,13 @@
           <div class="box">
             <h5 class="title is-5">About your Billboard</h5>
             <div class="description editor" v-html="imported.description"></div>
+          </div>
+
+          <div class="field box filter-list">
+            <h5 class="title is-5">Source Files</h5>
+            <p class="field description">Upload your <code>sketch</code> <code>psd</code> or <code>ai</code> files to allow players to customize this billboard.</p>
+            <p class="field description">Maximum of 5 files, 100 MB each.</p>
+            <Upload @uploaded="addSource" :maxItems="5" :allowFiles="true" folder="billboards" :enableToolbox="false" :instant="false" instructions="Drop your source files here, or click to browse your computer"></Upload>
           </div>
 
           <div class="field box filter-list">
@@ -115,12 +122,14 @@ export default {
   data () {
     return {
       loading: {
-        importing: false
+        importing: false,
+        creating: false,
       },
       url: 'http://steamcommunity.com/sharedfiles/filedetails/?id=1085896826',
       imported: {
         title: '',
         media: [],
+        source: [],
         tags: []
       },
       kits: [],
@@ -218,6 +227,9 @@ export default {
         this.$refs.tags.checkTagById('59654fdf12341326996d3359','billboards')
       }
     },
+    addSource(media) {
+      this.imported.source.push(media._id)
+    },
     addTags(tags) {
       this.imported.tags = tags
     },
@@ -235,30 +247,30 @@ export default {
       }
 
       data.name = this.imported.title
-      data.slug = slug(this.imported.title)
       data.description = this.editor.container.firstChild.innerHTML
+      data.colors = this.imported.colors
       
-      let tags = []
       this.imported.tags.forEach((t) => {
-        tags.push(t._id)
+        data.tags.push(t._id)
       })
-      data.tags = tags
 
       // Currently only permits one image per billboard
       data.media.push(this.imported.media[0])
+      data.source = this.imported.source
 
       API.post('billboards', data).then((data) => {
         data = data
-        this.$notify('notifications', 'Billboard created!', 'success')
+        this.$notify('notifications', `${data.name} created!`, 'success')
 
         let addToKits = []
+        if(this.kits.length > 0) this.$notify('notifications', `Adding ${data.name} to your kits`)
         this.kits.forEach(kit => {
           kit.billboards.push(data._id)
           addToKits.push(API.put('kits/'+kit._id, { billboards: kit.billboards }))
         })
         return Promise.all(addToKits)
       }).then((addedToKits) => {
-        if(addedToKits.length > 0) this.$notify('notifications', 'Billboard added to your Kits', 'success')
+        if(addedToKits.length > 0) this.$notify('notifications', `${data.name} added to your kits`, 'success')
         if(addAnother) {
           this.$router.push({ name: 'ImportBillboard' })
           new SmoothScroll().animateScroll(document.body)

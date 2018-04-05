@@ -35,6 +35,11 @@
       }
   }
 
+  .progress {
+    margin-bottom: 0!important;
+    flex-basis: 250px;
+  }
+
   .upload--delete {
     z-index: 15;
   }

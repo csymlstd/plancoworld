@@ -43,6 +43,12 @@ export default new Router({
       component: require('@/components/Kits/Kits'),
     },
     {
+      path: '/kits/create',
+      name: 'CreateKit',
+      meta: { auth: true },
+      component: require('@/components/Kits/Create')
+    },
+    {
       path: '/kits/:slug',
       name: 'Kit',
       component: require('@/components/Kits/Kit'),
