@@ -53,7 +53,6 @@
 
     <Modal @close="closeLogin" :show="loginOpen">
       <div>
-        <h2 class="title has-text-centered has-text-primary">Login to PlanCo World</h2>
         <Login :form="true"></Login>
       </div>
     </Modal>

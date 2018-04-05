@@ -12,12 +12,13 @@
           {{ error.error }}
         </div>
         <div class="field">
+          <p class="field description">Enter the email address from your <br /> PlanCo World profile to get a one-time login link.</p>
           <div class="control"><input type="email" class="input is-medium" placeholder="Email Address" v-model="credentials.email"></div>
         </div>
-        <div class="level">
-          <button class="button is-primary is-medium" type="submit" :class="{ 'is-loading': loading.login }">Send One-Time Login Link</button>
-          or
-          <button class="button is-dark is-medium" :class="{ 'is-loading': loading.steam }" @click="loginWithSteam()"><span class="icon"><i class="fab fa-steam"></i></span> <span>Login with Steam</span></button>
+        <div class="field text-center">
+          <button class="button is-primary is-medium" type="submit" :class="{ 'is-loading': loading.login }">Send Login Link</button>
+          <!-- or
+          <button class="button is-dark is-medium" :class="{ 'is-loading': loading.steam }" @click="loginWithSteam()"><span class="icon"><i class="fab fa-steam"></i></span> <span>Login with Steam</span></button> -->
         </div>
       </form>
     </div>

@@ -16,14 +16,14 @@
 
         <div class="box home-promos">
           <div>
-            <strong class="has-text-grey">New DLC &amp; v1.6!</strong>
+            <strong class="has-text-grey">New Planet Coaster DLC &amp; v1.6!</strong>
             <br />
-            <router-link :to="{ name: 'GuidePage', params: { slug: 'studios-pack-v1-6' } }">See what's new in the<br /> Studios Pack and 1.6 update.</router-link>
+            <router-link :to="{ name: 'GuidePage', params: { slug: 'studios-pack-v1-6' } }">See what's new in the<br /> Studios Pack and 1.6 update</router-link>
           </div>
           <div>
-            <strong class="has-text-grey">Welcome to PlanCo World Beta!</strong>
+            <strong class="has-text-grey">Welcome to PlanCo World v1!</strong>
             <br />
-            <a href="http://reddit.com/planetcoaster">Read our debut on Reddit<br /> to learn what you can do!</a>
+            <a href="http://reddit.com/planetcoaster">Read our debut on Reddit<br /> to learn what you can do</a>
           </div>
         </div>
 
@@ -88,6 +88,12 @@ export default {
       prevNextButtons: false,
       pauseAutoPlayOnHover: false,
       autoPlay: 6000,
+    })
+
+    // Reset animation
+    this.gallery.on('select', index => {
+      this.gallery.cells[index].element.style.animation = 'none'
+      setTimeout(() => { this.gallery.cells[index].element.style.animation = '' }, 10)
     })
 
   }

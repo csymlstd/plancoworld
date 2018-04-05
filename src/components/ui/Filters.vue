@@ -25,7 +25,7 @@
           <div v-else-if="options[group.model].description == false"></div>
           <div v-else-if="isVisible(group.model, options[group.model].visible) || readOnly || options[group.model].showDescriptionsClosed == true">
             <p class="description" v-if="group.model == 'age-groups'">Families stick around the gentle rides, while older guests enjoy the thrills</p>
-            <p class="description" v-if="group.model == 'parks-plans'">Find a base to start building, or a full park to jump in and manage.</p>
+            <p class="description" v-if="group.model == 'parks-plans'">Find a base to start building, or a full park to jump in and make your own.</p>
             <p class="description" v-if="group.model == 'billboards-context'">What the billboards represent, and where they would be placed</p>
             <p class="description" v-if="group.model == 'amenities'">Additions to your park that wow your guests and improves your park rating</p>
             <p class="description" v-if="group.model == 'themes'">Different themes of scenery and building materials in PlanCo</p>
