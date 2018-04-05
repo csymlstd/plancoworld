@@ -530,7 +530,7 @@ export default {
 
       API.fetch(this.apiURL(false)).then((park) => {
         this.park = park
-        this.shareURL = `http://planco.world/parks/${this.park.slug}`
+        this.shareURL = `https://planco.world/parks/${this.park.slug}`
         this.loading = false
 
       }).catch((err) => {

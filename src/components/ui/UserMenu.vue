@@ -1,6 +1,6 @@
 <template>
   <div class="navbar-item has-dropdown is-hoverable">
-    <div class="navbar-link"><div class="ui avatar"><img :src="user.avatar.url" v-if="user.avatar" /><img src="http://via.placeholder.com/150x150?text=%20" v-else /></div></div>
+    <div class="navbar-link"><div class="ui avatar"><img :src="user.avatar.url" v-if="user.avatar" /><img src="https://via.placeholder.com/150x150?text=%20" v-else /></div></div>
     <div class="navbar-dropdown is-right">
       <router-link to="/my/account" class="navbar-item">{{ user.name.display }}</router-link>
       <router-link to="/my/account" class="navbar-item">Your Account</router-link>

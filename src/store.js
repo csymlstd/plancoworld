@@ -28,7 +28,7 @@ export const store = new Vuex.Store({
         _id: false,
         name: {},
         avatar: {
-          url: 'http://placehold.it/150x150'
+          url: 'https://placehold.it/150x150'
         }
       }
     },
@@ -100,7 +100,7 @@ export const store = new Vuex.Store({
           _id: false,
           name: {},
           avatar: {
-            url: 'http://placehold.it/150x150'
+            url: 'https://placehold.it/150x150'
           }
         })
         context.commit('setAuthState', false)

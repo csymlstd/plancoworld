@@ -13,7 +13,7 @@ export default {
     profile: {
       name: {},
       avatar: {
-        url: 'http://placehold.it/150x150'
+        url: '//placehold.it/150x150'
       }
     }
   },
@@ -174,7 +174,7 @@ export default {
       _id: false,
       name: {},
       avatar: {
-        url: 'http://placehold.it/150x150'
+        url: '//placehold.it/150x150'
       }
     })
     store.commit('setAuthState', false)

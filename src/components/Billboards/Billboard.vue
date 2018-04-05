@@ -291,7 +291,7 @@ export default {
 
       API.fetch(this.apiURL(false)).then((billboard) => {
         this.billboard = Object.assign({}, this.billboard, billboard)
-        this.shareURL = `http://planco.world/billboards/${this.billboard.slug}`
+        this.shareURL = `https://planco.world/billboards/${this.billboard.slug}`
         this.loading = false
 
       }).catch((err) => {

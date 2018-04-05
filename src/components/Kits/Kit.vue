@@ -432,7 +432,7 @@ export default {
 
       API.fetch(this.apiURL(false)).then((kit) => {
         this.kit = kit
-        this.shareURL = `http://planco.world/kits/${this.kit.slug}`
+        this.shareURL = `https://planco.world/kits/${this.kit.slug}`
         this.loading = false
         this.editMode = false
         this.$refs.heroTags.setPopulated(this.kit.tags)

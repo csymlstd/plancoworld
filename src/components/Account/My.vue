@@ -3,7 +3,7 @@
     <div class="level">
       <div class="level-left">
         <figure class="image is-128x128 level-item">
-          <img :src="user.avatar ? user.avatar.url : 'http://placehold.it/100x100'" class="ui image small" />
+          <img :src="user.avatar ? user.avatar.url : 'https://placehold.it/100x100'" class="ui image small" />
         </figure>
         <div class="level-item">
           <button class="ui button" @click="uploadAvatar = (uploadAvatar == false) ? true : false" type="submit">Update Avatar</button>

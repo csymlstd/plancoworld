@@ -658,7 +658,7 @@ export default {
 
       API.fetch(this.apiURL(false)).then((blueprint) => {
         this.blueprint = Object.assign({}, this.blueprint, blueprint)
-        this.shareURL = `http://planco.world/blueprints/${this.blueprint.slug}`
+        this.shareURL = `https://planco.world/blueprints/${this.blueprint.slug}`
         this.loading = false
 
       }).catch((err) => {

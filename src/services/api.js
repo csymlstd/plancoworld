@@ -3,7 +3,7 @@ import axios from 'axios'
 
 let API_URL = 'http://localhost:5100/v1/'
 if(process.env.NODE_ENV == 'production') {
-  API_URL = 'http://api.planco.world/v1/'
+  API_URL = 'https://api.planco.world/v1/'
 }
 const api = axios.create({
   baseURL: API_URL,
