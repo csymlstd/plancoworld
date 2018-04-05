@@ -23,7 +23,7 @@
           <div>
             <strong class="has-text-grey">Welcome to PlanCo World v1!</strong>
             <br />
-            <a href="http://reddit.com/planetcoaster">Read our debut on Reddit<br /> to learn what you can do</a>
+            <a href="https://www.reddit.com/r/PlanetCoaster/comments/8a08wz/heyo_planco_world_is_open_for_business_a_place/" target="_blank">Read our debut on Reddit<br /> to learn what you can do</a>
           </div>
         </div>
 
