@@ -2,8 +2,8 @@
   <article :class="['billboard', {'is-vertical': isVertical }]" @click="open = false">
     <section class="hero hero--tall">
       <img :src="billboard.media[0].url" v-if="billboard.media.length > 0 && billboard.media[0].type == 'image'" class="cover-photo" />
-      <video class="cover-photo" muted autoplay loop>
-        <source :src="billboard.media[0].url" v-if="billboard.media.length > 0 && billboard.media[0].type == 'video'">
+      <video class="cover-photo" muted autoplay loop v-if="billboard.media.length > 0 && billboard.media[0].type == 'video'">
+        <source :src="billboard.media[0].url">
       </video>
     </section>
     <section class="hero">
