@@ -264,24 +264,26 @@ export default {
       data.media.push(this.imported.media[0])
       data.source = this.imported.source
 
+      let billboard = {}
       API.post('billboards', data).then((data) => {
-        data = data
-        this.$notify('notifications', `${data.name} created!`, 'success')
+        billboard = data
+        this.$notify('notifications', `${billboard.name} created!`, 'success')
 
         let addToKits = []
-        if(this.kits.length > 0) this.$notify('notifications', `Adding ${data.name} to your kits`)
+        if(this.kits.length > 0) this.$notify('notifications', `Adding ${billboard.name} to your kits`)
         this.kits.forEach(kit => {
-          kit.billboards.push(data._id)
+          if(!kit.billboards) kit.billboards = []
+          kit.billboards.push(billboard._id)
           addToKits.push(API.put('kits/'+kit._id, { billboards: kit.billboards }))
         })
         return Promise.all(addToKits)
       }).then((addedToKits) => {
-        if(addedToKits.length > 0) this.$notify('notifications', `${data.name} added to your kits`, 'success')
+        if(addedToKits.length > 0) this.$notify('notifications', `${billboard.name} added to your kits`, 'success')
         if(addAnother) {
           this.$router.push({ name: 'ImportBillboard' })
           new SmoothScroll().animateScroll(document.body)
         } else {
-          this.$router.push({ name: 'Billboard', params: { slug: data.slug }})
+          this.$router.push({ name: 'Billboard', params: { slug: billboard.slug }})
         } 
       }).catch((err) => {
         console.log(err)

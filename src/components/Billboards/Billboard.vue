@@ -1,9 +1,9 @@
 <template>
   <article :class="['billboard', {'is-vertical': isVertical }]" @click="open = false">
     <section class="hero hero--tall">
-      <img :src="billboard.media[0].url" v-if="billboard.media && billboard.media[0].type == 'image'" class="cover-photo" />
+      <img :src="billboard.media[0].url" v-if="billboard.media.length > 0 && billboard.media[0].type == 'image'" class="cover-photo" />
       <video class="cover-photo" muted autoplay loop>
-        <source :src="billboard.media[0].url" v-if="billboard.media && billboard.media[0].type == 'video'">
+        <source :src="billboard.media[0].url" v-if="billboard.media.length > 0 && billboard.media[0].type == 'video'">
       </video>
     </section>
     <section class="hero">
@@ -13,8 +13,8 @@
               <Filters :options="heroFilterOptions" :selected="billboard.tags" :inline="true" :readOnly="true" :large="true" ref="heroTags" class="level-item"></Filters>
           </div>
           <div class="level-right">
-              <span class="level-item tag is-large is-rounded" v-if="billboard.media[0] && billboard.media[0].meta.duration" title="Duration" v-tooltip="'Duration'"><i class="fas fa-forward"></i>&nbsp; {{ billboard.media[0].meta.duration }}s</span>
-              <span class="level-item tag is-large is-rounded" v-if="billboard.media[0] && billboard.media[0].size" title="File Size" v-tooltip="'File Size'"><i class="fas fa-hdd"></i>&nbsp; {{ size(billboard.media[0].size) }}</span>
+              <span class="level-item tag is-large is-rounded" v-if="billboard.media.length > 0 && billboard.media[0].type == 'video' && billboard.media[0].meta.duration" title="Duration" v-tooltip="'Duration'"><i class="fas fa-forward"></i>&nbsp; {{ billboard.media[0].meta.duration }}s</span>
+              <span class="level-item tag is-large is-rounded" v-if="billboard.media.length > 0 && billboard.media[0].size" title="File Size" v-tooltip="'File Size'"><i class="fas fa-hdd"></i>&nbsp; {{ size(billboard.media[0].size) }}</span>
           </div>
         </div>
       </div>
@@ -30,7 +30,7 @@
             <button class="button level-item is-medium is-dark" @click="copy" v-tooltip="{ content: 'Copy Billboard URL'  }"><span class="icon"><i class="fas fa-link"></i></span></button>
 
             <div class="field level-item has-addons">
-              <div class="control"><button class="button is-primary is-medium level-item" :class="{ 'is-loading': downloading }" @click="downloadBillboard(billboard.media[0]._id)" v-tooltip="billboard.media[0].downloads+' Downloads'" :disabled="!billboard.media"><span class="icon"><i class="fas fa-cloud-download"></i></span> <span>Download</span></button></div>
+              <div class="control"><button class="button is-primary is-medium level-item" :class="{ 'is-loading': downloading }" @click="downloadBillboard(billboard.media[0]._id)" v-tooltip="downloads+' Downloads'" :disabled="!billboard.media"><span class="icon"><i class="fas fa-cloud-download"></i></span> <span>Download</span></button></div>
               <div class="control">
                 <div class="dropdown is-right" :class="{ 'is-active': open }" @click.stop>
                   <div class="dropdown-trigger" @click="open = open ? false : true">
@@ -40,7 +40,7 @@
                   </div>
                   <div class="dropdown-menu" id="dropdown-menu" role="menu">
                     <div class="dropdown-content">
-                      <a class="dropdown-item"><strong>{{ billboard.media[0].name }}</strong></a>
+                      <a class="dropdown-item" v-if="billboard.media.length > 0"><strong>{{ billboard.media[0].name }}</strong></a>
                       <div v-if="billboard.source.length > 0">
                       <hr class="dropdown-divider">
                       <div class="dropdown-item">
@@ -169,7 +169,7 @@ export default {
   data () {
     return {
       loading: false,
-      billboard: { tags: [], source: [], },
+      billboard: { tags: [], source: [], media: [], colors: [] },
       shareURL: '',
       editMode: false,
       downloading: false,
@@ -310,7 +310,6 @@ export default {
       data.media = media
       data.user = data.user._id
       data.description = this.editor.container.firstChild.innerHTML
-      data.tags = this.$refs.tags.selected
 
       return API.put(this.apiURL(), data).then((park) => {
         this.$notify('notifications', `${data.name} has been saved`, 'success')
