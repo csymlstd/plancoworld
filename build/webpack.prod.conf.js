@@ -102,6 +102,12 @@ const webpackConfig = merge(baseWebpackConfig, {
         to: config.build.assetsSubDirectory,
         ignore: ['.*']
       }
+    ]),
+    new CopyWebpackPlugin([
+      {
+        from: path.resolve(__dirname, '../sitemap.xml'),
+        to: path.resolve(__dirname, '../dist/sitemap.xml'),
+      }
     ])
   ]
 })
