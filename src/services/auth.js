@@ -62,6 +62,7 @@ export default {
           document.body.classList.add('logged-in')
           localStorage.setItem('access_token', auth.access_token)
           localStorage.setItem('refresh_token', auth.refresh_token)
+          window._urq.push(['setFeedbackForumUserName', auth.user.name.display])
 
           message.source.close()
           resolve(auth.user)

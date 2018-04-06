@@ -1,7 +1,7 @@
 <template>
   <div class="column is-one-third-desktop is-half-tablet">
     <div class="card has-level-bottom">
-      <div class="card-image" :style="{ 'backgroundImage': `url('${thumbnail}')` }" @click="viewBlueprint">
+      <div class="card-image" :style="{ 'background': getBackground(model.media[0]) }" @click="viewBlueprint">
         <div class="level bottom">
           <div class="level-left">
             <a @click.stop="$emit('remove', { id: model._id, model: 'blueprints' })" v-if="editMode" class="level-item"><span class="tag is-rounded is-warning is-medium"><i class="fas fa-times"></i>&nbsp; Remove</span></a>
@@ -54,7 +54,6 @@ export default {
     return {
       selected: [],
       groups: [],
-      thumbnail: ''
     }
   },
   methods: {
@@ -73,15 +72,15 @@ export default {
       return this.model.tags.filter(t => {
         return t._id == '5a442a25c42b1d290831e007'
       }).length > 0
-    }
+    },
+    getBackground(item) {
+        if(item.type != 'image') return ''
+        let url = item.alternates.indexOf('600w') > -1 ? Media.getAlternateUrl('600w', item.url) : item.url
+        return `url('${url}')`
+    },
    },
   mounted () {
-    if((this.model.media.length > 0) && this.model.media[0].alternates.indexOf('350w') > -1) {
-      let url = Media.getAlternateUrl('350w', this.model.media[0].url)
-      this.$set(this, 'thumbnail', url)
-    } else if(this.model.media.length > 0) {
-      this.$set(this, 'thumbnail', this.model.media[0].url)
-    }
+
   }
 }
 </script>

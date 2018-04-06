@@ -55,7 +55,6 @@ export default {
       selected: [],
       groups: [],
       addReaction: false,
-      thumbnail: '',
       tagOptions: {
         'parks': {
           label: false,
@@ -71,15 +70,15 @@ export default {
     },
     isSaved() {
       return (this.model.toolbox.indexOf(Auth.user.profile._id) > -1)
-    }
+    },
+    getBackground(item) {
+        if(item.type != 'image') return ''
+        let url = item.alternates.indexOf('600w') > -1 ? Media.getAlternateUrl('600w', item.url) : item.url
+        return `url('${url}')`
+    },
   },
   mounted () {
-    if((this.model.media.length > 0) && this.model.media[0].alternates.indexOf('350w') > -1) {
-      let url = Media.getAlternateUrl('350w', this.model.media[0].url)
-      this.$set(this, 'thumbnail', url)
-    } else if(this.model.media.length > 0) {
-      this.$set(this, 'thumbnail', this.model.media[0].url)
-    }
+
   }
 }
 </script>

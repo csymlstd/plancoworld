@@ -2,8 +2,8 @@
   <div class="column is-one-third-desktop is-half-tablet">
     <div class="card has-level-bottom">
       <div class="card-image" @click="viewBillboard" :style="{ 'background': getBackground(model.media[0]) }">
-        <video autoplay loop muted>
-          <source :src="model.media[0].url" v-if="model.media[0] && model.media[0].type == 'video'">
+        <video autoplay loop muted v-if="model.media[0] && model.media[0].type == 'video'">
+          <source :src="model.media[0].url">
         </video>
         <div class="level bottom">
           <div class="level-left">
@@ -36,6 +36,7 @@
 
 <script>
 import API from '@/services/api'
+import Media from '@/services/media'
 import router from '@/router'
 import Creator from '@/components/ui/ProfileMicro'
 import Reaction from '@/components/ui/Reaction'
@@ -62,7 +63,9 @@ export default {
       router.push({ name: 'Billboard', params: { slug: this.model.slug, id: this.model._id }})
     },
     getBackground(item) {
-        return `url('${item.url}')`
+        if(item.type != 'image') return ''
+        let url = item.alternates.indexOf('600w') > -1 ? Media.getAlternateUrl('600w', item.url) : item.url
+        return `url('${url}')`
     },
     downloadBillboard () {
       this.downloading = true

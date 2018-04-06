@@ -1,16 +1,5 @@
 <template>
   <div class="reactions is-selectable" :class="{ 'is-open': open }">
-    <div v-if="reactOnly">
-      <div class="add-reaction" v-show="open" @mouseleave="open = false">
-        <a class="reaction nauseating" @click="react('nauseating')">Nauseating!</a>
-        <a class="reaction boring" @click="react('boring')">Boring..</a>
-        <a class="reaction scary" @click="react('scary')">Scary!</a>
-        <a class="reaction fun" @click="react('exciting')">Exciting!</a>
-        <a class="reaction love" @click="react('love')">Love It!</a>
-      </div>
-      <i class="far fa-plus-circle has-text-grey-light" @mouseover="open = true" @click="open ? open = false : open = true" v-if="isLoggedIn()"></i>
-    </div>
-    <div v-else>
       <div class="add-reaction" v-show="open" @mouseleave="open = false">
         <a class="reaction nauseating" @click="react('nauseating')">Nauseating!</a>
         <a class="reaction boring" @click="react('boring')">Boring..</a>
@@ -25,7 +14,6 @@
       <a class="reaction scary" v-if="hasReacted('scary')" v-tooltip="{ content: total('scary') }">Scary!</a>
       <a class="reaction fun" v-if="hasReacted('exciting')" v-tooltip="{ content: total('exciting') }">Exciting!</a>
       <a class="reaction love" v-if="hasReacted('love')" v-tooltip="{ content: total('love') }">Love It!</a>
-    </div>
   </div>
 </template>
 
