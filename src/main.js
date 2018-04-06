@@ -24,6 +24,12 @@ Vue.use(Vuelidate)
 import VueI18n from 'vue-i18n'
 Vue.use(VueI18n)
 
+import VueAnalytics from 'vue-analytics'
+Vue.use(VueAnalytics, {
+  id: 'UA-102743872-1',
+  router
+})
+
 // import Raven from 'raven-js';
 // import RavenVue from 'raven-js/plugins/vue';
 // Raven.config('https://1980789df2fc4270be59dd9b23d0dde9@sentry.io/197126')

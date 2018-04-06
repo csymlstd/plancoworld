@@ -29,7 +29,7 @@ module.exports = {
       ref  : 'origin/master',
       repo : 'git@plancoworld.github.com:csymlstd/plancoworld.git',
       path : '/var/www/client',
-      'post-deploy' : 'npm install && pm2 startOrReload ecosystem.config.js --env production'
+      'post-deploy' : 'npm install'
     }
   }
 };

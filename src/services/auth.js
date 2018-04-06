@@ -45,7 +45,6 @@ export default {
     return api.post('auth/login-link/verify', {
       token
     }, false).then(response => {
-      console.log('verified', response)
       localStorage.setItem('access_token', response.access_token)
       localStorage.setItem('refresh_token', response.refresh_token)
 
@@ -141,7 +140,6 @@ export default {
       return api.post('auth/refresh', body, {
         headers: { 'Authorization': authHeader }
       }).then((response) => {
-        console.log('token refreshed')
         localStorage.setItem('access_token', response.access_token)
 
         this.tokens.access_token = {}
