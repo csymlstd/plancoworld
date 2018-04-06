@@ -73,7 +73,7 @@ export default {
         return t._id == '5a442a25c42b1d290831e007'
       }).length > 0
     },
-    getBackground(item) {
+    getBackground(item = {}) {
         if(item.type != 'image') return ''
         let url = item.alternates.indexOf('600w') > -1 ? Media.getAlternateUrl('600w', item.url) : item.url
         return `url('${url}')`

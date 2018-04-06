@@ -2,7 +2,7 @@
   <article :class="['billboard', {'is-vertical': isVertical }]" @click="open = false">
     <section class="hero hero--tall">
       <img :src="billboard.media[0].url" v-if="billboard.media.length > 0 && billboard.media[0].type == 'image'" class="cover-photo" />
-      <video class="cover-photo" muted autoplay loop v-if="billboard.media.length > 0 && billboard.media[0].type == 'video'">
+      <video ref="video" class="cover-photo" muted autoplay loop v-if="billboard.media.length > 0 && billboard.media[0].type == 'video'">
         <source :src="billboard.media[0].url">
       </video>
     </section>
@@ -13,6 +13,8 @@
               <Filters :options="heroFilterOptions" :selected="billboard.tags" :inline="true" :readOnly="true" :large="true" ref="heroTags" class="level-item"></Filters>
           </div>
           <div class="level-right">
+              <a class="level-item button is-black is-medium is-rounded" @click="video.muted = false" v-if="hasAudio && muted" v-tooltip="'Muted'"><span class="icon"><i class="fas fa-volume-mute"></i></span></a>
+              <a class="level-item button is-black is-medium is-rounded" @click="video.muted = true" v-if="hasAudio && !muted" v-tooltip="'Mute'"><span class="icon"><i class="fas fa-volume-up"></i></span></a>
               <span class="level-item tag is-large is-rounded" v-if="billboard.media.length > 0 && billboard.media[0].type == 'video' && billboard.media[0].meta.duration" title="Duration" v-tooltip="'Duration'"><i class="fas fa-forward"></i>&nbsp; {{ billboard.media[0].meta.duration }}s</span>
               <span class="level-item tag is-large is-rounded" v-if="billboard.media.length > 0 && billboard.media[0].size" title="File Size" v-tooltip="'File Size'"><i class="fas fa-hdd"></i>&nbsp; {{ size(billboard.media[0].size) }}</span>
           </div>
@@ -274,6 +276,15 @@ export default {
     isVertical() {
       return this.billboard.tags.filter(t => { return t.slug == 'vertical' }).length > 0
     },
+    hasAudio() {
+      return this.$refs.video ? Media.hasAudio(this.$refs.video) : false
+    },
+    muted() {
+      return this.$refs.video ? this.$refs.video.muted : false
+    },
+    video() {
+      return this.$refs.video
+    }
   },
   methods: {
     downloadBillboard (mediaID) {
@@ -293,6 +304,8 @@ export default {
         this.billboard = Object.assign({}, this.billboard, billboard)
         this.shareURL = `https://planco.world/billboards/${this.billboard.slug}`
         this.loading = false
+
+        this.$nextTick(() => { console.dir(this.$refs.video) })
 
       }).catch((err) => {
         API.handleError(err, 'billboards')

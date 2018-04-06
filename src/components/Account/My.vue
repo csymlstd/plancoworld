@@ -18,7 +18,7 @@
     <div class="field">
     <div class="field-body">
       <div class="field">
-        <label class="label">Real Name</label>
+        <label class="label">Real Name (Display)</label>
         <div class="control"><input type="text" v-model="user.name.real" class="input is-medium"></div>
       </div>
       <div class="field">

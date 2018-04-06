@@ -87,6 +87,12 @@ export default {
     return (transcoderTypes.indexOf(type) > -1)
   },
 
+  hasAudio(element) {
+    return element.mozHasAudio ||
+    Boolean(element.webkitAudioDecodedByteCount) ||
+    Boolean(element.audioTracks && element.audioTracks.length)
+  },
+
   // http://scratch99.com/web-development/javascript/convert-bytes-to-mb-kb/
   bytesToSize(bytes) {
       const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];

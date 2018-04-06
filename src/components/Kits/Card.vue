@@ -71,7 +71,7 @@ export default {
     isSaved() {
       return (this.model.toolbox.indexOf(Auth.user.profile._id) > -1)
     },
-    getBackground(item) {
+    getBackground(item = {}) {
         if(item.type != 'image') return ''
         let url = item.alternates.indexOf('600w') > -1 ? Media.getAlternateUrl('600w', item.url) : item.url
         return `url('${url}')`

@@ -63,7 +63,7 @@ export default {
     viewBillboard () {
       router.push({ name: 'Billboard', params: { slug: this.model.slug, id: this.model._id }})
     },
-    getBackground(item) {
+    getBackground(item = {}) {
         if(item.type != 'image') return ''
         let url = item.alternates.indexOf('600w') > -1 ? Media.getAlternateUrl('600w', item.url) : item.url
         return `url('${url}')`
@@ -73,7 +73,6 @@ export default {
       let mediaID = this.model.media[0]._id
       API.fetch(`media/${mediaID}/download`).then((billboard) => {
         let url = billboard.signedRequest
-        console.log(url)
         window.open(url)
         this.downloading = false
       })

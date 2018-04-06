@@ -5,7 +5,7 @@
       <a :href="'/billboards/'+model.slug" @click="viewBillboard" class="level-item" :title="model.name">{{ model.name | truncate(45) }}</a>
     </div>
     <div class="level-right">
-      <div class="switch level-item" @click="toggleStatus()" :class="{ 'is-active': model.status }">
+      <div class="switch level-item" @click="toggleStatus()" :class="{ 'is-active': model.status }" v-if="isOwner()">
         <label></label>
       </div>
     </div>
@@ -16,6 +16,7 @@
 import router from '@/router'
 import Media from '@/services/media'
 import API from '@/services/api'
+import Auth from '@/services/auth'
 
 export default {
   name: 'billboard-list',
@@ -52,6 +53,9 @@ export default {
       })
       this.model.status = newStatus
     },
+    isOwner() {
+      return Auth.isOwner(this.model)
+    }
   },
   mounted () {
     // if((this.model.media.length > 0) && this.model.media[0].alternates.indexOf('350w') > -1) {
