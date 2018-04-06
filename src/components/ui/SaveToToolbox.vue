@@ -33,7 +33,7 @@ export default {
   },
   methods: {
     toggle () {
-      if(!Auth.authenticated) {
+      if(!this.$store.state.user.authenticated) {
         this.$store.commit('toggleModal', { modal: 'login', state: true })
 
         return false
