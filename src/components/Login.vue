@@ -17,8 +17,7 @@
         </div>
         <div class="field text-center">
           <button class="button is-primary is-medium" type="submit" :class="{ 'is-loading': loading.login }">Send Login Link</button>
-          <!-- or
-          <button class="button is-dark is-medium" :class="{ 'is-loading': loading.steam }" @click="loginWithSteam()"><span class="icon"><i class="fab fa-steam"></i></span> <span>Login with Steam</span></button> -->
+          <button class="button is-dark is-medium" :class="{ 'is-loading': loading.steam }" @click="loginWithSteam()"><span class="icon"><i class="fab fa-steam"></i></span> <span>Login with Steam</span></button>
         </div>
       </form>
     </div>

@@ -1,7 +1,7 @@
 <template>
   <div class="column is-one-third-desktop is-half-tablet">
-    <div class="card has-level-bottom">
-      <div class="card-image" @click="viewBillboard" :style="{ 'background': getBackground(model.media[0]) }">
+    <div class="card has-level-bottom" >
+      <div class="card-image" :class="{ 'playing': playing }" @click="viewBillboard" :style="{ 'background': getBackground(model.media[0]) }">
         <video autoplay loop muted v-if="model.media[0] && model.media[0].type == 'video'">
           <source :src="model.media[0].url">
         </video>
@@ -55,7 +55,8 @@ export default {
     return {
       selected: [],
       groups: [],
-      downloading: false
+      downloading: false,
+      playing: false,
     }
   },
   methods: {
@@ -79,14 +80,20 @@ export default {
     },
   },
   mounted () {
-
+    this.$nextTick(() => {
+      let v = this.$el.querySelector('video')
+      if(v) v.addEventListener('playing', () => {
+        this.playing = true
+      })
+    })
+    
   }
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" scoped>
-  .card-image {
+  .card-image:not(.playing) {
     background: url('/assets/images/color-bars.jpg');
   }
 </style>

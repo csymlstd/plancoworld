@@ -11,7 +11,7 @@
       </div>
     </div>
 
-    <Upload @uploaded="updateAvatar" folder="users" :instant="true" :maxItems="1" v-if="uploadAvatar">
+    <Upload @uploaded="updateAvatar" :allowFiles="false" folder="users" :instant="true" :maxItems="1" v-if="uploadAvatar">
 
     </Upload>
 

@@ -1,6 +1,6 @@
 import api from '@/services/api'
 
-const imageTypes = ['image/png','image/jpeg','image/gif']
+const imageTypes = ['image/png','image/jpeg','image/gif','image/jpg']
 const fileTypes = ['application/pdf','application/octet-stream','application/postscript']
 const audioTypes = ['audio/webm','audio/ogg','audio/mpeg3','audio/x-mpeg-3','audio/wav','audio/x-wav','audio/x-ms-wma','audio/aac','audio/mp4','audio/flac']
 const videoTypes = ['video/webm']
