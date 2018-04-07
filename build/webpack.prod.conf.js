@@ -27,10 +27,10 @@ const webpackConfig = merge(baseWebpackConfig, {
   },
   plugins: [
     // http://vuejs.github.io/vue-loader/en/workflow/production.html
-    // new Prerender(
-    //   path.join(__dirname, '../dist'),
-    //   ['/','/parks','/blueprints','/billboards','/guides']
-    // ),
+    new Prerender({
+      staticDir: path.join(__dirname, '../dist'),
+      routes: ['/','/parks','/blueprints','/billboards','/guides','/kits']
+    }),
     new webpack.DefinePlugin({
       'process.env': env
     }),

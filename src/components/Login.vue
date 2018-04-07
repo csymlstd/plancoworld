@@ -80,6 +80,7 @@ export default {
         this.$store.commit('setProfile', user)
         this.$store.commit('setAuthState', true)
         this.$store.commit('toggleModal', { modal: 'login', state: false })
+        this.$ga.set('userId', user._id)
         this.$notify('notifications','Welcome back to PlanCo World!')
       }).catch(() => {
         this.loading.steam = false

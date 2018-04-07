@@ -33,10 +33,10 @@
           <div class="navbar-item has-dropdown is-hoverable is-hidden-touch" v-if="user.authenticated">
             <a class="navbar-link"><span class="icon"><i class="fas fa-plus-circle"></i></span></a>
             <div class="navbar-dropdown is-right">
-              <router-link :to="{ name: 'ImportPark' }" class="navbar-item">Park</router-link>
-              <router-link :to="{ name: 'ImportBlueprint' }" class="navbar-item">Blueprint</router-link>
-              <router-link :to="{ name: 'ImportBillboard' }" class="navbar-item">Billboard</router-link>
-              <router-link :to="{ name: 'CreateKit' }" class="navbar-item">Kit</router-link>
+              <router-link :to="{ name: 'ImportPark' }" class="navbar-item" href="/parks">Park</router-link>
+              <router-link :to="{ name: 'ImportBlueprint' }" class="navbar-item" href="/blueprints">Blueprint</router-link>
+              <router-link :to="{ name: 'ImportBillboard' }" class="navbar-item" href="/billboards">Billboard</router-link>
+              <router-link :to="{ name: 'CreateKit' }" class="navbar-item" href="/kits">Kit</router-link>
               <!-- <router-link  class="navbar-item">Audio</router-link> -->
               <!-- <hr class="dropdown-divider" /> -->
               <!-- <router-link :to="{ name: 'Convert' }" class="navbar-item">Converter</router-link>

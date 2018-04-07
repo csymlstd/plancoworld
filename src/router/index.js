@@ -139,12 +139,12 @@ export default new Router({
     //   component: require('@/components/Billboards/Convert'),
 
     // },
-    // {
-    //   path: '/billboards/generator',
-    //   name: 'Generator',
-    //   meta: { },
-    //   component: require('@/components/Billboards/Generator'),
-    // },
+    {
+      path: '/billboards/generator',
+      name: 'Generator',
+      meta: { },
+      component: require('@/components/Billboards/Generator'),
+    },
     {
       path: '/billboards/:slug',
       name: 'Billboard',

@@ -147,7 +147,6 @@ export default {
       this.updating = true
       if(!this.user.avatar) this.user.avatar = []
       this.$set(this.user, 'avatar', media)
-      this.$set(auth.user.profile, 'avatar', media)
 
       console.log('Updating avatar', media)
       API.put('user', { avatar: media._id }).then(() => {
