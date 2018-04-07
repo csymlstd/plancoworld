@@ -88,6 +88,11 @@ Vue.component('vs-notify', {
 		}
 	}
 })
+
+export default {
+	
+}
+
 </script>
 
 <style>

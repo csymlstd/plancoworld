@@ -1,8 +1,8 @@
 <template>
   <article :class="['billboard', {'is-vertical': isVertical }]" @click="open = false">
     <section class="hero hero--tall">
-      <img :src="billboard.media[0].url" v-if="billboard.media.length > 0 && billboard.media[0].type == 'image'" class="cover-photo" />
-      <video ref="video" class="cover-photo" muted autoplay loop v-if="billboard.media.length > 0 && billboard.media[0].type == 'video'">
+      <img :src="billboard.media[0].url" v-if="billboard.media.length > 0 && billboard.media[0] !== null && billboard.media[0].type == 'image'" class="cover-photo" />
+      <video ref="video" class="cover-photo" muted autoplay loop v-if="billboard.media.length > 0 && billboard.media[0] !== null &&  billboard.media[0].type == 'video'">
         <source :src="billboard.media[0].url">
       </video>
     </section>
@@ -15,8 +15,8 @@
           <div class="level-right">
               <a class="level-item button is-black is-medium is-rounded" @click="video.muted = false" v-if="hasAudio && muted" v-tooltip="'Muted'"><span class="icon"><i class="fas fa-volume-mute"></i></span></a>
               <a class="level-item button is-black is-medium is-rounded" @click="video.muted = true" v-if="hasAudio && !muted" v-tooltip="'Mute'"><span class="icon"><i class="fas fa-volume-up"></i></span></a>
-              <span class="level-item tag is-large is-rounded" v-if="billboard.media.length > 0 && billboard.media[0].type == 'video' && billboard.media[0].meta.duration" title="Duration" v-tooltip="'Duration'"><i class="fas fa-forward"></i>&nbsp; {{ billboard.media[0].meta.duration }}s</span>
-              <span class="level-item tag is-large is-rounded" v-if="billboard.media.length > 0 && billboard.media[0].size" title="File Size" v-tooltip="'File Size'"><i class="fas fa-hdd"></i>&nbsp; {{ size(billboard.media[0].size) }}</span>
+              <span class="level-item tag is-large is-rounded" v-if="billboard.media.length > 0 && billboard.media[0] !== null &&  billboard.media[0].type == 'video' && billboard.media[0].meta.duration" title="Duration" v-tooltip="'Duration'"><i class="fas fa-forward"></i>&nbsp; {{ billboard.media[0].meta.duration }}s</span>
+              <span class="level-item tag is-large is-rounded" v-if="billboard.media.length > 0 && billboard.media[0] !== null &&  billboard.media[0].size" title="File Size" v-tooltip="'File Size'"><i class="fas fa-hdd"></i>&nbsp; {{ size(billboard.media[0].size) }}</span>
           </div>
         </div>
       </div>
@@ -31,7 +31,7 @@
           <div class="level-right">
             <button class="button level-item is-medium is-dark" @click="copy" v-tooltip="{ content: 'Copy Billboard URL'  }"><span class="icon"><i class="fas fa-link"></i></span></button>
 
-            <div class="field level-item has-addons">
+            <div class="field level-item has-addons" v-if="billboard.media.length > 0 && billboard.media[0] !== null">
               <div class="control"><button class="button is-primary is-medium level-item" :class="{ 'is-loading': downloading }" @click="downloadBillboard(billboard.media[0]._id)" v-tooltip="downloads+' Downloads'" :disabled="!billboard.media"><span class="icon"><i class="fas fa-cloud-download"></i></span> <span>Download</span></button></div>
               <div class="control">
                 <div class="dropdown is-right" :class="{ 'is-active': open }" @click.stop>
@@ -44,13 +44,13 @@
                     <div class="dropdown-content">
                       <a class="dropdown-item" v-if="billboard.media.length > 0"><strong>{{ billboard.media[0].name }}</strong></a>
                       <div v-if="billboard.source.length > 0">
-                      <hr class="dropdown-divider">
-                      <div class="dropdown-item">
-                        <p class="has-text-grey-light is-size-7">{{ billboard.user.name.display }} has provided source files so you customize this billboard! Additional software may be necessary.</p>
-                      </div>
-                      <a @click="downloadBillboard(source._id)" class="dropdown-item" :key="key" v-for="(source, key) in billboard.source">
-                        {{ source.name }}
-                      </a>
+                        <hr class="dropdown-divider">
+                        <div class="dropdown-item">
+                          <p class="has-text-grey-light is-size-7">{{ billboard.user.name.display }} has provided source files so you customize this billboard! Additional software may be necessary.</p>
+                        </div>
+                        <a @click="downloadBillboard(source._id)" class="dropdown-item" :key="key" v-for="(source, key) in billboard.source">
+                          {{ source.name }}
+                        </a>
                       </div>
                     </div>
                   </div>
@@ -293,7 +293,7 @@ export default {
       API.fetch(`media/${mediaID}/download`).then((billboard) => {
         let url = billboard.signedRequest
         console.log(url)
-        window.open(url)
+        window.location = url
         this.downloading = false
       })
     },
@@ -304,8 +304,6 @@ export default {
         this.billboard = Object.assign({}, this.billboard, billboard)
         this.shareURL = `https://planco.world/billboards/${this.billboard.slug}`
         this.loading = false
-
-        this.$nextTick(() => { console.dir(this.$refs.video) })
 
       }).catch((err) => {
         API.handleError(err, 'billboards')

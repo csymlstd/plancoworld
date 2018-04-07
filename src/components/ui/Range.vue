@@ -1,7 +1,7 @@
 <template>
     <div class="control range-wrapper">
         <div class="range"></div>
-        <input type="number" :value="value" :min="min" :max="max" :step="step" v-model="value" />
+        <input type="number" :min="min" :max="max" :step="step" v-model="value" />
     </div>
 </template>
 

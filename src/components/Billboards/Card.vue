@@ -73,7 +73,7 @@ export default {
       let mediaID = this.model.media[0]._id
       API.fetch(`media/${mediaID}/download`).then((billboard) => {
         let url = billboard.signedRequest
-        window.open(url)
+        window.location = url
         this.downloading = false
       })
     },
