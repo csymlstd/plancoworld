@@ -49,8 +49,8 @@ function classFromPath(path = '') {
 router.beforeEach((to, from, next) => {
 
   let slug = classFromPath(to.name) || classFromPath(to.path)
-  document.querySelector('html').className = ''
-  document.querySelector('html').classList.add('page-'+slug)
+  document.body.className = ''
+  document.body.classList.add('page-'+slug)
 
   // http://router.vuejs.org/en/advanced/navigation-guards.html
   if(to.meta.auth === true) {

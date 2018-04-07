@@ -2,7 +2,12 @@
   <article :class="['billboard', {'is-vertical': isVertical }]" @click="open = false">
     <section class="hero hero--tall">
       <img :src="billboard.media[0].url" v-if="billboard.media.length > 0 && billboard.media[0] !== null && billboard.media[0].type == 'image'" class="cover-photo" />
-      <video ref="video" class="cover-photo" muted autoplay loop v-if="billboard.media.length > 0 && billboard.media[0] !== null &&  billboard.media[0].type == 'video'">
+      <div class="row" v-if="isSafari() && billboard.media.length > 0 && billboard.media[0] !== null &&  billboard.media[0].type == 'video'" v-cloak>
+      <div class="notification is-warning text-center">
+        <p>Unfortunately Safari does not play the webm videos that Planet Coaster uses for billboards. <br /> Use another browser like <i class="fab fa-chrome"></i> <span>Chrome</span> or <i class="fab fa-firefox"></i> <span>Firefox</span> to view them.</p>
+      </div>
+      </div>
+      <video ref="video" :class="['cover-photo', { 'playing': playing }]" muted autoplay loop v-if="!isSafari() && billboard.media.length > 0 && billboard.media[0] !== null &&  billboard.media[0].type == 'video'">
         <source :src="billboard.media[0].url">
       </video>
     </section>
@@ -282,6 +287,9 @@ export default {
     muted() {
       return this.$refs.video ? this.$refs.video.muted : false
     },
+    playing() {
+      return this.$refs.video ? !this.$refs.video.paused : false
+    },
     video() {
       return this.$refs.video
     }
@@ -413,6 +421,9 @@ export default {
     },
     size(v) {
       return Media.bytesToSize(v)
+    },
+    isSafari() {
+      return window.sniff.browserType == 'safari'
     }
   },
   created () {
@@ -422,6 +433,9 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style>
-
+<style scoped>
+  /* video.cover-photo:not(.playing) {
+    background: url('/assets/images/color-bars.jpg');
+    background-size: cover;
+  } */
 </style>

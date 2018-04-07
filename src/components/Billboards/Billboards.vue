@@ -39,6 +39,10 @@
         </div>
       </div>
 
+      <div class="notification is-warning text-center" v-if="isSafari()" v-cloak>
+        <p>Unfortunately Safari does not play the webm videos that Planet Coaster uses for billboards. <br /> Use another browser like <i class="fab fa-chrome"></i> <span>Chrome</span> or <i class="fab fa-firefox"></i> <span>Firefox</span> to view them.</p>
+      </div>
+
       <div class="columns cards is-multiline loader--parent">
         <Loader v-if="loading"></Loader>
         <Billboard :model="billboard" :key="billboard._id" v-for="billboard in billboards"></Billboard>
@@ -197,6 +201,9 @@ export default {
       this.getBillboards().then(() => {
         this.loading = false
       })
+    },
+    isSafari() {
+      return window.sniff.browserType == 'safari'
     }
   },
   mounted () {
