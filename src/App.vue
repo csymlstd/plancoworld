@@ -58,10 +58,10 @@
       </div>
     </Modal>
 
-
     <footer class="main">
       <div class="container">
         <p class="description">PlanCo World &copy; 2018. <br /> We are not affiliated with Planet Coaster, Frontier Developments or its licensors. <span class="planco" title="Buldcrefs">Trademarks</span> are the property of their respective owners.</p>
+        <!-- <p class="description"><a @click="viewTerms = !viewTerms">Terms of Use</a></p> -->
       </div>
     </footer>
   </div>
@@ -108,6 +108,7 @@ export default {
     return {
       placeholder: '',
       menuOpen: false,
+      viewTerms: false,
     }
   },
   watch: {

@@ -30,6 +30,10 @@ Vue.use(VueAnalytics, {
   router
 })
 
+import Raven from 'raven-js'
+import RavenVue from 'raven-js/plugins/vue'
+Raven.config('https://3d0402ef4fb34ea89d548c1de0503312@sentry.io/1118803').addPlugin(RavenVue, Vue).install()
+
 // import Raven from 'raven-js';
 // import RavenVue from 'raven-js/plugins/vue';
 // Raven.config('https://1980789df2fc4270be59dd9b23d0dde9@sentry.io/197126')

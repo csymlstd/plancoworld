@@ -2,7 +2,7 @@
   <div class="column is-one-third-desktop is-half-tablet">
     <div class="card has-level-bottom" >
       <div class="card-image" :class="{ 'playing': playing }" @click="viewBillboard" :style="{ 'background': getBackground(model.media[0]) }">
-        <video autoplay loop muted v-if="model.media[0] && model.media[0].type == 'video'">
+        <video autoplay="autoplay" loop="loop" muted="muted" v-if="model.media[0] && model.media[0].type == 'video'">
           <source :src="model.media[0].url">
         </video>
         <div class="level bottom">
