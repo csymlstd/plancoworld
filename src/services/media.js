@@ -87,7 +87,7 @@ export default {
     return (transcoderTypes.indexOf(type) > -1)
   },
 
-  hasAudio(element) {
+  hasAudio(element = document.createElement('video')) {
     return element.mozHasAudio ||
     Boolean(element.webkitAudioDecodedByteCount) ||
     Boolean(element.audioTracks && element.audioTracks.length)

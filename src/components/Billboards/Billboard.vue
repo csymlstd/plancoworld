@@ -7,7 +7,7 @@
         <p>Unfortunately Safari does not play the webm videos that Planet Coaster uses for billboards. <br /> Use another browser like <i class="fab fa-chrome"></i> <span>Chrome</span> or <i class="fab fa-firefox"></i> <span>Firefox</span> to view them.</p>
       </div>
       </div>
-      <video ref="video" :class="['cover-photo', { 'playing': playing }]" muted autoplay loop v-if="!isSafari() && billboard.media.length > 0 && billboard.media[0] !== null &&  billboard.media[0].type == 'video'">
+      <video :class="['cover-photo', { 'playing': !paused }]" @click="paused ? video.play() : video.pause()" @pause="updatePause" @playing="updatePause" muted autoplay loop v-if="!isSafari() && billboard.media.length > 0 && billboard.media[0] !== null &&  billboard.media[0].type == 'video'">
         <source :src="billboard.media[0].url">
       </video>
     </section>
@@ -18,8 +18,9 @@
               <Filters :options="heroFilterOptions" :selected="billboard.tags" :inline="true" :readOnly="true" :large="true" ref="heroTags" class="level-item"></Filters>
           </div>
           <div class="level-right">
-              <a class="level-item button is-black is-medium is-rounded" @click="video.muted = false" v-if="hasAudio && muted" v-tooltip="'Muted'"><span class="icon"><i class="fas fa-volume-mute"></i></span></a>
-              <a class="level-item button is-black is-medium is-rounded" @click="video.muted = true" v-if="hasAudio && !muted" v-tooltip="'Mute'"><span class="icon"><i class="fas fa-volume-up"></i></span></a>
+              <a class="level-item button is-black is-medium is-rounded" @click="video.play()" v-if="paused" v-tooltip="'Play'"><span class="icon"><i class="fas fa-play"></i></span></a>
+              <a class="level-item button is-black is-medium is-rounded" @click="video.pause()" v-if="!paused" v-tooltip="'Pause'"><span class="icon"><i class="fas fa-pause"></i></span></a>
+              <a class="level-item button is-black is-medium is-rounded" @click="mute()" v-if="hasAudio" v-tooltip="'Toggle Audio'"><span class="icon"><i class="fas fa-volume-up"></i></span></a>
               <span class="level-item tag is-large is-rounded" v-if="billboard.media.length > 0 && billboard.media[0] !== null &&  billboard.media[0].type == 'video' && billboard.media[0].meta.duration" title="Duration" v-tooltip="'Duration'"><i class="fas fa-forward"></i>&nbsp; {{ billboard.media[0].meta.duration }}s</span>
               <span class="level-item tag is-large is-rounded" v-if="billboard.media.length > 0 && billboard.media[0] !== null &&  billboard.media[0].size" title="File Size" v-tooltip="'File Size'"><i class="fas fa-hdd"></i>&nbsp; {{ size(billboard.media[0].size) }}</span>
           </div>
@@ -181,6 +182,10 @@ export default {
       editMode: false,
       downloading: false,
       editor: false,
+      video: null,
+      paused: true,
+      videoMuted: true,
+      hasAudio: false,
       open: false,
       heroFilterOptions: {
         'billboards': {
@@ -281,18 +286,6 @@ export default {
     isVertical() {
       return this.billboard.tags.filter(t => { return t.slug == 'vertical' }).length > 0
     },
-    hasAudio() {
-      return this.$refs.video ? Media.hasAudio(this.$refs.video) : false
-    },
-    muted() {
-      return this.$refs.video ? this.$refs.video.muted : false
-    },
-    playing() {
-      return this.$refs.video ? !this.$refs.video.paused : false
-    },
-    video() {
-      return this.$refs.video
-    }
   },
   methods: {
     downloadBillboard (mediaID) {
@@ -312,6 +305,10 @@ export default {
         this.billboard = Object.assign({}, this.billboard, billboard)
         this.shareURL = `https://planco.world/billboards/${this.billboard.slug}`
         this.loading = false
+
+        this.$nextTick(() => {
+          this.video = this.$el.querySelector('video.cover-photo')
+        })
 
       }).catch((err) => {
         API.handleError(err, 'billboards')
@@ -424,6 +421,15 @@ export default {
     },
     isSafari() {
       return window.sniff.browserType == 'safari'
+    },
+    updatePause(e) {
+      this.video = e.target
+      this.paused = e.target.paused
+      this.hasAudio = Media.hasAudio(e.target)
+    },
+    mute() {
+      this.video.muted = !this.video.muted
+      this.videoMuted = !this.videoMuted
     }
   },
   created () {
