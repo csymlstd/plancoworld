@@ -24,7 +24,7 @@
                 <li :key="page._id" v-for="page in getPagesByCategory(category._id)">
                   <router-link :to="{ name: 'GuidePage', params: { slug: page.slug }}" class="flex-between">
                     <span v-html="page.name"></span>
-                    <span v-if="['priority-pass'].indexOf(page.slug) > -1"><i class="fas fa-circle has-text-primary"></i></span>
+                    <span v-if="['priority-pass','v-1-6-1'].indexOf(page.slug) > -1"><i class="fas fa-circle has-text-primary"></i></span>
                   </router-link>
                 </li>
             </ul>

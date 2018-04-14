@@ -18,6 +18,9 @@ import API from '@/services/api'
 import Auth from '@/services/auth'
 import Filters from '@/components/ui/Filters'
 
+import Plyr from 'plyr'
+// import 'plyr/src/sass/plyr.scss'
+
 export default {
     components: {
         Filters,
@@ -25,7 +28,9 @@ export default {
     },
     data() {
         return {
-            page: {}
+            loading: true,
+            page: {},
+            players: [],
         }
     },
     metaInfo() {
@@ -46,8 +51,15 @@ export default {
     },
     methods: {
         getPage() {
+            this.loading = true
             return API.fetch('wiki/slug/'+this.slug).then(page => {
                 this.page = page
+
+                this.$nextTick(t => {
+                    this.players = Array.from(document.querySelectorAll('.player')).map(player => new Plyr(player))
+                })
+
+                this.loading = false
             })
         }
     },
@@ -56,3 +68,8 @@ export default {
     }
 }
 </script>
+
+<style lang="scss">
+    $plyr-color-main: color('accent');
+    @import '~plyr/src/sass/plyr.scss';
+</style>

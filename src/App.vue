@@ -31,7 +31,7 @@
             <Search @selected="go" :placeholder="placeholder"></Search>
           </div>
           <div class="navbar-item has-dropdown is-hoverable is-hidden-touch" v-if="user.authenticated">
-            <a class="navbar-link"><span class="icon"><i class="fas fa-plus-circle"></i></span></a>
+            <a class="navbar-link"><span class="icon"><i class="fas fa-cloud-upload"></i></span></a>
             <div class="navbar-dropdown is-right">
               <router-link :to="{ name: 'ImportPark' }" class="navbar-item" href="/parks">Park</router-link>
               <router-link :to="{ name: 'ImportBlueprint' }" class="navbar-item" href="/blueprints">Blueprint</router-link>
