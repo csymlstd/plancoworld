@@ -71,20 +71,40 @@
 
     <div class="ui divider"></div>
 
-    <button class="button is-primary is-medium" @click="updateUser" :class="{ loading: updating }" type="submit">Save Account</button>
+    <div class="level">
+      <div class="level-left">
+        <button class="button is-primary is-medium level-item" @click="updateUser" :class="{ loading: updating }" type="submit">Save Account</button>
+      </div>
+      <!-- <div class="level-right">
+        <a class="level-item has-text-danger" @click="openModal('delete')">Delete Account &amp; Data</a>
+      </div> -->
+    </div>
+
+    <Modal :class="['deleteUser']" :show="modals.delete.show" @close="closeModal('delete')">
+      <p class="field"><strong>Are you sure you want to delete your account?</strong> This cannot be undone. All media and data associated with your account will be removed.</p>
+
+      <div class="field">
+        <input type="text" :class="{ 'is-danger': modals.delete.error }" placeholder="Confirm your Steam Name" v-model="confirmName" class="input is-medium" />
+      </div>
+
+      <a @click="deleteUser()" class="button is-warning">Delete</a>
+      <a @click="closeModal('delete')" class="button is-light">Cancel</a>
+    </Modal>
   </div>
 </template>
 
 <script>
 import API from '@/services/api'
 import auth from '@/services/auth'
+import Modal from '@/components/ui/Modal'
 
 import Upload from '../ui/Upload'
 
 export default {
   name: 'account',
   components: {
-    Upload
+    Upload,
+    Modal,
   },
   data () {
     return {
@@ -92,6 +112,13 @@ export default {
       loading: true,
       updating: false,
       uploadAvatar: false,
+      modals: {
+        delete: {
+          show: false,
+          loading: false,
+          error: false,
+        }
+      },
       user: {
         name: {},
         avatar: {},
@@ -99,7 +126,8 @@ export default {
       },
       errors: {
         email: false
-      }
+      },
+      confirmName: ''
     }
   },
   methods: {
@@ -159,7 +187,29 @@ export default {
         this.updating = false
         this.$notify('notifications', 'Error saving avatar', 'error')
       })
-    }
+    },
+    closeModal(modal) {
+      this.modals[modal].show = false
+      this.modals[modal].loading = false
+    },
+    openModal(modal) {
+      this.modals[modal].show = true
+      this.modals[modal].error = false
+    },
+    modalOpen(modal) {
+      return this.modals[modal].show
+    },
+    deleteUser() {
+      this.modals.delete.error = false
+      if(this.confirmName != this.user.name.display) return this.modals.delete.error = true
+      // API.delete('/users/'+this.user.id).then(response => {
+      //   this.$notify('notifications', `Your account has been deleted.`, 'success')
+      //   this.$router.push({ name: 'Home' })
+      // }).catch(err => {
+      //   this.$notify('notifications', 'There was a problem deleting your account.', 'error')
+      // })
+      this.closeModal('delete')
+    },
   },
   mounted() {
     this.getUser().then(() => {

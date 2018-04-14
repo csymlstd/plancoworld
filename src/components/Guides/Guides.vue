@@ -21,7 +21,12 @@
 
             <aside class="menu">
             <ul class="menu-list">
-                <li :key="page._id" v-for="page in getPagesByCategory(category._id)"><router-link :to="{ name: 'GuidePage', params: { slug: page.slug }}"><span v-html="page.name"></span></router-link></li>
+                <li :key="page._id" v-for="page in getPagesByCategory(category._id)">
+                  <router-link :to="{ name: 'GuidePage', params: { slug: page.slug }}" class="flex-between">
+                    <span v-html="page.name"></span>
+                    <span v-if="['priority-pass'].indexOf(page.slug) > -1"><i class="fas fa-circle has-text-primary"></i></span>
+                  </router-link>
+                </li>
             </ul>
             </aside>
         </div>
@@ -111,5 +116,11 @@ export default {
 
   .hero .title {
     margin: 0;
+  }
+
+  .flex-between {
+    display: flex!important;
+    align-items: center;
+    justify-content: space-between;
   }
 </style>
