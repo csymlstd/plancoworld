@@ -1,7 +1,7 @@
 <template>
   <div class="filters">
     <div class="field" :class="{ 'is-grouped': inline }">
-      <div class="control" :key="group.model" :class="[{ 'box': options[group.model].type != 'tags' }, 'filters-'+group.model, { 'is-danger-outline': !group.valid }]" v-for="group in groups" v-if="(calcSelected(group.model) > 0 && !options[group.model].hidden && readOnly) || !readOnly">
+      <div class="control" :key="group.model" :class="[{ 'box': options[group.model].type != 'tags' }, 'filters-'+group.model, { 'is-danger-outline': !group.valid }]" v-for="group in groups" v-if="(calcSelected(group.model) > 0 && !options[group.model].hidden && readOnly) || (!readOnly && !options[group.model].if) || (options[group.model].if && isSelected(options[group.model].if) !== false)">
         <div class="field filter-list">
           <div class="level" v-if="group.label">
             <div class="level-left">
@@ -9,7 +9,7 @@
               <div class="level-item"><div class="tag is-rounded is-outlined" v-if="options[group.model].dlc">DLC</div></div>
             </div>
             <div class="level-right">
-              <div class="tag is-rounded is-medium is-primary" v-for="tag in group.tags" v-if="isSelected(tag._id, group.model) !== false && readOnly && options[group.model].inline">{{ tag.name }}</div>
+              <div class="tag is-rounded is-medium is-primary" :key="tag._id" v-for="tag in group.tags" v-if="isSelected(tag._id, group.model) !== false && readOnly && options[group.model].inline">{{ tag.name }}</div>
               <div class="level-item" v-if="options[group.model].min && calcSelected(group.model) < options[group.model].min"><span class="icon"><i class="fas fa-check has-text-primary"></i></span> You must select at least {{ options[group.model].min }}</div>
               <div class="level-item" v-if="options[group.model].force !== true && !readOnly">
                 <a class="button is-white" v-if="isVisible(group.model, options[group.model].visible)" @click="toggleVisibility(group.model)"><span class="icon has-text-grey-light"><i class="far fa-chevron-up"></i></span></a>
@@ -43,7 +43,7 @@
           </div>
 
           <div class="field toggles columns is-mobile" v-if="options[group.model].type == 'toggle' && isVisible(group.model, options[group.model].visible) && !readOnly">
-            <div class="column" :class="{ 'is-half': (group.tags.length > 3)}" v-for="tag in group.tags">
+            <div class="column" :class="{ 'is-half': (group.tags.length > 3)}" :key="tag._id" v-for="(tag, key) in group.tags">
               <a class="toggle is-box" :title="tag.name" :class="[{ 'is-selected': isSelected(tag._id, group.model) !== false }, 'option-'+tag.slug]" @click="checkTag(tag, group.model)" v-tooltip="options[group.model].tooltips ? tag.name : false">
                 <span v-if="tag.slug == 'horizontal'" class="icon"><i class="far fa-rectangle-landscape"></i></span>
                 <span v-else-if="tag.slug == 'vertical'" class="icon"><i class="far fa-rectangle-portrait"></i></span>
@@ -61,7 +61,7 @@
             </div>
             <div class="dropdown-menu">
               <div class="dropdown-content">
-                  <label class="checkbox dropdown-item" :class="{ 'is-selected': isSelected(tag._id, group.model) !== false }" v-for="tag in group.tags">
+                  <label class="checkbox dropdown-item" :class="{ 'is-selected': isSelected(tag._id, group.model) !== false }" :key="tag._id" v-for="tag in group.tags">
                     <!--  @click="checkTag(tag._id, group.model)" -->
                     <input type="checkbox" name="selected[]" :value="tag._id" v-model="selected[group.model]">
                     {{ tag.name }}
@@ -71,13 +71,28 @@
           </div>
 
           <div class="selected-tags tags" v-else-if="options[group.model].type == 'tags'">
-            <div class="tag is-rounded is-primary is-inverted" :class="{ 'is-large': large, 'is-medium': !large }" v-for="tag in group.tags" v-if="isSelected(tag._id, group.model) !== false">{{ tag.name }}</div>
+            <div class="tag is-rounded is-primary is-inverted" :class="{ 'is-large': large, 'is-medium': !large }" :key="tag._id" v-for="tag in group.tags" v-if="isSelected(tag._id, group.model) !== false">{{ tag.name }}</div>
+          </div>
+
+          <div class="field" v-else-if="options[group.model].type == 'switch' && !readOnly">
+            <div class="level" :key="tag._id" v-for="tag in group.tags" @click="checkTag(tag, group.model)">
+              <div class="level-left">
+                <div class="level-item">{{ tag.name }}</div>
+              </div>
+              <div class="level-right">
+                <div class="level-item">
+                  <div class="switch" :class="{ 'is-active': isSelected(tag._id, group.model) !== false }">
+                    <label></label>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div v-else-if="!readOnly">
             <div class="controls" v-if="isVisible(group.model, options[group.model].visible)">
 
-              <label class="checkbox dropdown-item" :title="tag.name" @click="checkTag(tag, group.model)" :class="{ 'is-selected': isSelected(tag._id, group.model) !== false }" v-for="tag in group.tags">
+              <label class="checkbox dropdown-item" :title="tag.name" @click="checkTag(tag, group.model)" :key="tag._id" :class="{ 'is-selected': isSelected(tag._id, group.model) !== false }" v-for="tag in group.tags">
                 <!-- @click="checkTag(tag._id, group.model)" -->
                 <!-- <input type="checkbox":value="tag._id" :model="selected" /> -->
                 <!-- <span class="icon icon-spooky" v-if="tag.slug == 'spooky-pack'"></span> -->
@@ -99,12 +114,12 @@
 
           <!-- Read Only Tags -->
           <div class="selected-tags tags" v-if="(!isVisible(group.model, options[group.model].visible) || readOnly) && !options[group.model].inline && options[group.model].readOnly !== 'checklist' && options[group.model].type !== 'tags'">
-            <div class="tag is-rounded is-medium is-primary" v-for="tag in group.tags" v-if="isSelected(tag._id, group.model) !== false">{{ tag.name }} <button class="delete is-small" @click="checkTag(tag, group.model)" v-if="!readOnly"></button></div>
+            <div class="tag is-rounded is-medium is-primary" v-for="tag in group.tags" :key="tag._id" v-if="isSelected(tag._id, group.model) !== false">{{ tag.name }} <button class="delete is-small" @click="checkTag(tag, group.model)" v-if="!readOnly"></button></div>
           </div>
 
           <!-- Checklist Tags -->
-          <div class="selected-tags tags" v-if="readOnly && options[group.model].readOnly == 'checklist' && !options[group.model].inline">
-            <div class="check-item" v-for="tag in group.tags" v-if="isSelected(tag._id, group.model) !== false"><span class="icon"><i class="fas fa-check has-text-primary"></i></span> <span>{{ tag.name }}</span></div>
+          <div class="selected-tags tags" v-if="readOnly && (options[group.model].readOnly == 'checklist') && !options[group.model].inline">
+            <div class="check-item" :key="tag._id" v-for="tag in group.tags" v-if="isSelected(tag._id, group.model) !== false"><span class="icon"><i class="fas fa-check has-text-primary"></i></span> <span>{{ tag.name }}</span></div>
           </div>
 
         </div>

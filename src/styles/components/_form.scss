@@ -55,12 +55,14 @@ label.checkbox {
   label {
     cursor: pointer;
     text-indent: -9999px;
-    width: 2em;
-    height: 1em;
+    max-width: 32px;
+    width: 2rem;
+    height: 1rem;
     background: grey;
     display: block;
     border-radius: 100px;
     position: relative;
+    padding: 0;
 
     &:after {
       content: '';

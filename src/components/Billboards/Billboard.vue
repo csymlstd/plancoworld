@@ -96,7 +96,16 @@
             <ColorPalette v-model="billboard.colors" :editMode="editMode"></ColorPalette>
           </div>
 
-          <Filters :options="filterOptions" :selected="billboard.tags" @selected="billboard.tags = $event" :readOnly="!editMode" ref="tags"></Filters>
+          <Filters class="field" :options="filterOptions" :selected="billboard.tags" @selected="billboard.tags = $event" :readOnly="!editMode" ref="tags"></Filters>
+
+          <a @click="openModal('delete')" class="button is-warning is-fluid" v-if="editMode">Delete Billboard</a>
+
+          <Modal :class="['deleteBillboard']" :show="modalOpen('delete')">
+            <p><strong>Are you sure you want to delete {{ billboard.name }}?</strong> This cannot be undone. Your media will still be available in the toolbox.</p>
+
+            <a @click="deleteBillboard()" class="button is-warning">Delete</a>
+            <a @click="closeModal('delete')" class="button is-light">Cancel</a>
+          </Modal>
         </div>
 
         <div class="column">
@@ -152,6 +161,7 @@ import Media from '@/services/media'
 
 import Upload from '@/components/ui/Upload'
 import Dropdown from '@/components/ui/Dropdown'
+import Modal from '@/components/ui/Modal'
 import ColorPalette from '@/components/ui/ColorPalette'
 import Quill from 'quill'
 
@@ -162,6 +172,7 @@ export default {
     Blueprint,
     Billboard,
     Dropdown,
+    Modal,
     ColorPalette,
     ReactionMeter,
     Creator,
@@ -211,6 +222,14 @@ export default {
           min: 1,
           max: 1,
           hidden: true
+        },
+        'billboards-movie': {
+          label: 'Movie Attributes',
+          type:'switch',
+          force: true,
+          visible: true,
+          readOnly: 'checklist',
+          if: '59654fdf12341326996d3359',
         },
         'orientation': {
           label: 'Orientation',
@@ -269,6 +288,12 @@ export default {
           label: 'Styles',
           type: 'list'
         },
+      },
+      modals: {
+        delete: {
+          show: false,
+          loading: false
+        }
       }
     }
   },
@@ -317,7 +342,8 @@ export default {
     updateBillboard() {
       this.toggleEditMode()
       this.loading = true
-      let data = this.billboard
+      let data = Object.assign({}, this.billboard)
+      delete data.slug
 
       let media = []
       data.media.forEach((m) => {
@@ -330,6 +356,16 @@ export default {
       return API.put(this.apiURL(), data).then((park) => {
         this.$notify('notifications', `${data.name} has been saved`, 'success')
         return this.getBillboard()
+      })
+    },
+    deleteBillboard() {
+      API.delete(this.apiURL(true)).then(response => {
+        console.log(response)
+        this.$notify('notifications', `${this.billboard.name} has been deleted.`, 'success')
+        this.$router.push({ name: 'Billboards' })
+      }).catch(err => {
+        console.log(err)
+        this.$notify('notifications', 'There was a problem deleting your billboard.', 'error')
       })
     },
     addSource(media) {
@@ -408,6 +444,16 @@ export default {
         },
         theme: 'snow'
       })
+    },
+    closeModal(modal) {
+      this.modals[modal].show = false
+      this.modals[modal].loading = false
+    },
+    openModal(modal) {
+      this.modals[modal].show = true
+    },
+    modalOpen(modal) {
+      return this.modals[modal].show
     },
     isOwner() {
       return auth.isOwner(this.billboard)

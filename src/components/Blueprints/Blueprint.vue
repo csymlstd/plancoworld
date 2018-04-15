@@ -668,7 +668,8 @@ export default {
     updateBlueprint() {
       this.toggleEditMode(false)
       this.loading = true
-      let data = this.blueprint
+      let data = Object.assign({}, this.blueprint)
+      delete data.slug
 
       let media = []
       this.blueprint.media.forEach((m) => {

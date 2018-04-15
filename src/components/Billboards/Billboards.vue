@@ -99,6 +99,13 @@ export default {
           visible: true,
           max: 1,
         },
+        'billboards-movie': {
+          label: null,
+          type:'switch',
+          force: true,
+          visible: true,
+          if: '59654fdf12341326996d3359',
+        },
         'orientation': {
           label: 'Orientation',
           type: 'toggle',

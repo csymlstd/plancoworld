@@ -540,7 +540,8 @@ export default {
     updatePark() {
       this.toggleEditMode(false)
       this.loading = true
-      let data = this.park
+      let data = Object.assign({}, this.park)
+      delete data.slug
 
       let media = []
       this.park.media.forEach((m) => {

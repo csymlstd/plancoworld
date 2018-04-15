@@ -225,6 +225,6 @@ export default {
   },
 
   isOwner(model) {
-    return (store.state.user.authenticated && typeof model.user !== 'undefined' && typeof store.state.user.profile !== 'undefined') ? (model.user._id == store.state.user.profile._id) : false
+    return (store.state.user.authenticated && typeof model.user !== 'undefined' && typeof store.state.user.profile !== 'undefined') && (model.user._id == store.state.user.profile._id || ['admin'].indexOf(store.state.user.profile.role) > -1) ? true : false
   }
 }

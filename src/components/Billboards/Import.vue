@@ -145,6 +145,13 @@ export default {
           max: 1,
           required: true,
         },
+        'billboards-movie': {
+          label: null,
+          type:'switch',
+          force: true,
+          visible: true,
+          if: '59654fdf12341326996d3359',
+        },
         'orientation': {
           label: 'Orientation',
           type: 'toggle',
@@ -224,13 +231,17 @@ export default {
       })
     },
     addMedia(media) {
-      console.log('adding', media)
+      // console.log('adding', media)
       this.imported.media.push(media)
 
       if(Media.isImage(media.contentType)) {
-        this.$refs.tags.checkTagById('59654fd912341326996d3358','billboards')
+        this.$refs.tags.checkTagById('59654fd912341326996d3358')
       } else if(Media.isVideo(media.contentType)) {
-        this.$refs.tags.checkTagById('59654fdf12341326996d3359','billboards')
+        this.$refs.tags.checkTagById('59654fdf12341326996d3359')
+
+        if(Media.hasAudio(document.querySelector('video.cover-photo'))) {
+          this.$refs.tags.checkTagById('5ad28ac89bb394631b4dadab')
+        }
       }
     },
     addSource(media) {
