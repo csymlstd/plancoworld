@@ -98,6 +98,7 @@
                 <!-- <span class="icon icon-spooky" v-if="tag.slug == 'spooky-pack'"></span> -->
                 {{ tag.name }}
 
+                <span class="tag is-rounded is-outlined" v-if="['safety-first-billboard-contest'].indexOf(tag.slug) > - 1 && options[group.model].label !== 'Contest Submissions'">Contest ends June 1, 12AM CDT.</span>
                 <span class="tag is-rounded is-outlined" v-if="['back-to-the-future','knight-rider','the-munsters'].indexOf(tag.slug) > -1">$2.99</span>
                 <span class="tag is-rounded is-outlined" v-if="['spooky-pack','adventure-pack', 'studios-pack'].indexOf(tag.slug) > -1">$10.99</span>
                 <span class="tag is-rounded is-outlined" v-if="['spooky', 'adventure', 'temple', 'temple-gold', 'crypt','parabolic-screen'].indexOf(tag.slug) > -1">DLC</span>
@@ -180,6 +181,7 @@ export default {
     tags(tags) {
       if(tags.length == 0) return
       this.getTags()
+      this.getQuery()
     }
   },
   methods: {
@@ -283,10 +285,31 @@ export default {
 
       // console.log('is valid', valid)
       return valid
+    },
+    getQuery() {
+      if(this.QueryParam('tags')) {
+        let preselected = this.QueryParam('tags').split(',')
+        console.log('query', preselected)
+        if(preselected.length > 0) {
+          preselected.forEach(tag => {
+            this.checkTagById(tag)
+          })
+        }
+      }
+    },
+    QueryParam(param) {
+        let query = window.location.search.substring(1)
+        let vars = query.split("&")
+        for (var i=0;i<vars.length;i++) {
+            let pair = vars[i].split("=")
+            if(pair[0] == param){ return unescape(pair[1]) }
+        }
+        return(false)
     }
   },
   mounted () {
     if(this.tags.length > 0) this.getTags()
+    this.getQuery()
   }
 }
 </script>

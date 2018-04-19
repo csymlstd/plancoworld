@@ -24,7 +24,7 @@
               <Creator :user="model.user" class="level-item"></Creator>
             </div>
             <div class="level-right">
-              <Reaction :model="model" :type="'blueprints'"></Reaction>
+              <Reaction :model="model" @reacted="model.reactions = $event" :type="'blueprints'"></Reaction>
             </div>
           </div>
         </div>

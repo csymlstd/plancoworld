@@ -20,7 +20,7 @@
               <Creator :user="model.user" class="level-item"></Creator>
             </div>
             <div class="level-right">
-              <Reaction :model="model" :type="'kits'"></Reaction>
+              <Reaction :model="model" @reacted="model.reactions = $event" :type="'kits'"></Reaction>
               <!-- <div class="vote level-item"><span class="icon"><i class="fas fa-heart"></i></span><span class="count">{{ model.votes.upTotal || 0 }}</span></div> -->
             </div>
           </div>

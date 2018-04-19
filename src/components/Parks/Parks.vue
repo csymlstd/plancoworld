@@ -36,13 +36,13 @@
           </div>
         </div>
 
-        <section class="box adventure-promo" v-if="pagination.current == 1 && !globalParams.tags">
+        <!-- <section class="box adventure-promo" v-if="pagination.current == 1 && !globalParams.tags">
           <div>
             <h1 class="title">Explore the temples and traps <br /> built with the new <img alt="Adventure Pack" src="/assets/images/adventure-pack-logo.svg" style="width: 250px;transform:translateY(5px);" />!</h1>
             <br />
             <a class="button is-warning is-medium" @click="$refs.filters.checkTagById('5a2deba8c22ae923f29cc220', 'content-packs')"><span>Search for Adventure Parks</span> <span class="icon"><i class="far fa-arrow-down"></i></span></a>
           </div>
-        </section>
+        </section> -->
 
 
         <div class="columns cards is-multiline loader--parent">

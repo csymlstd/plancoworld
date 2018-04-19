@@ -112,3 +112,18 @@ section.filters {
   }
 
 }
+
+
+.filters-contests.box, .is-purp {
+    background: color('purp')!important;
+    border: 3px solid rgba(255,255,255,0.1);
+    color: #fff;
+
+    h1, h2, h3, h4, h5, h6, p, label {
+      color: #fff;
+    }
+
+    p.description {
+      color: rgba(255,255,255,0.75);
+    }
+  }

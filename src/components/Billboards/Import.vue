@@ -136,6 +136,14 @@ export default {
       creatingKit: false,
       wasImported: false,
       filterOptions: {
+        'contests': {
+          label: 'Enter a Contest',
+          description: 'You may submit up to 3 billboards per contest.',
+          type:'list',
+          force: true,
+          visible: true,
+          max: 1,
+        },
         'billboards': {
           label: 'Type of Media',
           type: 'toggle',
@@ -312,7 +320,7 @@ export default {
     },
     removeFromKit(index) {
       this.kits.splice(index, 1)
-    }
+    },
   },
   mounted () {
     this.$nextTick(() => {

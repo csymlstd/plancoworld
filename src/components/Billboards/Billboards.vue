@@ -43,6 +43,15 @@
         <p>Unfortunately Safari does not play the webm videos that Planet Coaster uses for billboards. <br /> Use another browser like <i class="fab fa-chrome"></i> <span>Chrome</span> or <i class="fab fa-firefox"></i> <span>Firefox</span> to view them.</p>
       </div>
 
+      <div class="notification is-purp text-center" v-if="pagination.current == 1 && !globalParams.tags">
+        <i class="fas fa-2x push-down-single fa-exclamation-triangle"></i> 
+        <h2 class="title is-4">Remain seated and keep your arms and legs inside the vehicle!</h2>
+        <p class="field">Submit your safety signs and videos to the <strong>Safety First!</strong> billboard contest. <br /> Winner will receive the DLC of their choice!</p>
+        <router-link :to="{ name: 'ImportBillboard', query: { tags: '5ad51d6d9d5d9ba67f9c4e11' } }" class="button is-primary is-inverted is-medium field" v-if="isLoggedIn()">Submit a Billboard!</router-link>
+        <a href="/billboards?tags=5ad51d6d9d5d9ba67f9c4e11" class="button is-warning is-medium field" @click.prevent="filterBillboards([{ _id: '5ad51d6d9d5d9ba67f9c4e11' }])" v-if="isLoggedIn()">Vote!</a>
+        <div class="content is-small"><p>Contest ends June 1st 12AM CDT / 6AM BST. Maximum of 3 submissions.</p></div>
+      </div>
+
       <div class="columns cards is-multiline loader--parent">
         <Loader v-if="loading"></Loader>
         <Billboard :model="billboard" :key="billboard._id" v-for="billboard in billboards"></Billboard>
@@ -125,6 +134,13 @@ export default {
           label: 'Language',
           type: 'list',
           visible: true
+        },
+        'contests': {
+          label: 'Contest Submissions',
+          type:'list',
+          force: true,
+          visible: true,
+          max: 1,
         },
         'coasters': {
           label: 'Coasters',

@@ -60,13 +60,27 @@ router.beforeEach((to, from, next) => {
 
   // http://router.vuejs.org/en/advanced/navigation-guards.html
   if(to.meta.auth === true) {
-    if(!store.state.user.authenticated) {
-      return next('/')
+    if(auth.checkAuth() && auth.accessTokenExpired()) {
+      return auth.refreshToken().then(() => {
+        console.log('Token refreshed')
+        return next()
+      }).catch((err) => {
+        console.log('error refreshing token, login again', err)
+        return next('/')
+      })
+    } else {
+      return auth.refreshUser().then(() => {
+        console.log('User refreshed')
+        return next()
+      }).catch((err) => {
+        console.log('error refreshing user, login again', err)
+        return next('/')
+      })
     }
   }
 
   if(to.name !== 'Home' && auth.checkAuth() && auth.accessTokenExpired()) {
-    auth.refreshToken().then(() => {
+    return auth.refreshToken().then(() => {
       console.log('Token refreshed')
       return next()
     }).catch((err) => {
