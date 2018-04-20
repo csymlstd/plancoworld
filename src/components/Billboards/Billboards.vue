@@ -11,7 +11,7 @@
         <!-- <router-link :to="{ name: 'Convert' }" class="level-item">Convert to WebM</router-link> -->
         <router-link :to="{ name: 'GuidePage', params: { slug: 'advertising-and-billboards' }}" class="level-item">Read the Guide</router-link>
         <router-link :to="{ name: 'GuidePage', params: { slug: 'glossary' }}" class="level-item">Glossary</router-link>
-        <router-link :to="{ name: 'ImportBillboard' }" class="button is-primary is-medium" v-if="isLoggedIn()">Add a Billboard</router-link>
+        <router-link :to="{ name: 'ImportBillboard' }" class="button is-primary is-medium" v-if="isLoggedIn">Add a Billboard</router-link>
       </div>
     </div>
   </div>
@@ -43,12 +43,16 @@
         <p>Unfortunately Safari does not play the webm videos that Planet Coaster uses for billboards. <br /> Use another browser like <i class="fab fa-chrome"></i> <span>Chrome</span> or <i class="fab fa-firefox"></i> <span>Firefox</span> to view them.</p>
       </div>
 
-      <div class="notification is-purp text-center" v-if="pagination.current == 1 && !globalParams.tags">
+      <div class="notification is-purp text-center" v-if="(pagination.current == 1 && (!globalParams.tags || globalParams.tags.indexOf('5ad51d6d9d5d9ba67f9c4e11') > -1) ) && !hidePromo">
+        <button class="delete" @click="hidePromo = true"></button>
         <i class="fas fa-2x push-down-single fa-exclamation-triangle"></i> 
         <h2 class="title is-4">Remain seated and keep your arms and legs inside the vehicle!</h2>
         <p class="field">Submit your safety signs and videos to the <strong>Safety First!</strong> billboard contest. <br /> Winner will receive the DLC of their choice!</p>
-        <router-link :to="{ name: 'ImportBillboard', query: { tags: '5ad51d6d9d5d9ba67f9c4e11' } }" class="button is-primary is-inverted is-medium field" v-if="isLoggedIn()">Submit a Billboard!</router-link>
-        <a href="/billboards?tags=5ad51d6d9d5d9ba67f9c4e11" class="button is-warning is-medium field" @click.prevent="filterBillboards([{ _id: '5ad51d6d9d5d9ba67f9c4e11' }])" v-if="isLoggedIn()">Vote!</a>
+        
+        <Login v-if="!isLoggedIn" class="field" :steamOnly="true"></Login>
+        <router-link :to="{ name: 'ImportBillboard', query: { tags: '5ad51d6d9d5d9ba67f9c4e11' } }" class="button is-primary is-inverted is-medium field" v-if="isLoggedIn">Submit a Billboard!</router-link>
+        <a href="/billboards?tags=5ad51d6d9d5d9ba67f9c4e11" class="button is-warning is-medium field" @click.prevent="filterBillboards([{ _id: '5ad51d6d9d5d9ba67f9c4e11' }])" v-if="isLoggedIn">Vote!</a>
+        
         <div class="content is-small"><p>Contest ends June 1st 12AM CDT / 6AM BST. Maximum of 3 submissions.</p></div>
       </div>
 
@@ -74,6 +78,7 @@ import Loader from '@/components/ui/Loader'
 import Pagination from '@/components/ui/Pagination'
 import API from '@/services/api'
 import Auth from '@/services/auth'
+import Login from '@/components/Login'
 
 import Billboard from '@/components/Billboards/Card'
 
@@ -84,7 +89,8 @@ export default {
     Sort,
     Loader,
     Billboard,
-    Pagination
+    Pagination,
+    Login
   },
   metaInfo: {
     title: 'Billboards'
@@ -100,6 +106,7 @@ export default {
         total: 0,
         limit: 25
       },
+      hidePromo: false,
       selectedTags: [],
       filterOptions: {
         'billboards': {
@@ -173,9 +180,6 @@ export default {
     }
   },
   methods: {
-    isLoggedIn() {
-      return Auth.isLoggedIn()
-    },
     getBillboards (params = {}) {
       this.loading = true
       params = Object.assign(params, this.globalParams)
@@ -228,6 +232,11 @@ export default {
     isSafari() {
       return window.sniff.browserType == 'safari'
     }
+  },
+  computed: {
+    isLoggedIn() {
+      return this.$store.state.user.authenticated
+    },
   },
   mounted () {
     this.getBillboards().catch((err) => {

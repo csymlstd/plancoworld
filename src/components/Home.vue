@@ -68,7 +68,7 @@ export default {
   },
   mounted() {
     let cycle = this.$el.querySelectorAll('[data-cycle]')
-    if(cycle) {
+    if(cycle.length > 0) {
       let i = 0;
       let l = cycle.length
       let last

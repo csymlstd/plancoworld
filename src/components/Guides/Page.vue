@@ -1,5 +1,5 @@
 <template>
-<div class="box">
+<div class="box loader--parent">
 <Loader v-if="loading"></Loader>
 <article class="guide content" v-show="!loading">
     <header>

@@ -170,7 +170,6 @@ export default {
       this.loading = true
       params = Object.assign(params, this.globalParams)
       return API.fetch('blueprints', params).then((data) => {
-        console.log(data)
         this.loading = false
         this.blueprints = data.blueprints
         this.pagination.total = data.total

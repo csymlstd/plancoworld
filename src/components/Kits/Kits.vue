@@ -167,7 +167,6 @@ export default {
       this.loading = true
       params = Object.assign(params, this.globalParams)
       return API.fetch('kits', params).then((data) => {
-        console.log(data)
         this.kits = data.kits
         this.loading = false
         this.pagination.total = data.total
