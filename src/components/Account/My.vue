@@ -18,12 +18,12 @@
     <div class="field">
     <div class="field-body">
       <div class="field">
-        <label class="label">Real Name (Display)</label>
+        <label class="label">Real Name</label>
         <div class="control"><input type="text" v-model="user.name.real" class="input is-medium"></div>
       </div>
       <div class="field">
-        <label class="label">Steam Name</label>
-        <div class="control"><input type="text" v-model="user.name.display" class="input is-medium" disabled></div>
+        <label class="label">Display Name (Steam Persona)</label>
+        <div class="control"><input type="text" v-model="user.name.display" class="input is-medium"></div>
       </div>
     </div>
     </div>
@@ -35,7 +35,7 @@
     </div>
 
     <div class="box">
-      You can request a <a href="#">one-time login link</a> sent to the email address above at any time. This will let you log back in to PlanCo World if you lose access to your Steam account.
+      You can login using a one-time login link sent to the email saved above. This will let you log back in to PlanCo World if you lose access to your Steam account.
     </div>
 
     <div class="field">

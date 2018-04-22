@@ -19,7 +19,7 @@
             <div class="level is-mobile">
                 <div class="level-left">
                 <h1 class="title level-item">Creator</h1>
-                <h2 class="title level-item"> / {{ $route.params.username }} </h2>
+                <h2 class="title level-item"> / {{ username }} </h2>
                 </div>
                 <div class="level-right">
                     <button class="button level-item is-medium is-dark" @click="copy" v-tooltip="{ content: 'Copy Profile URL'  }"><span class="icon"><i class="fas fa-link"></i></span></button>
@@ -80,60 +80,9 @@ export default {
     data() {
         return {
             editMode: false,
-            profile: { oauth: { steam: {}}},
+            profile: { oauth: { steam: {} } },
             active: 'parks',
             selectedTags: [],
-            filterOptions: {
-                'coasters': {
-                label: 'Coasters',
-                type: 'list'
-                },
-                'rides': {
-                label: 'Rides',
-                type: 'list'
-                },
-                'shops': {
-                label: 'Shops',
-                type: 'list'
-                },
-                'facilities': {
-                label: 'Facilities & Utilities',
-                type: 'list'
-                },
-                'buildings': {
-                label: 'Buildings',
-                type: 'list',
-                visible: true
-                },
-                'scenery': {
-                label: 'Scenery',
-                type: 'list',
-                visible: true
-                },
-                'age-groups': {
-                label: 'Age Groups',
-                type: 'toggle',
-                },
-                'materials': {
-                label: 'Materials',
-                type: 'list'
-                },
-                'themes': {
-                label: 'Themes',
-                type: 'list'
-                },
-                'style': {
-                label: 'Styles',
-                type: 'list'
-                },
-                'content-packs': {
-                label: 'Content Packs',
-                type: 'list',
-                dlc: true,
-                visible: true,
-                force: true
-                },
-            }
         }
     },
     methods: {
@@ -143,7 +92,7 @@ export default {
             })
         }, 
         getOwned(model) {
-
+           
         },
         getPublic(model) {
 

@@ -51,6 +51,7 @@
     <vs-notify group="notifications"></vs-notify>
     <Toolbox v-if="user.authenticated" ref="toolbox"></Toolbox>
     <router-view></router-view>
+    <vue-progress-bar></vue-progress-bar>
 
     <Modal @close="closeLogin" :show="loginOpen">
       <div>
@@ -140,12 +141,42 @@ export default {
     }
   },
   created() {
+    this.$Progress.start()
     this.searchPlaceholder()
     this.$store.dispatch('fetchTags')
 
-    if(auth.checkAuth() && !this.user._id) {
+    // Initial Auth Check
+    if(auth.checkAuth() && auth.accessTokenExpired()) {
+      auth.refreshToken().then(() => {
+        this.$store.dispatch('refreshUser')
+      })
+    } else if(auth.checkAuth()) {
       this.$store.dispatch('refreshUser')
     }
+
+    // Init Progress Bar
+    this.$router.beforeEach((to, from, next) => {
+      //  does the page we want to go to have a meta.progress object
+      if (to.meta.progress !== undefined) {
+        let meta = to.meta.progress
+        // parse meta tags
+        this.$Progress.parseMeta(meta)
+      }
+      //  start the progress bar
+      this.$Progress.start()
+      //  continue to next page
+      next()
+    })
+
+    //  hook the progress bar to finish after we've finished moving router-view
+    this.$router.afterEach((to, from) => {
+      //  finish the progress bar
+      this.$Progress.finish()
+    })
+
+  },
+  mounted() {
+    this.$Progress.finish()
   }
 }
 </script>

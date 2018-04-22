@@ -183,6 +183,7 @@ export default {
     getBillboards (params = {}) {
       this.loading = true
       params = Object.assign(params, this.globalParams)
+      this.$Progress.set(50)
       return API.fetch('billboards', params).then((data) => {
         this.billboards = data.billboards
         this.loading = false
@@ -190,9 +191,9 @@ export default {
         this.pagination.pages = data.pages
         this.pagination.limit = data.limit
         this.pagination.current = data.page
-        
+        this.$Progress.finish()
       }).catch((err) => {
-
+        this.$Progress.fail()
       })
     },
     sortBillboards(sort) {
@@ -208,6 +209,8 @@ export default {
       })
     },
     filterBillboards(tags) {
+      this.$Progress.start()
+
       this.loading = true
       this.selectedTags = tags
 

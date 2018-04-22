@@ -30,6 +30,12 @@ Vue.use(VueAnalytics, {
   router
 })
 
+import ProgressBar from 'vue-progressbar'
+Vue.use(ProgressBar, {
+  color: '#FFD84D',
+  failedColor: '#FF1934'
+})
+
 import Raven from 'raven-js'
 import RavenVue from 'raven-js/plugins/vue'
 if(process.env.NODE_ENV == 'production') {
@@ -54,10 +60,6 @@ function classFromPath(path = '') {
 
 router.beforeEach((to, from, next) => {
 
-  let slug = classFromPath(to.name) || classFromPath(to.path)
-  document.body.className = ''
-  document.body.classList.add('page-'+slug)
-
   // http://router.vuejs.org/en/advanced/navigation-guards.html
   if(to.meta.auth === true) {
     if(auth.checkAuth() && auth.accessTokenExpired()) {
@@ -79,17 +81,23 @@ router.beforeEach((to, from, next) => {
     }
   }
 
-  if(to.name !== 'Home' && auth.checkAuth() && auth.accessTokenExpired()) {
-    return auth.refreshToken().then(() => {
-      console.log('Token refreshed')
-      return next()
-    }).catch((err) => {
-      console.log('error refreshing token, login again', err)
-      return next('/')
-    })
-  }
+  // if(to.name !== 'Home' && auth.checkAuth() && auth.accessTokenExpired()) {
+  //   return auth.refreshToken().then(() => {
+  //     console.log('Token refreshed')
+  //     return next()
+  //   }).catch((err) => {
+  //     console.log('error refreshing token, login again', err)
+  //     return next('/')
+  //   })
+  // }
 
   return next()
+})
+
+router.afterEach((to, from) => {
+  let slug = classFromPath(to.name) || classFromPath(to.path)
+  document.body.className = ''
+  document.body.classList.add('page-'+slug)
 })
 
 Vue.filter('truncate', function (text, length, clamp) {
