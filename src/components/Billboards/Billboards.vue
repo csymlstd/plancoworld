@@ -50,8 +50,8 @@
         <p class="field">Submit your safety signs and videos to the <strong>Safety First!</strong> billboard contest. <br /> Winner will receive the DLC of their choice!</p>
         
         <Login v-if="!isLoggedIn" class="field" :steamOnly="true"></Login>
-        <router-link :to="{ name: 'ImportBillboard', query: { tags: '5ad51d6d9d5d9ba67f9c4e11' } }" class="button is-primary is-inverted is-medium field" v-if="isLoggedIn">Submit a Billboard!</router-link>
-        <a href="/billboards?tags=5ad51d6d9d5d9ba67f9c4e11" class="button is-warning is-medium field" @click.prevent="filterBillboards([{ _id: '5ad51d6d9d5d9ba67f9c4e11' }])" v-if="isLoggedIn">Vote!</a>
+        <router-link :to="{ name: 'ImportBillboard', query: { tags: '5ad3c09b9bb394631b4dadbd' } }" class="button is-primary is-inverted is-medium field" v-if="isLoggedIn">Submit a Billboard!</router-link>
+        <a href="/billboards?tags=5ad3c09b9bb394631b4dadbd" class="button is-warning is-medium field" @click.prevent="filterBillboards([{ _id: '5ad51d6d9d5d9ba67f9c4e11' }])" v-if="isLoggedIn">Vote!</a>
         
         <div class="content is-small"><p>Contest ends June 1st 12AM CDT / 6AM BST. Maximum of 3 submissions.</p></div>
       </div>
