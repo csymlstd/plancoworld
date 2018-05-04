@@ -256,6 +256,13 @@ export default {
           min: 1,
           guide: 'billboards-and-adverising',
         },
+        'contests': {
+          label: 'Contest Submissions',
+          type:'list',
+          force: true,
+          visible: true,
+          max: 1,
+        },
         'language': {
           label: 'Language',
           type: 'list',
