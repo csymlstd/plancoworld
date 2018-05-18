@@ -173,9 +173,9 @@ export default new Router({
       component: require('@/components/Audio')
     },
     {
-      path: '/help',
-      name: 'Help',
-      component: require('@/components/Help')
+      path: '/rules',
+      name: 'Rules',
+      component: require('@/components/Rules')
     },
   ]
 })

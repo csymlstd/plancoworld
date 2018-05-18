@@ -61,7 +61,7 @@
 
     <footer class="main">
       <div class="container">
-        <p class="description">PlanCo World &copy; 2018. <br /> We are not affiliated with Planet Coaster, Frontier Developments or its licensors. <span class="planco" title="Buldcrefs">Trademarks</span> are the property of their respective owners.</p>
+        <p class="description">PlanCo World &copy; 2018. <router-link :to="{ name: 'Rules' }">Rules and Data Usage Policy</router-link> <br /> We are not affiliated with Planet Coaster, Frontier Developments or its licensors. <span class="planco" title="Buldcrefs">Trademarks</span> are the property of their respective owners.</p>
         <!-- <p class="description"><a @click="viewTerms = !viewTerms">Terms of Use</a></p> -->
       </div>
     </footer>
