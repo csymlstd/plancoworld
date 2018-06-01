@@ -45,15 +45,9 @@
 
       <div class="notification is-purp text-center" v-if="(pagination.current == 1 && (!globalParams.tags || globalParams.tags.indexOf('5ad3c09b9bb394631b4dadbd') > -1) ) && !hidePromo">
         <button class="delete" @click="hidePromo = true"></button>
-        <i class="fas fa-2x push-down-single fa-exclamation-triangle"></i> 
-        <h2 class="title is-4">Remain seated and keep your arms and legs inside the vehicle!</h2>
-        <p class="field">Submit your safety signs and videos to the <strong>Safety First!</strong> billboard contest. <br /> Winner will receive the DLC of their choice!</p>
-        
-        <Login v-if="!isLoggedIn" class="field" :steamOnly="true"></Login>
-        <router-link :to="{ name: 'ImportBillboard', query: { tags: '5ad3c09b9bb394631b4dadbd' } }" class="button is-primary is-inverted is-medium field" v-if="isLoggedIn">Submit a Billboard!</router-link>
-        <a href="/billboards?tags=5ad3c09b9bb394631b4dadbd" class="button is-warning is-medium field" @click.prevent="filterBillboards([{ _id: '5ad3c09b9bb394631b4dadbd' }])" v-if="isLoggedIn">Vote!</a>
-        
-        <div class="content is-small"><p>Contest ends June 1st 12AM CDT / 6AM BST. Maximum of 3 submissions.</p></div>
+        <i class="fas fa-2x field fa-exclamation-triangle"></i>
+        <h2 class="title is-4">Congrats to our first billboard contest winner &mdash; hot.wookie.pr0nz!</h2>
+        <a href="/billboards?tags=5ad3c09b9bb394631b4dadbd" class="button is-warning is-medium field" @click.prevent="filterBillboards([{ _id: '5ad3c09b9bb394631b4dadbd' }])" v-if="isLoggedIn">See the Billboards</a>        
       </div>
 
       <div class="columns cards is-multiline loader--parent">
