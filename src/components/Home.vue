@@ -27,11 +27,11 @@
           </div>
         </div> -->
 
-        <div class="notification is-purp text-center push-up-double">
+        <!-- <div class="notification is-purp text-center push-up-double">
           <i class="fas fa-2x field fa-exclamation-triangle"></i>
           <h2 class="title is-5">Congrats to our first billboard contest winner &mdash; hot.wookie.pr0nz!</strong></h2>
           <router-link :to="{ name: 'Billboards', query: { tags: '5ad3c09b9bb394631b4dadbd' } }" class="button is-primary is-inverted">Download the Billboards</router-link>
-        </div>
+        </div> -->
 
       </div>
     </div>

@@ -43,12 +43,12 @@
         <p>Unfortunately Safari does not play the webm videos that Planet Coaster uses for billboards. <br /> Use another browser like <i class="fab fa-chrome"></i> <span>Chrome</span> or <i class="fab fa-firefox"></i> <span>Firefox</span> to view them.</p>
       </div>
 
-      <div class="notification is-purp text-center" v-if="(pagination.current == 1 && (!globalParams.tags || globalParams.tags.indexOf('5ad3c09b9bb394631b4dadbd') > -1) ) && !hidePromo">
+      <!-- <div class="notification is-purp text-center" v-if="(pagination.current == 1 && (!globalParams.tags || globalParams.tags.indexOf('5ad3c09b9bb394631b4dadbd') > -1) ) && !hidePromo">
         <button class="delete" @click="hidePromo = true"></button>
         <i class="fas fa-2x field fa-exclamation-triangle"></i>
         <h2 class="title is-4">Congrats to our first billboard contest winner &mdash; hot.wookie.pr0nz!</h2>
         <a href="/billboards?tags=5ad3c09b9bb394631b4dadbd" class="button is-warning is-medium field" @click.prevent="filterBillboards([{ _id: '5ad3c09b9bb394631b4dadbd' }])" v-if="isLoggedIn">See the Billboards</a>        
-      </div>
+      </div> -->
 
       <div class="columns cards is-multiline loader--parent">
         <Loader v-if="loading"></Loader>
